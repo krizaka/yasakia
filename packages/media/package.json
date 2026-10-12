@@ -1,0 +1,20 @@
+{
+  "name": "@yazakia/media",
+  "version": "0.1.0",
+  "description": "Profile photos: Bunny Storage (or a local folder), signed upload URLs, Optimizer URLs signed for 300 s, image normalisation (orientation, metadata stripped, blurhash), PhotoModeration.",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "blurhash": "^2.0.5",
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.4"
+  }
+}

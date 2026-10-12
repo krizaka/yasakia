@@ -1,0 +1,9 @@
+{
+  "name": "@yazakia/config",
+  "version": "0.1.0",
+  "description": "Shared TypeScript presets of the workspace (ESLint comes from @krizaka/config).",
+  "private": true,
+  "files": [
+    "tsconfig"
+  ]
+}

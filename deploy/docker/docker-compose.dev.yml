@@ -1,0 +1,25 @@
+# Local PostgreSQL 16 with pgvector (the extensions cube and earthdistance ship with PostgreSQL's contrib).
+# Port 5435 and its own project name, so it runs next to the other Krizaka products' databases (Orochia's compose file
+# lives in a folder of the same name: without `name`, both would be the project "docker" and replace each other).
+name: yazakia
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: yazakia-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yazakia_user
+      POSTGRES_PASSWORD: yazakia_secret
+      POSTGRES_DB: yazakia_db
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - postgres_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yazakia_user -d yazakia_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_dev:

@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "siteName": "Yazakia",
+    "titleTemplate": "{title} — Yazakia",
+    "description": "Yazakia is the dating app where you talk first: an AI agent gets to know you, then opens small, mutual batches of profiles."
+  },
+  "chrome": {
+    "brandHome": "Yazakia on krizaka.com",
+    "navLabel": "Legal pages",
+    "nav": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "deleteAccount": "Delete your account"
+    },
+    "languageLabel": "Language",
+    "otherLanguage": "Français",
+    "themeToggle": "Switch between light and dark",
+    "footer": "Yazakia is an open-source product by <b>Krizaka</b>, made in Québec.",
+    "sourceCode": "Source code",
+    "contact": "Contact us",
+    "updated": "Last updated {date} · version {version}",
+    "onThisPage": "On this page"
+  },
+  "privacy": {
+    "metaTitle": "Privacy policy",
+    "eyebrow": "Privacy",
+    "title": "What Yazakia keeps about you, and for how long",
+    "lead": "A dating app learns personal things. Here is exactly what we store, where, for how long, and how it disappears — in plain words.",
+    "sections": [
+      {
+        "id": "principles",
+        "title": "Our principles",
+        "paragraphs": [
+          "<b>We keep the least we can.</b> Your position is rounded to about one kilometre on your phone's request, before it is written: your exact location never exists on our servers. We never read your contacts.",
+          "<b>What the agent learns is yours to change.</b> Your portrait — who you are, who you are looking for — can be corrected at any time, and every correction wins over what the agent guessed.",
+          "<b>Sensitive answers are encrypted at rest</b> (AES-256-GCM, a key per environment), and so is what you write in a report.",
+          "<b>Nothing you share trains a model.</b> Not your conversation with the agent, not your photos, not your messages — not ours, not anyone's.",
+          "<b>No score is ever shown</b>, and nobody sees your photos unless the two of you are in each other's batch or in an intro."
+        ]
+      },
+      {
+        "id": "what",
+        "title": "What we store",
+        "paragraphs": [
+          "<b>Your account</b>: your e-mail address (to send your sign-in codes), your language, your date of birth (checked once to make sure you are 18 or older; nobody else ever sees it), and when you accepted these terms.",
+          "<b>Your profile</b>: your first name or nickname, your gender and who you want to meet, the age range and distance you accept, what you are looking for, and your rounded position.",
+          "<b>Your photos</b>: re-encoded when you upload them, which removes every piece of metadata your phone added — including where the photo was taken.",
+          "<b>Your conversation with the agent and your portrait</b>: what you told the agent and what it understood, so the batches fit you better each time.",
+          "<b>Your batches, decisions and debriefs</b>: who was proposed to you, what you answered, and your debrief answers.",
+          "<b>Your intros</b>: the messages you exchange during an intro. The agent never reads them.",
+          "<b>Your safety actions</b>: the people you blocked and the reports you filed.",
+          "<b>Your phone's notification token</b>, so we can tell you when a batch is ready or someone wrote to you.",
+          "<b>The cost of the agent</b>: for each call to an AI model, its size and duration — never its content."
+        ]
+      },
+      {
+        "id": "where",
+        "title": "Where it is kept",
+        "paragraphs": [
+          "Our database and our servers run at DigitalOcean, in its Toronto region (Canada).",
+          "Photos are stored at Bunny.net and only ever served through links signed for one viewer, valid five minutes.",
+          "Sign-in codes are sent by e-mail through Mailgun. Notifications go through Expo to Apple or Google, which deliver them to your phone.",
+          "The conversation with the agent is processed by the AI model we configure: Orazaka, the sovereign AI platform built by Krizaka, or a hosted model whose contract forbids keeping or training on what it receives."
+        ]
+      },
+      {
+        "id": "retention",
+        "title": "How long we keep it",
+        "paragraphs": [
+          "<b>As long as your account exists</b> for your account, profile, portrait, conversation with the agent, batches and blocks — you can change or remove most of it from the app.",
+          "<b>Sign-in codes</b>: ten minutes. <b>Data exports</b> you ask for: 24 hours. <b>Notification tokens</b>: until you sign out, turn notifications off or uninstall the app.",
+          "<b>Intro messages</b>: as long as the intro exists; when either of you deletes their account, the intro and its messages disappear for both.",
+          "<b>Reports</b> are kept as long as safety reviews need them; when an account is deleted, the report no longer points to it.",
+          "<b>When you delete your account</b>, everything above is deleted at once, and your photos are removed from storage within 30 days at most — usually within minutes. What remains is a record that a deletion happened (a random identifier and its date), and the agent's cost figures without any link to you."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Your rights",
+        "paragraphs": [
+          "You can see, correct, export and delete your data at any time, from the app: <b>Settings → Download my data</b> gives you everything we hold about you as a file; <b>Settings → Delete my account</b> deletes it for good.",
+          "Québec's Law 25 and Europe's GDPR give you these rights and more (to object, to withdraw consent, to complain to the Commission d'accès à l'information du Québec or your own authority). Write to us for anything the app does not do yet: we answer within 30 days.",
+          "Krizaka's person in charge of the protection of personal information answers through our contact form."
+        ]
+      },
+      {
+        "id": "age",
+        "title": "Adults only",
+        "paragraphs": [
+          "Yazakia is for people aged 18 and over. We check the date of birth when an account is created and close any account we learn belongs to a minor."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "metaTitle": "Terms of use",
+    "eyebrow": "Terms",
+    "title": "The rules of Yazakia",
+    "lead": "Yazakia works because people are honest and kind to each other. These terms say what we expect from you, and what you can expect from us.",
+    "sections": [
+      {
+        "id": "who",
+        "title": "Who we are",
+        "paragraphs": [
+          "Yazakia is made by Krizaka, in Québec. The app is free; its code is open source under the Apache 2.0 licence."
+        ]
+      },
+      {
+        "id": "you",
+        "title": "Who can use Yazakia",
+        "paragraphs": [
+          "You must be 18 or older, use one account only, and be who you say you are: your photos show you, and only you; your name is yours.",
+          "You keep your sign-in codes to yourself. If you think someone else used your account, sign out everywhere from the settings and tell us."
+        ]
+      },
+      {
+        "id": "conduct",
+        "title": "How we treat each other",
+        "paragraphs": [
+          "No harassment, threats, hate, or pressure. No scams, requests for money, advertising or recruiting. No sexual content, and nothing involving a minor — ever; we report such content to the authorities.",
+          "Respect a no, a pass, or silence. An intro that fades is not a failure; insisting is.",
+          "When you meet someone, choose a public place, tell a friend, and leave whenever you want. We do not run background checks."
+        ]
+      },
+      {
+        "id": "agent",
+        "title": "The agent",
+        "paragraphs": [
+          "The agent is an AI. It helps you describe yourself and opens batches of people who could suit you — both ways. It can be wrong, it never gives medical, legal or financial advice, and it never talks about other members.",
+          "Nobody pays to skip a debrief or to get a bigger batch: the rules are the same for everyone."
+        ]
+      },
+      {
+        "id": "safety",
+        "title": "Blocks, reports and sanctions",
+        "paragraphs": [
+          "You can block or report anyone from their card, their profile or an intro. A block is immediate and invisible to the other person. A report is kept and reviewed; the person is never told who reported them.",
+          "We may hide a photo, freeze an intro, suspend or close an account that breaks these rules, and keep what a review needs."
+        ]
+      },
+      {
+        "id": "content",
+        "title": "What you share",
+        "paragraphs": [
+          "Your photos and words remain yours. You allow us to store them and show them to the people Yazakia introduces you to, only for as long as your account exists."
+        ]
+      },
+      {
+        "id": "end",
+        "title": "Leaving, and the rest",
+        "paragraphs": [
+          "You can pause your account or delete it at any time from the app. We may change these terms; when it matters, the app tells you before it applies.",
+          "Yazakia is provided as it is, without a promise of a match. These terms are governed by the laws of Québec and Canada."
+        ]
+      }
+    ]
+  },
+  "deleteAccount": {
+    "metaTitle": "Delete your account",
+    "eyebrow": "Your account",
+    "title": "Delete your Yazakia account",
+    "lead": "You can delete your account at any time, from the app, in a few seconds. It is permanent: everything that is yours disappears.",
+    "inAppTitle": "From the app",
+    "inAppSteps": [
+      "Open Yazakia and go to <b>Settings</b>.",
+      "Choose <b>Delete my account</b>.",
+      "Confirm. You are signed out and your account no longer exists."
+    ],
+    "withoutAppTitle": "Without the app",
+    "withoutApp": "If you no longer have the app, write to us from the e-mail address of your account through our contact form, asking us to delete it. We confirm the deletion within 30 days.",
+    "contactAction": "Ask for the deletion",
+    "deletedTitle": "What is deleted",
+    "deleted": [
+      "Immediately: your account, profile, rounded position, conversation with the agent and portrait, batches and debriefs, intros and their messages, blocks and notification tokens.",
+      "Within 30 days at most — usually within minutes: your photos, from our storage.",
+      "A confirmation is sent to your e-mail address."
+    ],
+    "keptTitle": "What remains",
+    "kept": [
+      "A record that a deletion happened: a random identifier and its date, nothing that identifies you.",
+      "Reports filed by or about you, for safety reviews, without any link to your account.",
+      "The cost figures of the agent's calls (size and duration, never their content), without any link to you."
+    ],
+    "exportHint": "Before you leave, you can download everything we hold about you: Settings → Download my data."
+  }
+}

@@ -1,0 +1,5 @@
+{content}
+
+—
+{footer}
+© {year} Yazakia · {appUrl}

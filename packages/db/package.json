@@ -1,0 +1,31 @@
+{
+  "name": "@yazakia/db",
+  "version": "0.1.0",
+  "description": "PostgreSQL 16 + pgvector schema (Drizzle, the source of truth), migrations and the bundled migrator, the process-wide pool, encryption at rest, development seed.",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx src/migrate.ts",
+    "seed": "tsx src/seed.ts",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "build:migrator": "esbuild src/migrate.ts --bundle --platform=node --target=node20 --external:pg-native --outfile=dist/migrate.cjs",
+    "check": "drizzle-kit check",
+    "studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.3",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/pg": "^8.11.8",
+    "drizzle-kit": "^0.31.11",
+    "esbuild": "^0.25.12",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "blurhash": "^2.0.5"
+  }
+}

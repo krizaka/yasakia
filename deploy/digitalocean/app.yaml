@@ -1,0 +1,138 @@
+# Yazakia API — DigitalOcean App Platform (production). Used to CREATE the app or change its structure only:
+#   doctl apps create --spec deploy/digitalocean/app.yaml
+#   doctl apps update <APP_ID> --spec deploy/digitalocean/app.yaml   # ⚠ can blank the SECRETs (no value here): check them afterwards
+# Secret values live in the app (Settings → Environment Variables), entered once. docs/DEPLOYMENT.md has the manual
+# prerequisites (Bunny zone `yazakia`, Mailgun domain, the domain) and the connection budget.
+name: yazakia
+region: tor
+domains:
+  - domain: api.yazakia.com
+    type: PRIMARY
+services:
+  - name: api
+    github:
+      repo: krizaka/yazakia
+      branch: production
+      deploy_on_push: true
+    dockerfile_path: deploy/docker/Dockerfile
+    source_dir: /
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: professional-xs
+    health_check:
+      http_path: /api/healthz
+      initial_delay_seconds: 15
+      period_seconds: 10
+      timeout_seconds: 5
+      failure_threshold: 3
+    routes:
+      - path: /
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_APP_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${APP_URL}
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${yazakia-db.DATABASE_URL}
+      # The direct connection for LISTEN — the same URL until a connection pool carries DATABASE_URL.
+      - key: DATABASE_DIRECT_URL
+        scope: RUN_TIME
+        value: ${yazakia-db.DATABASE_URL}
+      - key: DATABASE_CA_CERT
+        scope: RUN_TIME
+        value: ${yazakia-db.CA_CERT}
+      # One pool per instance (default 5). (instances + 1 during a rolling deploy) × (this + 1 LISTEN) + migrate + admin
+      # ≤ 70 % of the database's usable slots — docs/DEPLOYMENT.md, "Database connections".
+      - key: DATABASE_MAX_CONNECTIONS
+        scope: RUN_TIME
+        value: "5"
+      - key: SESSION_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATA_ENCRYPTION_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: STORAGE_DRIVER
+        scope: RUN_TIME
+        value: "bunny"
+      - key: BUNNY_STORAGE_ZONE
+        scope: RUN_TIME
+        value: "yazakia"
+      - key: BUNNY_STORAGE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: BUNNY_STORAGE_ENDPOINT
+        scope: RUN_TIME
+        type: GENERAL
+      - key: BUNNY_PULL_ZONE_HOSTNAME
+        scope: RUN_TIME
+        type: GENERAL
+      - key: BUNNY_TOKEN_AUTH_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: PHOTO_MODERATION
+        scope: RUN_TIME
+        value: "auto"
+      - key: MAILGUN_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MAILGUN_DOMAIN
+        scope: RUN_TIME
+        type: GENERAL
+      - key: MAIL_FROM
+        scope: RUN_TIME
+        type: GENERAL
+      - key: REALTIME_BUS
+        scope: RUN_TIME
+        value: "postgres"
+      - key: RATE_LIMIT_STORE
+        scope: RUN_TIME
+        value: "postgres"
+      - key: CLIENT_IP_HEADER
+        scope: RUN_TIME
+        value: "do-connecting-ip"
+      - key: YAZAKIA_ADMIN_API_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: ADMIN_ALLOWED_IPS
+        scope: RUN_TIME
+        type: GENERAL
+      - key: EXPO_ACCESS_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+
+jobs:
+  # Applies packages/db/drizzle before every release (bundled migrator, same image). The first one creates the
+  # extensions vector, cube and earthdistance: run it as the database owner (doadmin) or create them once by hand.
+  - name: migrate
+    kind: PRE_DEPLOY
+    github:
+      repo: krizaka/yazakia
+      branch: production
+    dockerfile_path: deploy/docker/Dockerfile
+    source_dir: /
+    run_command: node migrate.cjs
+    instance_size_slug: basic-xxs
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${yazakia-db.DATABASE_URL}
+      - key: DATABASE_DIRECT_URL
+        scope: RUN_TIME
+        value: ${yazakia-db.DATABASE_URL}
+      - key: DATABASE_CA_CERT
+        scope: RUN_TIME
+        value: ${yazakia-db.CA_CERT}
+
+databases:
+  # Managed PostgreSQL 16 cluster, created beforehand in the same region:
+  #   doctl databases create yazakia-pg --engine pg --version 16 --region tor1 --size db-s-1vcpu-1gb
+  - name: yazakia-db
+    engine: PG
+    version: "16"
+    production: true
+    cluster_name: yazakia-pg
+    db_name: yazakia_db
+    db_user: yazakia_user

@@ -1,0 +1,18 @@
+{
+  "notFoundMetaTitle": "Page introuvable",
+  "notFoundEyebrow": "Erreur 404",
+  "notFoundTitle": "Cette page n’existe pas",
+  "notFoundBody": "Yazakia vit dans son app. Sur le web, il n’y a que les pages ci-dessous.",
+  "serverMetaTitle": "Un problème est survenu",
+  "serverEyebrow": "Erreur",
+  "serverTitle": "Un problème est survenu de notre côté",
+  "serverBody": "Rien de ce qui est à toi n’est perdu. Réessaie dans un instant.",
+  "retry": "Réessayer",
+  "retrying": "Nouvel essai…",
+  "contact": "Nous écrire",
+  "reference": "Référence",
+  "privacy": "Confidentialité",
+  "terms": "Conditions",
+  "deleteAccount": "Supprimer ton compte",
+  "product": "Yazakia sur krizaka.com"
+}
