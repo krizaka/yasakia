@@ -54,7 +54,7 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 | `npm run db:up` / `db:down` | Start / stop PostgreSQL |
 | `npm run db:generate -- --name <what>` | SQL migration from a schema change (read it before committing) |
 | `npm run db:migrate` / `db:seed` / `db:status` | Apply migrations / the seed accounts (refuses production) / applied vs. pending, row counts |
-| `npm run db:reset -- --yes` | Drop the **local** schema, migrate, seed (refuses a non-local URL) |
+| `npm run db:reset -- --yes` | Drop the **local** schema of your branch's database, migrate, seed (refuses a non-local URL, the shared `yazakia_db` and `*_demo`; dumps first) |
 | `npm run db:studio` / `db:psql` / `db:dump` / `db:restore -- <file>` | Studio, psql, local backups |
 | `npm run docs:generate [-- --check]` | API + database references, architecture data, the krizaka.com sync |
 | `npm run workspace -- clone\|status\|pull` | The two repositories, side by side |
@@ -62,6 +62,11 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 
 - Destructive commands are **local-only by construction**: they refuse `NODE_ENV=production` and any `DATABASE_URL`
   whose host is not this machine, and act on **the database named in `DATABASE_URL`**.
+- **One database per branch (org rule).** A session or a worktree works on its own database, named from its branch
+  (`yazakia_<branch>`, `scripts/lib.mjs` `databaseForBranch`; `npm run setup` on a branch writes it into `.env` and
+  creates it) — never on the shared `yazakia_db`. `db:reset` and `db:restore` **refuse** `yazakia_db` and every
+  `*_demo` database (only `demo:seed` writes `*_demo`) and **dump the target to `backups/` before any destruction**
+  (`destructionRefusal`, tested in `scripts/db-guard.test.mjs`).
 
 ---
 

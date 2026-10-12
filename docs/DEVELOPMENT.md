@@ -18,7 +18,7 @@ description: The day-to-day of the Yazakia repository — commands, database lif
 | `npm run db:migrate` | Apply pending migrations |
 | `npm run db:seed` | The seed accounts (idempotent, refuses `NODE_ENV=production`) |
 | `npm run db:status` | Applied vs. pending migrations, row counts |
-| `npm run db:reset -- --yes` | Drop the **local** schema, migrate, seed (refuses a non-local URL) |
+| `npm run db:reset -- --yes` | Drop the **local** schema of your branch's database, migrate, seed (refuses a non-local URL, the shared `yazakia_db` and `*_demo`; dumps first) |
 | `npm run db:studio` / `db:psql` | Drizzle Studio / psql in the dev container |
 | `npm run db:dump` / `db:restore -- <file>` | Local backups in `backups/` (git-ignored) |
 | `npm run docs:generate [-- --check]` | API and database references, the architecture data, the krizaka.com sync |
@@ -26,8 +26,9 @@ description: The day-to-day of the Yazakia repository — commands, database lif
 | `npm run mail:templates:preview` | Every e-mail template and language rendered to `apps/web/.mail-preview/` |
 
 Destructive commands are local-only **by construction**: they refuse `NODE_ENV=production`, any `DATABASE_URL` whose
-host is not this machine, and they act on the database named in `DATABASE_URL` (a worktree on its own database never
-touches the shared `yazakia_db`).
+host is not this machine, and they act on the database named in `DATABASE_URL`. **One database per branch**: on a
+branch, `npm run setup` points `.env` at `yazakia_<branch>` and creates it; `db:reset` / `db:restore` refuse the shared
+`yazakia_db` and any `*_demo` database, and dump the target to `backups/` before destroying anything.
 
 The dev database is the Docker Compose project **`yazakia`** (container `yazakia-postgres-dev`, port 5435): it lives
 next to Orochia's (`orochia-postgres-dev`, 5432) and Orazaka's without touching them.

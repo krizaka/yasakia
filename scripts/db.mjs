@@ -2,6 +2,7 @@
 /**
  * Database lifecycle for development — `npm run db:<command>`:
  *   status   migrations applied vs. files, row counts of the main tables
+ * reset and restore refuse the shared yazakia_db and every *_demo database, and dump the target to backups/ first.
  *   reset    drops the local schema, re-applies every migration, re-seeds (asks for confirmation;
  *            `--yes` skips it). Refuses any non-local DATABASE_URL and NODE_ENV=production.
  *   psql     opens psql in the dev container
@@ -13,7 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline/promises";
 
-import { c, CONTAINER, databaseUrl, fail, isLocalDatabase, ok, ROOT, run, step, warn } from "./lib.mjs";
+import { c, CONTAINER, databaseUrl, destructionRefusal, fail, isLocalDatabase, ok, ROOT, run, step, warn } from "./lib.mjs";
 
 const [command, ...rest] = process.argv.slice(2);
 // The database and role of DATABASE_URL — never a hard-coded name: a worktree on its own database (e.g. yazakia_e2e)
@@ -37,6 +38,17 @@ function guardLocal(action) {
   }
 }
 
+/** Before any destruction: refuse the shared and demo databases, then dump the target to backups/ (automatic). */
+function guardDestruction(action) {
+  const refusal = destructionRefusal(target.name);
+  if (refusal) fail(`Refusing to ${action}: ${refusal}`);
+  fs.mkdirSync(path.join(ROOT, "backups"), { recursive: true });
+  const file = path.join(ROOT, "backups", `yazakia-${target.name}-before-${action.split(" ")[0]}-${new Date().toISOString().replace(/[:.]/g, "-")}.sql`);
+  const r = run("docker", ["exec", CONTAINER, "pg_dump", "-U", target.user, "-d", target.name, "--no-owner"], { quiet: true });
+  fs.writeFileSync(file, r.stdout);
+  ok(`Dumped ${target.name} first: ${path.relative(ROOT, file)}`);
+}
+
 const sqlOut = (query) => run("docker", [...PSQL, "-At", "-c", query], { quiet: true }).stdout.trim();
 
 switch (command) {
@@ -55,6 +67,7 @@ switch (command) {
   }
   case "reset": {
     guardLocal("reset the database");
+    guardDestruction("reset the database");
     if (!rest.includes("--yes")) {
       const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
       const answer = await rl.question(`${c.red(`This deletes every row of the local database ${target.name}.`)} Type "reset" to continue: `);
@@ -87,6 +100,7 @@ switch (command) {
   }
   case "restore": {
     guardLocal("restore the database");
+    guardDestruction("restore the database");
     const file = rest.find((a) => !a.startsWith("--"));
     if (!file || !fs.existsSync(file)) fail("Usage: npm run db:restore -- backups/<file>.sql");
     warn(`Restoring over the local database ${target.name}`);
