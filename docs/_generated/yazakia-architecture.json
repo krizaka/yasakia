@@ -1,0 +1,529 @@
+{
+  "product": "yazakia",
+  "title": "Yazakia Architecture",
+  "source": "generated from code by products/yazakia/scripts/generate-docs.mjs — do not hand-edit",
+  "repositories": [
+    {
+      "name": "yazakia",
+      "repo": "krizaka/yazakia",
+      "url": "https://github.com/krizaka/yazakia",
+      "port": 3000,
+      "role": "API (route handlers), packages (db, media), docs, legal pages — this repository"
+    },
+    {
+      "name": "yazakia-mobile",
+      "repo": "krizaka/yazakia-mobile",
+      "url": "https://github.com/krizaka/yazakia-mobile",
+      "port": 8081,
+      "role": "iOS and Android app (Expo) over the same API — the agent, the batch, the debrief, the intros"
+    }
+  ],
+  "modules": [
+    {
+      "id": "api",
+      "name": "API",
+      "path": "apps/web/app/api",
+      "features": [
+        "Route handlers — the only HTTP surface",
+        "Bearer sessions for the native app",
+        "Rate limits per account and per IP",
+        "Fail-closed configuration"
+      ]
+    },
+    {
+      "id": "web",
+      "name": "Legal pages",
+      "path": "apps/web/app/[locale]",
+      "features": [
+        "Privacy, terms, account deletion",
+        "English and French",
+        "@krizaka/ui, both themes"
+      ]
+    },
+    {
+      "id": "data",
+      "name": "Data",
+      "path": "packages/db",
+      "features": [
+        "PostgreSQL 16 + pgvector, cube, earthdistance",
+        "Drizzle schema and migrations",
+        "One named pool per process",
+        "AES-256-GCM sealed columns"
+      ],
+      "tables": [
+        "account_deletions",
+        "account_exports",
+        "accounts",
+        "agent_messages",
+        "agent_sessions",
+        "ai_calls",
+        "auth_codes",
+        "batch_items",
+        "batches",
+        "blocks",
+        "debriefs",
+        "facet_embeddings",
+        "facets",
+        "intro_messages",
+        "intros",
+        "pairs_seen",
+        "profile_photos",
+        "profiles",
+        "push_tokens",
+        "rate_limit_buckets",
+        "reports"
+      ]
+    },
+    {
+      "id": "media",
+      "name": "Photos",
+      "path": "packages/media",
+      "features": [
+        "Signed upload URLs (300 s)",
+        "Metadata stripped, blurhash computed",
+        "Bunny Optimizer URLs signed for one viewer (300 s)",
+        "PhotoModeration"
+      ]
+    },
+    {
+      "id": "realtime",
+      "name": "Realtime",
+      "path": "apps/web/lib/realtime.ts",
+      "features": [
+        "@krizaka/realtime — LISTEN/NOTIFY or Redis",
+        "Typed events: batch.ready, intro.opened, intro.message",
+        "Server-Sent Events"
+      ]
+    },
+    {
+      "id": "push",
+      "name": "Push",
+      "path": "apps/web/lib/push.ts",
+      "features": [
+        "@krizaka/push — Expo Push → FCM / APNs"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "postgres",
+      "name": "PostgreSQL 16 + pgvector",
+      "kind": "data store"
+    },
+    {
+      "id": "bunny",
+      "name": "Bunny Storage + Optimizer",
+      "kind": "media"
+    },
+    {
+      "id": "mailgun",
+      "name": "Mailgun",
+      "kind": "e-mail"
+    },
+    {
+      "id": "expo",
+      "name": "Expo Push (FCM, APNs)",
+      "kind": "push"
+    },
+    {
+      "id": "orazaka",
+      "name": "Orazaka (AI — next milestone)",
+      "kind": "ai"
+    }
+  ],
+  "tables": [
+    {
+      "name": "account_deletions",
+      "columns": 7,
+      "references": []
+    },
+    {
+      "name": "account_exports",
+      "columns": 7,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "accounts",
+      "columns": 13,
+      "references": []
+    },
+    {
+      "name": "agent_messages",
+      "columns": 6,
+      "references": [
+        "agent_sessions"
+      ]
+    },
+    {
+      "name": "agent_sessions",
+      "columns": 10,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "ai_calls",
+      "columns": 10,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "auth_codes",
+      "columns": 7,
+      "references": []
+    },
+    {
+      "name": "batch_items",
+      "columns": 8,
+      "references": [
+        "batches",
+        "accounts"
+      ]
+    },
+    {
+      "name": "batches",
+      "columns": 7,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "blocks",
+      "columns": 4,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "debriefs",
+      "columns": 5,
+      "references": [
+        "batches",
+        "accounts"
+      ]
+    },
+    {
+      "name": "facet_embeddings",
+      "columns": 6,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "facets",
+      "columns": 9,
+      "references": [
+        "accounts",
+        "agent_messages"
+      ]
+    },
+    {
+      "name": "intro_messages",
+      "columns": 6,
+      "references": [
+        "intros",
+        "accounts"
+      ]
+    },
+    {
+      "name": "intros",
+      "columns": 13,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "pairs_seen",
+      "columns": 3,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "profile_photos",
+      "columns": 14,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "profiles",
+      "columns": 14,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "push_tokens",
+      "columns": 5,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "rate_limit_buckets",
+      "columns": 3,
+      "references": []
+    },
+    {
+      "name": "reports",
+      "columns": 10,
+      "references": [
+        "accounts"
+      ]
+    }
+  ],
+  "apiEndpoints": [
+    {
+      "method": "GET",
+      "path": "/api/admin/reports",
+      "access": "operator · service token + IP allow-list",
+      "summary": "The reports for operators — urgent reasons (UNDERAGE, THREAT) first, details decrypted; service token and IP allow-list."
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "access": "bearer · account",
+      "summary": "Signs out: forgets this phone's push token, and with `everywhere` invalidates every session token of the account at once (the app also deletes its own token from secure storage)."
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/request-code",
+      "access": "public",
+      "summary": "Sends a 6-digit sign-in code to an e-mail address — the same answer whether an account exists or not."
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/verify",
+      "access": "public",
+      "summary": "Exchanges an e-mail code for a session token (`client: \"native\"`, sent back as `Authorization: Bearer`)."
+    },
+    {
+      "method": "GET",
+      "path": "/api/blocks",
+      "access": "bearer · account",
+      "summary": "The people the account blocked (the settings list), oldest first."
+    },
+    {
+      "method": "POST",
+      "path": "/api/blocks",
+      "access": "bearer · account",
+      "summary": "Blocks someone — immediate, invisible to them, mutual in effect: their intro closes and each leaves the other's current batch."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/blocks/{id}",
+      "access": "bearer · account",
+      "summary": "Lifts one of the account's blocks (what it closed stays closed); another account's block is a 404."
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "access": "bearer · account",
+      "summary": "The account's live events as Server-Sent Events — `batch.ready`, `intro.opened`, `intro.message` (ids only: the app fetches what changed) — with a heartbeat every 15 s, ending every 5 minutes (the app reconnects at once)."
+    },
+    {
+      "method": "GET",
+      "path": "/api/healthz",
+      "access": "public",
+      "summary": "Health of this instance: the database answers (503 when it does not) and whether the realtime bus hears the other instances."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/me",
+      "access": "bearer · account",
+      "summary": "Deletes the account for good, at once — every row that is theirs, in one transaction; the photos are purged from storage right after (retried until done, 30 days at most) and a confirmation e-mail leaves."
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "access": "bearer · account",
+      "summary": "The signed-in account: e-mail, status, language, age (never the date of birth), profile, rounded position, the agent's state."
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/me",
+      "access": "bearer · account",
+      "summary": "Changes the profile, the language, or pauses the account (nobody is shown it any more; its batches and intros stay open)."
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/export",
+      "access": "bearer · account",
+      "summary": "Everything the account holds, as JSON — at once when it takes under a second, else 202 with an export id to poll (`?id=`, kept 24 hours); `?mode=async` asks for the background build directly."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/location",
+      "access": "bearer · account",
+      "summary": "Sets the position from the phone's coordinates, rounded to about 1 km before it is written — the exact one is never stored; the answer is what was kept."
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/photos",
+      "access": "bearer · account",
+      "summary": "The account's own photos in their order, with status, size and blurhash — never a URL (GET /api/photos/{id} signs one)."
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/me/photos",
+      "access": "bearer · account",
+      "summary": "Reorders the photos: `order` lists each of the account's photos once, the first one first."
+    },
+    {
+      "method": "POST",
+      "path": "/api/me/photos",
+      "access": "bearer · account",
+      "summary": "Starts a photo: declares its type and size and answers a signed upload URL (PUT, 300 seconds, this photo only); then `PUT /api/me/photos/{id}/complete`."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/me/photos/{id}",
+      "access": "bearer · account",
+      "summary": "Removes one of the account's photos — from storage first, then from the profile (another account's photo is a 404)."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/photos/{id}/complete",
+      "access": "bearer · account",
+      "summary": "Completes an upload: checks the bytes are the declared picture, re-encodes them (orientation applied, metadata — GPS included — stripped), computes width, height and blurhash, then moderation (V1: approved automatically)."
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/{key…}",
+      "access": "signed media URL (300 s, development storage only)",
+      "summary": "Development storage only: serves a local photo at a URL `GET /api/photos/{id}` signed (300 seconds, one width) — what Bunny's pull zone and Optimizer do in production."
+    },
+    {
+      "method": "GET",
+      "path": "/api/photos/{id}",
+      "access": "bearer · account",
+      "summary": "A photo for the signed-in viewer — after the access rule (its owner; someone with the owner in a current batch; an open intro), a URL signed for 300 seconds at the asked width (`?w=`, snapped to 160…1280)."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/push/tokens",
+      "access": "bearer · account",
+      "summary": "Forgets this phone's push token (notifications turned off on the device)."
+    },
+    {
+      "method": "POST",
+      "path": "/api/push/tokens",
+      "access": "bearer · account",
+      "summary": "Registers this phone's Expo push token for the account (a phone that changed hands moves to the new account)."
+    },
+    {
+      "method": "POST",
+      "path": "/api/reports",
+      "access": "bearer · account",
+      "summary": "Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/uploads/photos/{id}",
+      "access": "signed upload URL (one photo, 300 s)",
+      "summary": "Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one."
+    }
+  ],
+  "enums": {
+    "account_status": [
+      "ACTIVE",
+      "PAUSED",
+      "SUSPENDED"
+    ],
+    "agent_message_role": [
+      "USER",
+      "AGENT",
+      "SYSTEM"
+    ],
+    "agent_state": [
+      "ONBOARDING",
+      "DISCOVERY",
+      "WAITING_POOL",
+      "BATCH_READY",
+      "BATCH_OPEN",
+      "DEBRIEF_DUE"
+    ],
+    "ai_call_purpose": [
+      "CHAT",
+      "EXTRACT",
+      "EMBED",
+      "PORTRAIT",
+      "REASONS",
+      "DEBRIEF",
+      "OPENER"
+    ],
+    "batch_decision": [
+      "INTERESTED",
+      "PASS",
+      "TELL_ME_MORE"
+    ],
+    "batch_status": [
+      "OPEN",
+      "DEBRIEF_DUE",
+      "DONE",
+      "EXPIRED"
+    ],
+    "embedding_kind": [
+      "SELF",
+      "SEEKING"
+    ],
+    "export_status": [
+      "PENDING",
+      "READY",
+      "FAILED"
+    ],
+    "gender": [
+      "WOMAN",
+      "MAN",
+      "NON_BINARY"
+    ],
+    "intro_state": [
+      "OPEN",
+      "CONTINUED",
+      "FADED",
+      "CLOSED"
+    ],
+    "locale": [
+      "en",
+      "fr"
+    ],
+    "photo_moderation_status": [
+      "UPLOADING",
+      "PENDING",
+      "APPROVED",
+      "REJECTED"
+    ],
+    "push_platform": [
+      "ios",
+      "android"
+    ],
+    "relationship_intent": [
+      "LONG_TERM",
+      "OPEN_TO_LONG_TERM",
+      "CASUAL",
+      "FRIENDSHIP_FIRST",
+      "NOT_SURE"
+    ],
+    "report_reason": [
+      "UNDERAGE",
+      "THREAT",
+      "HARASSMENT",
+      "HATE",
+      "SCAM",
+      "FAKE_PROFILE",
+      "INAPPROPRIATE_PHOTO",
+      "OFFLINE_BEHAVIOUR",
+      "OTHER"
+    ],
+    "report_status": [
+      "OPEN",
+      "REVIEWED",
+      "ACTIONED",
+      "DISMISSED"
+    ]
+  }
+}

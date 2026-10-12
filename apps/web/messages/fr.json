@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "siteName": "Yazakia",
+    "titleTemplate": "{title} — Yazakia",
+    "description": "Yazakia, l’app de rencontre où l’on parle d’abord : un agent IA apprend à te connaître, puis ouvre de petits lots de profils, compatibles dans les deux sens."
+  },
+  "chrome": {
+    "brandHome": "Yazakia sur krizaka.com",
+    "navLabel": "Pages légales",
+    "nav": {
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "deleteAccount": "Supprimer ton compte"
+    },
+    "languageLabel": "Langue",
+    "otherLanguage": "English",
+    "themeToggle": "Passer du thème clair au sombre",
+    "footer": "Yazakia est un produit open source de <b>Krizaka</b>, conçu au Québec.",
+    "sourceCode": "Code source",
+    "contact": "Nous écrire",
+    "updated": "Mis à jour le {date} · version {version}",
+    "onThisPage": "Sur cette page"
+  },
+  "privacy": {
+    "metaTitle": "Politique de confidentialité",
+    "eyebrow": "Confidentialité",
+    "title": "Ce que Yazakia garde de toi, et combien de temps",
+    "lead": "Une app de rencontre apprend des choses intimes. Voici exactement ce qu’on conserve, où, combien de temps, et comment ça disparaît — sans jargon.",
+    "sections": [
+      {
+        "id": "principles",
+        "title": "Nos principes",
+        "paragraphs": [
+          "<b>On garde le moins possible.</b> Ta position est arrondie à environ un kilomètre avant d’être enregistrée : ta localisation exacte n’existe nulle part sur nos serveurs. On ne lit jamais tes contacts.",
+          "<b>Ce que l’agent apprend t’appartient.</b> Ton portrait — qui tu es, qui tu cherches — se corrige à tout moment, et chaque correction l’emporte sur ce que l’agent avait deviné.",
+          "<b>Les réponses sensibles sont chiffrées au repos</b> (AES-256-GCM, une clé par environnement), tout comme ce que tu écris dans un signalement.",
+          "<b>Rien de ce que tu partages n’entraîne un modèle.</b> Ni ta conversation avec l’agent, ni tes photos, ni tes messages — ni chez nous, ni ailleurs.",
+          "<b>Aucun score n’est jamais affiché</b>, et personne ne voit tes photos à moins que vous soyez dans le lot l’un de l’autre ou en intro."
+        ]
+      },
+      {
+        "id": "what",
+        "title": "Ce qu’on conserve",
+        "paragraphs": [
+          "<b>Ton compte</b> : ton adresse courriel (pour t’envoyer tes codes de connexion), ta langue, ta date de naissance (vérifiée une fois pour s’assurer que tu as 18 ans ou plus ; personne d’autre ne la voit jamais) et le moment où tu as accepté ces conditions.",
+          "<b>Ton profil</b> : ton prénom ou ton surnom, ton genre et qui tu veux rencontrer, la tranche d’âge et la distance que tu acceptes, ce que tu cherches, et ta position arrondie.",
+          "<b>Tes photos</b> : réencodées à l’envoi, ce qui retire toutes les métadonnées ajoutées par ton téléphone — y compris l’endroit où la photo a été prise.",
+          "<b>Ta conversation avec l’agent et ton portrait</b> : ce que tu as dit à l’agent et ce qu’il en a compris, pour que chaque lot te ressemble un peu plus.",
+          "<b>Tes lots, tes décisions et tes débriefs</b> : qui t’a été proposé, ce que tu as répondu, et tes réponses au débrief.",
+          "<b>Tes intros</b> : les messages que vous échangez pendant une intro. L’agent ne les lit jamais.",
+          "<b>Tes gestes de sécurité</b> : les personnes que tu as bloquées et les signalements que tu as faits.",
+          "<b>Le jeton de notification de ton téléphone</b>, pour te prévenir quand un lot est prêt ou qu’on t’a écrit.",
+          "<b>Le coût de l’agent</b> : pour chaque appel à un modèle d’IA, sa taille et sa durée — jamais son contenu."
+        ]
+      },
+      {
+        "id": "where",
+        "title": "Où c’est conservé",
+        "paragraphs": [
+          "Notre base de données et nos serveurs tournent chez DigitalOcean, dans sa région de Toronto (Canada).",
+          "Les photos sont stockées chez Bunny.net et ne sont servies que par des liens signés pour une seule personne, valables cinq minutes.",
+          "Les codes de connexion partent par courriel avec Mailgun. Les notifications passent par Expo vers Apple ou Google, qui les livrent à ton téléphone.",
+          "La conversation avec l’agent est traitée par le modèle d’IA que nous configurons : Orazaka, la plateforme d’IA souveraine construite par Krizaka, ou un modèle hébergé dont le contrat interdit de conserver ce qu’il reçoit ou de s’en servir pour s’entraîner."
+        ]
+      },
+      {
+        "id": "retention",
+        "title": "Combien de temps",
+        "paragraphs": [
+          "<b>Tant que ton compte existe</b> pour ton compte, ton profil, ton portrait, ta conversation avec l’agent, tes lots et tes blocages — tu peux modifier ou retirer presque tout depuis l’app.",
+          "<b>Codes de connexion</b> : dix minutes. <b>Exports de données</b> que tu demandes : 24 heures. <b>Jetons de notification</b> : jusqu’à ce que tu te déconnectes, coupes les notifications ou désinstalles l’app.",
+          "<b>Messages d’intro</b> : tant que l’intro existe ; quand l’un de vous deux supprime son compte, l’intro et ses messages disparaissent pour les deux.",
+          "<b>Signalements</b> : conservés tant que les vérifications de sécurité en ont besoin ; quand un compte est supprimé, le signalement ne pointe plus vers lui.",
+          "<b>Quand tu supprimes ton compte</b>, tout ce qui précède est supprimé sur-le-champ, et tes photos sont retirées de notre stockage en 30 jours au plus — en général en quelques minutes. Il ne reste qu’une trace qu’une suppression a eu lieu (un identifiant aléatoire et sa date), et les chiffres de coût de l’agent, sans lien avec toi."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Tes droits",
+        "paragraphs": [
+          "Tu peux consulter, corriger, exporter et supprimer tes données à tout moment depuis l’app : <b>Réglages → Télécharger mes données</b> te donne dans un fichier tout ce qu’on détient sur toi ; <b>Réglages → Supprimer mon compte</b> le supprime pour de bon.",
+          "La Loi 25 du Québec et le RGPD européen te donnent ces droits et d’autres (t’opposer, retirer ton consentement, porter plainte auprès de la Commission d’accès à l’information du Québec ou de ton autorité). Écris-nous pour tout ce que l’app ne fait pas encore : on répond en 30 jours.",
+          "La personne responsable de la protection des renseignements personnels chez Krizaka répond par notre formulaire de contact."
+        ]
+      },
+      {
+        "id": "age",
+        "title": "Réservé aux adultes",
+        "paragraphs": [
+          "Yazakia est réservé aux personnes de 18 ans et plus. On vérifie la date de naissance à la création du compte et on ferme tout compte dont on apprend qu’il appartient à une personne mineure."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "metaTitle": "Conditions d’utilisation",
+    "eyebrow": "Conditions",
+    "title": "Les règles de Yazakia",
+    "lead": "Yazakia fonctionne parce que les gens sont honnêtes et bienveillants entre eux. Ces conditions disent ce qu’on attend de toi, et ce que tu peux attendre de nous.",
+    "sections": [
+      {
+        "id": "who",
+        "title": "Qui nous sommes",
+        "paragraphs": [
+          "Yazakia est conçu par Krizaka, au Québec. L’app est gratuite ; son code est ouvert, sous licence Apache 2.0."
+        ]
+      },
+      {
+        "id": "you",
+        "title": "Qui peut utiliser Yazakia",
+        "paragraphs": [
+          "Tu dois avoir 18 ans ou plus, n’utiliser qu’un seul compte et être qui tu dis être : tes photos te montrent, toi seul·e ; ton prénom est le tien.",
+          "Tes codes de connexion restent à toi. Si tu penses que quelqu’un d’autre a utilisé ton compte, déconnecte-toi partout depuis les réglages et préviens-nous."
+        ]
+      },
+      {
+        "id": "conduct",
+        "title": "Comment on se traite",
+        "paragraphs": [
+          "Pas de harcèlement, de menaces, de haine ni de pression. Pas d’arnaque, de demande d’argent, de publicité ni de recrutement. Pas de contenu sexuel, et jamais rien qui implique une personne mineure ; ce genre de contenu est signalé aux autorités.",
+          "Respecte un non, une passe ou un silence. Une intro qui s’éteint n’est pas un échec ; insister, si.",
+          "Quand tu rencontres quelqu’un, choisis un lieu public, préviens un·e ami·e et pars quand tu veux. Nous ne faisons pas de vérification d’antécédents."
+        ]
+      },
+      {
+        "id": "agent",
+        "title": "L’agent",
+        "paragraphs": [
+          "L’agent est une IA. Il t’aide à te décrire et ouvre des lots de personnes qui pourraient te convenir — dans les deux sens. Il peut se tromper, ne donne jamais de conseil médical, juridique ou financier, et ne parle jamais des autres membres.",
+          "Personne ne paie pour sauter un débrief ou agrandir son lot : les règles sont les mêmes pour tout le monde."
+        ]
+      },
+      {
+        "id": "safety",
+        "title": "Blocages, signalements et sanctions",
+        "paragraphs": [
+          "Tu peux bloquer ou signaler n’importe qui depuis sa carte, son profil ou une intro. Un blocage est immédiat et invisible pour l’autre. Un signalement est conservé et examiné ; la personne ne sait jamais qui l’a signalée.",
+          "Nous pouvons masquer une photo, geler une intro, suspendre ou fermer un compte qui enfreint ces règles, et conserver ce qu’une vérification exige."
+        ]
+      },
+      {
+        "id": "content",
+        "title": "Ce que tu partages",
+        "paragraphs": [
+          "Tes photos et tes mots restent à toi. Tu nous permets de les conserver et de les montrer aux personnes que Yazakia te présente, seulement tant que ton compte existe."
+        ]
+      },
+      {
+        "id": "end",
+        "title": "Partir, et le reste",
+        "paragraphs": [
+          "Tu peux mettre ton compte en pause ou le supprimer à tout moment depuis l’app. Ces conditions peuvent changer ; quand c’est important, l’app te prévient avant que ça s’applique.",
+          "Yazakia est fourni tel quel, sans promesse de rencontre. Ces conditions sont régies par les lois du Québec et du Canada."
+        ]
+      }
+    ]
+  },
+  "deleteAccount": {
+    "metaTitle": "Supprimer ton compte",
+    "eyebrow": "Ton compte",
+    "title": "Supprimer ton compte Yazakia",
+    "lead": "Tu peux supprimer ton compte à tout moment, depuis l’app, en quelques secondes. C’est définitif : tout ce qui est à toi disparaît.",
+    "inAppTitle": "Depuis l’app",
+    "inAppSteps": [
+      "Ouvre Yazakia et va dans <b>Réglages</b>.",
+      "Choisis <b>Supprimer mon compte</b>.",
+      "Confirme. Tu es déconnecté·e et ton compte n’existe plus."
+    ],
+    "withoutAppTitle": "Sans l’app",
+    "withoutApp": "Si tu n’as plus l’app, écris-nous depuis l’adresse courriel de ton compte, par notre formulaire de contact, pour demander sa suppression. On confirme la suppression en 30 jours au plus.",
+    "contactAction": "Demander la suppression",
+    "deletedTitle": "Ce qui est supprimé",
+    "deleted": [
+      "Sur-le-champ : ton compte, ton profil, ta position arrondie, ta conversation avec l’agent et ton portrait, tes lots et tes débriefs, tes intros et leurs messages, tes blocages et tes jetons de notification.",
+      "En 30 jours au plus — en général en quelques minutes : tes photos, de notre stockage.",
+      "Une confirmation est envoyée à ton adresse courriel."
+    ],
+    "keptTitle": "Ce qui reste",
+    "kept": [
+      "Une trace qu’une suppression a eu lieu : un identifiant aléatoire et sa date, rien qui t’identifie.",
+      "Les signalements faits par toi ou sur toi, pour les vérifications de sécurité, sans lien avec ton compte.",
+      "Les chiffres de coût des appels de l’agent (taille et durée, jamais leur contenu), sans lien avec toi."
+    ],
+    "exportHint": "Avant de partir, tu peux télécharger tout ce qu’on détient sur toi : Réglages → Télécharger mes données."
+  }
+}

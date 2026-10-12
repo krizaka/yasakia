@@ -1,0 +1,18 @@
+{
+  "notFoundMetaTitle": "Page not found",
+  "notFoundEyebrow": "Error 404",
+  "notFoundTitle": "This page does not exist",
+  "notFoundBody": "Yazakia lives in its app. On the web, there are only the pages below.",
+  "serverMetaTitle": "Something went wrong",
+  "serverEyebrow": "Error",
+  "serverTitle": "Something went wrong on our side",
+  "serverBody": "Nothing of yours is lost. Try again in a moment.",
+  "retry": "Try again",
+  "retrying": "Trying again…",
+  "contact": "Contact us",
+  "reference": "Reference",
+  "privacy": "Privacy",
+  "terms": "Terms",
+  "deleteAccount": "Delete your account",
+  "product": "Yazakia on krizaka.com"
+}

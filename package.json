@@ -1,0 +1,61 @@
+{
+  "name": "yazakia-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Yazakia \u2014 the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/web",
+    "lint": "npm run lint --workspaces --if-present && npm run check:i18n && npm run ratchet",
+    "check:i18n": "krizaka-i18n check apps/web/messages && krizaka-i18n check apps/web/messages/errors && krizaka-i18n scan apps/web/app apps/web/components --allow Yazakia,YAZAKIA,Krizaka,KRIZAKA,Bunny --skip /app/api/",
+    "ratchet": "krizaka-ratchet",
+    "ratchet:update": "krizaka-ratchet --update",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "node e2e/run.mjs",
+    "check": "npm run lint && npm run typecheck && npm test && npm run docs:generate -- --check",
+    "db:up": "docker compose -f deploy/docker/docker-compose.dev.yml up -d --wait",
+    "db:down": "docker compose -f deploy/docker/docker-compose.dev.yml down",
+    "db:generate": "npm run generate --workspace=packages/db --",
+    "db:migrate": "npm run migrate --workspace=packages/db",
+    "db:seed": "npm run seed --workspace=packages/db",
+    "db:check": "npm run check --workspace=packages/db",
+    "db:studio": "npm run studio --workspace=packages/db",
+    "db:status": "node scripts/db.mjs status",
+    "db:reset": "node scripts/db.mjs reset",
+    "db:psql": "node scripts/db.mjs psql",
+    "db:dump": "node scripts/db.mjs dump",
+    "db:restore": "node scripts/db.mjs restore",
+    "docs:generate": "node scripts/generate-docs.mjs",
+    "workspace": "node scripts/workspace.mjs",
+    "mail:templates:preview": "tsx apps/web/scripts/mail-templates.ts"
+  },
+  "keywords": [
+    "dating-app",
+    "ai-agent",
+    "matching",
+    "pgvector",
+    "nextjs",
+    "drizzle-orm",
+    "open-source"
+  ],
+  "author": "Krizaka Core Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@krizaka/i18n": "^0.1.0",
+    "pg": "^8.12.0",
+    "sharp": "^0.34.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

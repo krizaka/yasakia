@@ -1,0 +1,5 @@
+Ton code de connexion : {code}
+
+Entre-le dans l’app Yazakia. Il fonctionne une seule fois, pendant {minutes} minutes. Personne chez Yazakia ne te le demandera jamais.
+
+Si tu n’as pas demandé de code, ignore ce message : rien ne se passe sans lui.
