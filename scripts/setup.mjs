@@ -5,6 +5,8 @@
  *   2. creates .env from .env.example with a fresh SESSION_SECRET and DATA_ENCRYPTION_KEY (an existing .env is kept,
  *      and a missing secret is added to it)
  *   3. starts PostgreSQL 16 + pgvector (deploy/docker/docker-compose.dev.yml, port 5435) and waits for it
+ *      — on a branch (a session, a worktree), DATABASE_URL names the branch's own database (`yazakia_<branch>`), never
+ *      the shared yazakia_db
  *   4. installs dependencies if needed, applies migrations, seeds the development data
  * Safe to run again at any time: every step is idempotent.
  */
@@ -12,7 +14,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-import { c, COMPOSE, databaseUrl, fail, isLocalDatabase, ok, readEnv, ROOT, run, step, waitForPostgres } from "./lib.mjs";
+import { c, COMPOSE, CONTAINER, currentBranch, databaseForBranch, databaseUrl, fail, isLocalDatabase, ok, readEnv, ROOT, run, SHARED_DATABASE, step, waitForPostgres } from "./lib.mjs";
 
 step("Prerequisites");
 const major = Number(process.versions.node.split(".")[0]);
@@ -31,7 +33,10 @@ const SECRETS = {
 if (!fs.existsSync(envFile)) {
   let text = fs.readFileSync(path.join(ROOT, ".env.example"), "utf8");
   for (const [name, make] of Object.entries(SECRETS)) text = text.replace(new RegExp(`^${name}=\\s*$`, "m"), `${name}=${make()}`);
+  const own = databaseForBranch(currentBranch());
+  if (own !== SHARED_DATABASE) text = text.replace(/^(DATABASE_URL=.*\/)yazakia_db(\?.*)?$/m, `$1${own}$2`);
   fs.writeFileSync(envFile, text);
+  if (own !== SHARED_DATABASE) ok(`this branch works on its own database: ${own}`);
   ok(`.env created from .env.example with a generated ${Object.keys(SECRETS).join(" and ")}`);
 } else {
   const current = readEnv(envFile);
@@ -53,6 +58,14 @@ step("PostgreSQL 16 + pgvector");
 run("docker", [...COMPOSE, "up", "-d", "--wait"], { allowFail: true }).status === 0 || run("docker", [...COMPOSE, "up", "-d"]);
 await waitForPostgres();
 ok("PostgreSQL is ready on localhost:5435");
+{
+  const name = decodeURIComponent(new URL(process.env.DATABASE_URL || readEnv().DATABASE_URL || databaseUrl()).pathname.slice(1));
+  if (/^[a-z0-9_]{1,63}$/.test(name) && name !== SHARED_DATABASE) {
+    const exists = run("docker", ["exec", CONTAINER, "psql", "-U", "yazakia_user", "-d", SHARED_DATABASE, "-Atc", `select 1 from pg_database where datname = '${name}'`], { quiet: true }).stdout.trim();
+    if (!exists) run("docker", ["exec", CONTAINER, "createdb", "-U", "yazakia_user", name], { quiet: true });
+    ok(`database ${name} ready`);
+  }
+}
 
 step("Dependencies");
 if (fs.existsSync(path.join(ROOT, "node_modules"))) ok("node_modules present (run `npm install` after pulling)");

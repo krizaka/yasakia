@@ -83,3 +83,32 @@ export async function waitForPostgres(timeoutMs = 60_000) {
   }
   fail(`PostgreSQL did not become ready in time (docker logs ${CONTAINER})`);
 }
+
+/** The shared development database: every session and worktree works on its own, never on this one. */
+export const SHARED_DATABASE = "yazakia_db";
+
+/**
+ * The database of a branch: `yazakia_<branch>` (lower-case, [a-z0-9_], at most 63 characters) — `main` (or no branch)
+ * keeps the shared one. A session or a worktree on `feat/photos` works on `yazakia_feat_photos`.
+ */
+export function databaseForBranch(branch) {
+  if (!branch || branch === "main" || branch === "HEAD") return SHARED_DATABASE;
+  const slug = branch.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  return `yazakia_${slug}`.slice(0, 63);
+}
+
+/**
+ * Why a destructive command (reset, restore) refuses a database, or null when it may go on: never the shared
+ * database, never a demo database (`*_demo` — only `demo:seed` writes those).
+ */
+export function destructionRefusal(name) {
+  if (name === SHARED_DATABASE) return `${name} is the shared database — work on your branch's (npm run setup on a branch creates it)`;
+  if (/_demo$/.test(name)) return `${name} is a demo database — only demo:seed rebuilds it`;
+  return null;
+}
+
+/** The current git branch, or null. */
+export function currentBranch() {
+  const r = spawnSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd: ROOT, encoding: "utf8" });
+  return r.status === 0 ? r.stdout.trim() : null;
+}
