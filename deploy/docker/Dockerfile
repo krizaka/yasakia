@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # Yazakia API — production image: the Next.js standalone server + the bundled migrator (PRE_DEPLOY job).
 # -------------------------------------------------------------
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -28,7 +28,7 @@ RUN npm run build --workspace=@yazakia/web
 RUN npm run build:migrator --workspace=@yazakia/db
 
 # 3. Run
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
