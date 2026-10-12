@@ -220,6 +220,11 @@ yazakia/                           npm workspaces — Apache-2.0
 
 ## 7. Testing
 
+- **No test, not done.** Every feature and every fix ships with its tests in the same pull request: a unit test for
+  logic, a scenario in `e2e/scenarios.mjs` for a route or a flow, a render test for a component's states.
+- **A fix starts with a failing test** that reproduces the bug; the fix turns it green and the test stays as the guard.
+- **CI runs them all on every pull request and must be green** before merge. A test is never skipped, weakened or
+  deleted to get there.
 - **Unit** (`npm test`, Vitest): pure logic — tokens and codes, 18+, rounding, the photo access rule, crypto and
   rotation, signatures, image normalisation, storage, mail, rate limits, the realtime door, the pool, configuration.
 - **Realtime contract** (`REALTIME_IT=1`, CI with PostgreSQL + Valkey): two buses stand for two instances.
@@ -256,6 +261,7 @@ yazakia/                           npm workspaces — Apache-2.0
 3. New behaviour has scenarios in `e2e/scenarios.mjs`, and `npm run test:e2e` passes.
 4. The invariants of §3 still hold; no credential, demo shortcut, fake profile or score reaches production code.
 5. Web page changes are checked at phone and desktop widths, in both themes and both languages.
+6. The change ships with its tests (§7) — a fix with the test that failed before it.
 
 ---
 
