@@ -21,7 +21,7 @@ export function mediaStorage(config: MediaConfig = mediaConfig()): MediaStorage 
   return holder.__yazakiaStorage.storage;
 }
 
-/** The HMAC key of the API's own signatures (uploads, local media), derived from SESSION_SECRET for this purpose only. */
+/** The HMAC key of the API's own signatures (uploads, local media), derived from AUTH_SESSION_SECRET for this purpose only. */
 export function mediaSecret(): string {
   return crypto.createHash("sha256").update(`yazakia-media:${sessionSecret()}`).digest("hex");
 }

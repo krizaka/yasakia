@@ -6,7 +6,7 @@ import { HttpError } from "./http";
 
 /**
  * Fixed-window rate limits (sign-in codes, uploads, reports, blocks, exports…). The counters live in a
- * {@link RateLimitStore}, chosen by `RATE_LIMIT_STORE`:
+ * {@link RateLimitStore}, chosen by `ABUSE_RATE_LIMIT_STORE`:
  * - `memory` (default): per instance — counters reset on restart and are NOT shared: fine for one instance only;
  * - `postgres`: one upsert per check on `rate_limit_buckets`, shared by every instance — required before a second one.
  * A store that fails lets the request through (logged): a limiter outage must not take the API down.
@@ -65,11 +65,11 @@ export function postgresStore(): RateLimitStore {
 
 const holder = globalThis as unknown as { __yazakiaRateLimit?: RateLimitStore };
 
-/** The configured store (RATE_LIMIT_STORE=memory|postgres), one per process. */
+/** The configured store (ABUSE_RATE_LIMIT_STORE=memory|postgres), one per process. */
 export function rateLimitStore(env: Record<string, string | undefined> = process.env): RateLimitStore {
   if (holder.__yazakiaRateLimit) return holder.__yazakiaRateLimit;
-  const kind = env.RATE_LIMIT_STORE?.trim().toLowerCase() || "memory";
-  if (kind !== "memory" && kind !== "postgres") throw new Error(`RATE_LIMIT_STORE must be "memory" or "postgres", not "${kind}"`);
+  const kind = env.ABUSE_RATE_LIMIT_STORE?.trim().toLowerCase() || "memory";
+  if (kind !== "memory" && kind !== "postgres") throw new Error(`ABUSE_RATE_LIMIT_STORE must be "memory" or "postgres", not "${kind}"`);
   holder.__yazakiaRateLimit = kind === "postgres" ? postgresStore() : memoryStore();
   return holder.__yazakiaRateLimit;
 }

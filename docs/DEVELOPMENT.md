@@ -50,7 +50,7 @@ Never edit an applied migration: fix forward. Migration `0000_extensions` (hand-
   storage adapters, mail templates and delivery, rate limits, the realtime door, the database pool (one per process,
   named, small), fail-closed configuration.
 - **Realtime contract** (`REALTIME_IT=1 npx vitest run apps/web/lib/realtime.integration.test.ts`, with `DATABASE_URL`
-  and optionally `REDIS_URL`): two buses stand for two instances.
+  and optionally `REALTIME_REDIS_URL`): two buses stand for two instances.
 - **End-to-end** (`npm run test:e2e`): `e2e/scenarios.mjs` drives the real API with real sessions on PostgreSQL — sign-up
   (18+ server-side), sign-in, tokens and their revocation, profile, rounded position, photos (signed upload, metadata
   stripped, signed view, who may see them), blocks, reports (encrypted; operators behind token + allow-list), push

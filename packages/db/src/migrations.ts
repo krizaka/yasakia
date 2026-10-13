@@ -68,11 +68,11 @@ export async function applyMigrations(pool: Pool, migrations: Migration[]): Prom
 
 /**
  * Whether this deployment's database may be wiped (a development deployment whose migration history was squashed):
- * only when YAZAKIA_ALLOW_DATABASE_RESET=true, and never with NODE_ENV=production and APP_ENV=production, whatever the
+ * only when DATABASE_ALLOW_RESET=true, and never with NODE_ENV=production and APP_ENV=production, whatever the
  * flag says.
  */
 export function databaseResetAllowed(env: Record<string, string | undefined> = process.env): boolean {
-  const asked = env.YAZAKIA_ALLOW_DATABASE_RESET === "true";
+  const asked = env.DATABASE_ALLOW_RESET === "true";
   const production = env.NODE_ENV === "production" && (env.NEXT_PUBLIC_APP_ENV ?? "production") === "production";
   return asked && !production;
 }

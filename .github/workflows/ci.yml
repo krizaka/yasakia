@@ -62,9 +62,9 @@ jobs:
       - name: Bundled production migrator (creates vector, cube, earthdistance, then the schema)
         run: |
           npm run build:migrator -w packages/db
-          MIGRATIONS_DIR=packages/db/drizzle node packages/db/dist/migrate.cjs
+          DATABASE_MIGRATIONS_DIR=packages/db/drizzle node packages/db/dist/migrate.cjs
       - name: Migrations are idempotent
-        run: MIGRATIONS_DIR=packages/db/drizzle node packages/db/dist/migrate.cjs
+        run: DATABASE_MIGRATIONS_DIR=packages/db/drizzle node packages/db/dist/migrate.cjs
       - name: Development seed loads (twice — idempotent)
         run: npm run db:seed && npm run db:seed
 
@@ -90,17 +90,17 @@ jobs:
     env:
       DATABASE_URL: postgresql://yazakia_user:yazakia_secret@localhost:5432/yazakia_db
       # The scenarios' settings (e2e/run.mjs E2E_ENV) — test values, no real secret anywhere.
-      SESSION_SECRET: ci-only-session-secret-0123456789abcdef0123456789
-      DATA_ENCRYPTION_KEY: Y2ktb25seS1kYXRhLWVuY3J5cHRpb24ta2V5LTMyYnk=
+      AUTH_SESSION_SECRET: ci-only-session-secret-0123456789abcdef0123456789
+      DATABASE_ENCRYPTION_KEY: Y2ktb25seS1kYXRhLWVuY3J5cHRpb24ta2V5LTMyYnk=
       MAIL_DELIVERY: file
       MAIL_OUTBOX_DIR: ${{ github.workspace }}/.mail-outbox
-      STORAGE_DRIVER: local
-      STORAGE_LOCAL_DIR: ${{ github.workspace }}/.storage
-      YAZAKIA_ADMIN_API_TOKEN: e2e-only-operator-token-0123456789abcdef0123
-      ADMIN_ALLOWED_IPS: 203.0.113.7
-      ACCOUNT_PURGE_INTERVAL_SECONDS: "1"
+      MEDIA_STORAGE_PROVIDER: local
+      MEDIA_STORAGE_LOCAL_DIR: ${{ github.workspace }}/.storage
+      OPERATOR_API_TOKEN: e2e-only-operator-token-0123456789abcdef0123
+      OPERATOR_ALLOWED_IPS: 203.0.113.7
+      APP_ACCOUNT_PURGE_INTERVAL_SECONDS: "1"
       REALTIME_BUS: postgres
-      RATE_LIMIT_STORE: postgres
+      ABUSE_RATE_LIMIT_STORE: postgres
       NEXT_PUBLIC_APP_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
@@ -114,7 +114,7 @@ jobs:
         run: npx vitest run apps/web/lib/realtime.integration.test.ts
         env:
           REALTIME_IT: "1"
-          REDIS_URL: redis://localhost:6379
+          REALTIME_REDIS_URL: redis://localhost:6379
       - run: npm run db:seed
       - name: Start the API (development server)
         run: |
@@ -123,6 +123,6 @@ jobs:
       - name: Scenarios
         run: npm run test:e2e
         env:
-          YAZAKIA_URL: http://localhost:3000
+          APP_URL: http://localhost:3000
       - if: failure()
         run: tail -200 web.log

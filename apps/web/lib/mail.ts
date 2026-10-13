@@ -5,7 +5,7 @@ import { appUrl, ConfigurationError, isProduction } from "./env";
 import { type MailTemplateId, type MailVars, renderMailTemplate } from "./mail-templates";
 
 /**
- * Transactional e-mail through Mailgun's HTTP API (`MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `MAILGUN_API_URL` for the EU
+ * Transactional e-mail through `MAIL_PROVIDER=mailgun` — Mailgun's HTTP API (`MAIL_API_KEY`, `MAIL_DOMAIN`, `MAIL_API_URL` for the EU
  * region, `MAIL_FROM`). Every message is a template (`sendTemplate`, mail-templates/): no body written in code.
  *
  * `MAIL_DELIVERY` decides what leaves:
@@ -41,7 +41,7 @@ export function outboxDir(env: NodeJS.ProcessEnv = process.env): string {
   return cwd.endsWith(`${path.sep}apps${path.sep}web`) ? path.resolve(cwd, "../../.mail-outbox") : path.join(cwd, ".mail-outbox");
 }
 
-const fromAddress = (env: NodeJS.ProcessEnv) => env.MAIL_FROM?.trim() || `Yazakia <no-reply@${env.MAILGUN_DOMAIN?.trim() || "mg.yazakia.com"}>`;
+const fromAddress = (env: NodeJS.ProcessEnv) => env.MAIL_FROM?.trim() || `Yazakia <no-reply@${env.MAIL_DOMAIN?.trim() || "mg.yazakia.com"}>`;
 
 /** Sends one message. Throws a ConfigurationError when Mailgun is required and missing; resolves false when refused. */
 export async function sendMail(mail: Mail, env: NodeJS.ProcessEnv = process.env, fetchImpl: typeof fetch = fetch): Promise<boolean> {
@@ -57,9 +57,10 @@ export async function sendMail(mail: Mail, env: NodeJS.ProcessEnv = process.env,
     await fs.promises.writeFile(path.join(dir, name), JSON.stringify({ ...mail, at: new Date().toISOString() }, null, 2));
     return true;
   }
-  const key = env.MAILGUN_API_KEY?.trim();
-  const domain = env.MAILGUN_DOMAIN?.trim();
-  if (!key || !domain) throw new ConfigurationError("MAILGUN_API_KEY and MAILGUN_DOMAIN", "are required to send e-mail");
+  if (env.MAIL_PROVIDER?.trim().toLowerCase() !== "mailgun") throw new ConfigurationError("MAIL_PROVIDER", "must be mailgun to send e-mail");
+  const key = env.MAIL_API_KEY?.trim();
+  const domain = env.MAIL_DOMAIN?.trim();
+  if (!key || !domain) throw new ConfigurationError("MAIL_API_KEY and MAIL_DOMAIN", "are required to send e-mail");
   // https://documentation.mailgun.com — POST /v3/{domain}/messages, Basic auth `api:<key>`, form fields.
   const form = new FormData();
   form.append("from", fromAddress(env));
@@ -68,7 +69,7 @@ export async function sendMail(mail: Mail, env: NodeJS.ProcessEnv = process.env,
   form.append("text", mail.text);
   form.append("html", mail.html);
   form.append("o:tag", mail.template);
-  const base = (env.MAILGUN_API_URL?.trim() || "https://api.mailgun.net").replace(/\/+$/, "");
+  const base = (env.MAIL_API_URL?.trim() || "https://api.mailgun.net").replace(/\/+$/, "");
   try {
     const res = await fetchImpl(`${base}/v3/${encodeURIComponent(domain)}/messages`, {
       method: "POST",

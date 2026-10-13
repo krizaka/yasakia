@@ -45,9 +45,9 @@ const PEOPLE: SeedPerson[] = [
   { name: "Félix", birthDate: "1990-09-08", locale: "fr", gender: "MAN", seeking: ["WOMAN"], intent: "CASUAL", lat: 45.549, lng: -73.55, state: "DISCOVERY", colors: [[17, 94, 89], [94, 234, 212], [204, 251, 241]] },
 ];
 
-/** Where local media live (STORAGE_DRIVER=local): STORAGE_LOCAL_DIR, else `.storage/` at the repository root. */
+/** Where local media live (MEDIA_STORAGE_PROVIDER=local): MEDIA_STORAGE_LOCAL_DIR, else `.storage/` at the repository root. */
 function localStorageDir(): string {
-  if (process.env.STORAGE_LOCAL_DIR) return path.resolve(process.env.STORAGE_LOCAL_DIR);
+  if (process.env.MEDIA_STORAGE_LOCAL_DIR) return path.resolve(process.env.MEDIA_STORAGE_LOCAL_DIR);
   let dir = __dirname;
   for (let i = 0; i < 6 && !fs.existsSync(path.join(dir, "yazakia.workspace.json")); i++) dir = path.dirname(dir);
   return path.join(dir, ".storage");
@@ -57,7 +57,7 @@ const ascii = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerC
 
 export async function runSeed(): Promise<void> {
   if (process.env.NODE_ENV === "production") throw new Error("The development seed refuses NODE_ENV=production");
-  const localMedia = (process.env.STORAGE_DRIVER ?? "local") === "local";
+  const localMedia = (process.env.MEDIA_STORAGE_PROVIDER ?? "local") === "local";
   let created = 0;
   for (const person of PEOPLE) {
     const email = `${ascii(person.name)}@${SEED_DOMAIN}`;
@@ -112,7 +112,7 @@ export async function runSeed(): Promise<void> {
     created++;
   }
   console.log(
-    `Seed: ${created} account(s) created, ${PEOPLE.length - created} already there (${PEOPLE.length} seed accounts @${SEED_DOMAIN}${localMedia ? ", generated avatars in local storage" : ", no avatars: STORAGE_DRIVER is not local"}).`,
+    `Seed: ${created} account(s) created, ${PEOPLE.length - created} already there (${PEOPLE.length} seed accounts @${SEED_DOMAIN}${localMedia ? ", generated avatars in local storage" : ", no avatars: MEDIA_STORAGE_PROVIDER is not local"}).`,
   );
 }
 
