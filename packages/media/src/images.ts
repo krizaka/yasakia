@@ -1,5 +1,5 @@
 import { encode } from "blurhash";
-import sharp from "sharp";
+import sharp, { type OutputInfo } from "sharp";
 
 import { PHOTO_TYPES, type PhotoType, STORED_MAX_EDGE } from "./limits";
 
@@ -36,7 +36,7 @@ export async function normalisePhoto(bytes: Buffer, declared: string): Promise<N
   const sniffed = sniffImageType(bytes);
   if (!sniffed || !(declared in PHOTO_TYPES) || sniffed !== declared) throw new InvalidImageError("not the declared JPEG, PNG or WebP picture");
   let body: Buffer;
-  let info: sharp.OutputInfo;
+  let info: OutputInfo;
   try {
     ({ data: body, info } = await sharp(bytes, { failOn: "error", limitInputPixels: 50_000_000 })
       .rotate()
