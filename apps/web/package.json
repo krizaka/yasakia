@@ -26,12 +26,12 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sharp": "^0.35.5",
-    "zod": "^3.25.76"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@krizaka/config": "^0.1.0",
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^20.14.10",
+    "@types/node": "^25.9.9",
     "@types/pg": "^8.11.8",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -40,6 +40,6 @@
     "eslint-config-next": "^16.4.0",
     "postcss": "^8.4.41",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.5.4"
+    "typescript": "^6.0.3"
   }
 }
