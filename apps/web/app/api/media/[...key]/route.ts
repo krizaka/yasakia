@@ -7,7 +7,7 @@ import { mediaSecret, mediaStorage } from "@/lib/media";
 
 /**
  * Development storage only: serves a local photo at a URL `GET /api/photos/{id}` signed (300 seconds, one width) —
- * what Bunny's pull zone and Optimizer do in production. With STORAGE_DRIVER=bunny it does not exist (404).
+ * what Bunny's pull zone and Optimizer do in production. With MEDIA_STORAGE_PROVIDER=bunny it does not exist (404).
  */
 export async function GET(req: Request, ctx: { params: Promise<{ key: string[] }> }) {
   return handle("media", async () => {

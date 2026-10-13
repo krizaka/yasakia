@@ -21,6 +21,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildDatabaseMarkdown, readSchema } from "./database-doc.mjs";
+import { tsImport } from "tsx/esm/api";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const siteArg = process.argv.indexOf("--site");
@@ -135,7 +136,41 @@ ${endpoints.map((e) => `| \`${e.method}\` | \`${e.path}\` | ${e.access} | ${mdTe
 See the Database Reference: ${schema.tables.map((t) => `\`${t.name}\``).join(" · ")}.
 `;
 
+// ── Configuration (docs/DEPLOYMENT.md) — from apps/web/lib/env-vars.ts, grouped by bounded context ─────────────
+const { ENV_VARS, ENV_CONTEXTS } = await tsImport(path.join(ROOT, "apps/web/lib/env-vars.ts"), import.meta.url);
+// Inline code stays as written; elsewhere angle brackets and braces are escaped for MDX, pipes for the table.
+const mdCell = (s) => s.split(/(`[^`]*`)/).map((part, i) => (i % 2 ? part : mdText(part))).join("").replace(/[\\|]/g, (c) => `\\${c}`);
+const NEED = { required: "✓", recommended: "recommended", optional: "—" };
+const configMarkdown = [
+  "## Configuration",
+  "",
+  "> Generated from `apps/web/lib/env-vars.ts` (`ENV_VARS`) by `scripts/generate-docs.mjs` — do not hand-edit this section.",
+  "",
+  "Every variable is named `<CONTEXT>_<THING>` after the part of Yazakia it configures — never after the product or a",
+  "vendor: a vendor is a value (`MEDIA_STORAGE_PROVIDER=bunny`, `MAIL_PROVIDER=mailgun`). **Production** ✓ = the server",
+  "refuses to start without it (`assertProductionConfig`, which also checks every value set against its schema);",
+  "**Secret** = a `SECRET` on App Platform. Every variable is also in `.env.example`.",
+  "",
+  ...Object.entries(ENV_CONTEXTS).flatMap(([context, label]) => {
+    const vars = ENV_VARS.filter((e) => e.context === context);
+    if (!vars.length) return [];
+    return [
+      `### ${label.split(" — ")[0]} — \`${context}_\``,
+      "",
+      "| Variable | Production | Secret | Default | What it does |",
+      "| :--- | :---: | :---: | :--- | :--- |",
+      ...vars.map((e) => `| \`${e.name}\`${e.build ? " *(build)*" : ""} | ${NEED[e.need]} | ${e.secret ? "✓" : ""} | ${e.default ? mdCell(`\`${e.default}\``) : ""} | ${mdCell(e.doc)} |`),
+      "",
+    ];
+  }),
+].join("\n");
+const deploymentPath = path.join(ROOT, "docs/DEPLOYMENT.md");
+const configBlock = /## Configuration\n[\s\S]*?\n(?=## Database connections)/;
+if (!configBlock.test(read(deploymentPath))) throw new Error('docs/DEPLOYMENT.md has no "## Configuration" section before "## Database connections"');
+const deploymentMarkdown = read(deploymentPath).replace(configBlock, () => configMarkdown + "\n");
+
 const outputs = {
+  [deploymentPath]: deploymentMarkdown,
   [path.join(ROOT, "docs/_generated/yazakia-architecture.json")]: JSON.stringify(model, null, 2) + "\n",
   [path.join(ROOT, "docs/API_CONTRACTS.md")]: apiMarkdown,
   [path.join(ROOT, "docs/DATABASE.md")]: buildDatabaseMarkdown(ROOT, schema),

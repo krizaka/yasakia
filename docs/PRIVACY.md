@@ -59,6 +59,6 @@ message content. The development seed has no real photo; the demo will live in i
 
 ## Keys
 
-`DATA_ENCRYPTION_KEY` (32 random bytes, base64) is per environment and mandatory in production — the server refuses
-to start without it. Rotate by moving the old key to `DATA_ENCRYPTION_KEYS_PREVIOUS` and setting a new one: old
+`DATABASE_ENCRYPTION_KEY` (32 random bytes, base64) is per environment and mandatory in production — the server refuses
+to start without it. Rotate by moving the old key to `DATABASE_ENCRYPTION_KEYS_PREVIOUS` and setting a new one: old
 values still open, new ones use the new key. Losing a key loses what it sealed: keep it in the secret store.

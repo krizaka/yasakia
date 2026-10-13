@@ -22,7 +22,7 @@ npm run dev       # the API on http://localhost:3000
 ```
 
 `npm run setup` is idempotent: run it again after pulling. It writes `.env` from `.env.example` with a generated
-`SESSION_SECRET` and `DATA_ENCRYPTION_KEY`, and seeds six **seed** accounts (`*@seed.yazakia.test`, names ending in
+`AUTH_SESSION_SECRET` and `DATABASE_ENCRYPTION_KEY`, and seeds six **seed** accounts (`*@seed.yazakia.test`, names ending in
 "(seed)", generated geometric avatars — never a real photo).
 
 Check it answers:

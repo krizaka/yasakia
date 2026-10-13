@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { EncryptionKeyError, isSealed, keyFromSecret, open, openJson, seal, sealJson } from "./crypto";
 
 const KEY = crypto.randomBytes(32).toString("base64");
-const env = { DATA_ENCRYPTION_KEY: KEY };
+const env = { DATABASE_ENCRYPTION_KEY: KEY };
 
 describe("encryption at rest", () => {
   it("opens what it sealed, in the same context", () => {
@@ -32,19 +32,19 @@ describe("encryption at rest", () => {
 
   it("refuses another key", () => {
     const sealed = seal("secret", "ctx", env);
-    expect(() => open(sealed, "ctx", { DATA_ENCRYPTION_KEY: crypto.randomBytes(32).toString("base64") })).toThrow(EncryptionKeyError);
+    expect(() => open(sealed, "ctx", { DATABASE_ENCRYPTION_KEY: crypto.randomBytes(32).toString("base64") })).toThrow(EncryptionKeyError);
   });
 
   it("rotates: values sealed with a previous key still open, new ones use the new key", () => {
     const old = seal("before", "ctx", env);
-    const next = { DATA_ENCRYPTION_KEY: crypto.randomBytes(32).toString("base64"), DATA_ENCRYPTION_KEYS_PREVIOUS: KEY };
+    const next = { DATABASE_ENCRYPTION_KEY: crypto.randomBytes(32).toString("base64"), DATABASE_ENCRYPTION_KEYS_PREVIOUS: KEY };
     expect(open(old, "ctx", next)).toBe("before");
     const fresh = seal("after", "ctx", next);
     expect(() => open(fresh, "ctx", env)).toThrow(EncryptionKeyError);
   });
 
   it("is mandatory in production, derived only outside it", () => {
-    expect(() => seal("x", "ctx", { NODE_ENV: "production" })).toThrow(/DATA_ENCRYPTION_KEY is required in production/);
+    expect(() => seal("x", "ctx", { NODE_ENV: "production" })).toThrow(/DATABASE_ENCRYPTION_KEY is required in production/);
     expect(open(seal("x", "ctx", { NODE_ENV: "development" }), "ctx", { NODE_ENV: "test" })).toBe("x");
   });
 

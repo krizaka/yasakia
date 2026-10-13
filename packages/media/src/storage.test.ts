@@ -53,6 +53,6 @@ describe("Bunny storage", () => {
 describe("photo moderation", () => {
   it("V1 approves automatically; any other moderation is refused until it exists", async () => {
     expect(await photoModeration(undefined).review({ id: "p", accountId: "a", width: 1, height: 1, body: Buffer.alloc(0) })).toBe("APPROVED");
-    expect(() => photoModeration("vision")).toThrow(/PHOTO_MODERATION/);
+    expect(() => photoModeration("vision")).toThrow(/MEDIA_PHOTO_MODERATION/);
   });
 });

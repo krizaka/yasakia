@@ -27,7 +27,7 @@ import { refuse } from "./http";
 
 /**
  * The export of everything an account holds (Loi 25 / GDPR portability) — `GET /api/me/export`. Built at once when it
- * takes less than EXPORT_SYNC_BUDGET_MS (1 s); otherwise the answer is 202 with an export id, the build goes on in the
+ * takes less than APP_EXPORT_SYNC_BUDGET_MS (1 s); otherwise the answer is 202 with an export id, the build goes on in the
  * background, and `GET /api/me/export?id=` returns it when ready. A stored export is sealed (it holds the decrypted
  * sensitive facets), kept 24 hours, and goes with the account.
  *
@@ -142,7 +142,7 @@ const timeout = (ms: number) => new Promise<"timeout">((resolve) => setTimeout((
  */
 export async function startExport(accountId: string, options: { async?: boolean; schedule: (task: () => Promise<void>) => void }) {
   const build = buildExport(accountId);
-  const budget = setting("EXPORT_SYNC_BUDGET_MS", 1000, 0, 30_000);
+  const budget = setting("APP_EXPORT_SYNC_BUDGET_MS", 1000, 0, 30_000);
   const first = options.async ? "timeout" : await Promise.race([build, timeout(budget)]);
   if (first !== "timeout") return { ready: true as const, data: first };
   const [row] = await db

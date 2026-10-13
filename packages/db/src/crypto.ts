@@ -5,10 +5,10 @@ import crypto from "node:crypto";
  * value, and an "additional authenticated data" context that binds a sealed value to its row and column — a value
  * copied into another row or column does not open.
  *
- * The key is DATA_ENCRYPTION_KEY (32 random bytes in base64 — `npm run setup` generates one; any other string of 32+
+ * The key is DATABASE_ENCRYPTION_KEY (32 random bytes in base64 — `npm run setup` generates one; any other string of 32+
  * characters is hashed to 32 bytes). It is mandatory in production: the server refuses to start without it
- * (apps/web/instrumentation.ts) and any seal/open throws. Rotation: put the new key in DATA_ENCRYPTION_KEY and the old
- * ones in DATA_ENCRYPTION_KEYS_PREVIOUS (comma separated) — values sealed with an old key still open, new values use the
+ * (apps/web/instrumentation.ts) and any seal/open throws. Rotation: put the new key in DATABASE_ENCRYPTION_KEY and the old
+ * ones in DATABASE_ENCRYPTION_KEYS_PREVIOUS (comma separated) — values sealed with an old key still open, new values use the
  * new key (each value records which key sealed it).
  *
  * Format: `enc:v1:<key id>:<base64url(nonce ‖ tag ‖ ciphertext)>` — the key id is the first 8 hex characters of the
@@ -36,7 +36,7 @@ export function keyFromSecret(secret: string): Buffer {
     const raw = Buffer.from(trimmed, "base64");
     if (raw.length === 32) return raw;
   }
-  if (trimmed.length < 32) throw new EncryptionKeyError("DATA_ENCRYPTION_KEY must be 32 random bytes in base64 (or 32+ characters)");
+  if (trimmed.length < 32) throw new EncryptionKeyError("DATABASE_ENCRYPTION_KEY must be 32 random bytes in base64 (or 32+ characters)");
   return crypto.createHash("sha256").update(trimmed).digest();
 }
 
@@ -49,10 +49,10 @@ interface Keyring {
 
 /** The keys of this environment: the current one first, then the previous ones (rotation). */
 export function keyring(env: Env = process.env): Keyring {
-  const configured = env.DATA_ENCRYPTION_KEY?.trim();
-  if (!configured && env.NODE_ENV === "production") throw new EncryptionKeyError("DATA_ENCRYPTION_KEY is required in production");
+  const configured = env.DATABASE_ENCRYPTION_KEY?.trim();
+  if (!configured && env.NODE_ENV === "production") throw new EncryptionKeyError("DATABASE_ENCRYPTION_KEY is required in production");
   const current = keyFromSecret(configured || DEVELOPMENT_KEY);
-  const previous = (env.DATA_ENCRYPTION_KEYS_PREVIOUS ?? "")
+  const previous = (env.DATABASE_ENCRYPTION_KEYS_PREVIOUS ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean)

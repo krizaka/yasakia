@@ -6,6 +6,10 @@
  */
 import { keyring } from "@yazakia/db";
 
+import { schemaProblems } from "./env-vars";
+
+export { ENV_CONTEXTS, ENV_VARS, type EnvVar } from "./env-vars";
+
 type Env = Record<string, string | undefined>;
 
 export class ConfigurationError extends Error {
@@ -28,8 +32,8 @@ function read(name: string, developmentDefault: string, env: Env = process.env):
 
 /** Signs the session tokens (and, derived, the media URLs). At least 32 characters. */
 export function sessionSecret(env: Env = process.env): string {
-  const secret = read("SESSION_SECRET", "development-only-yazakia-session-secret-0123456789", env);
-  if (secret.length < 32) throw new ConfigurationError("SESSION_SECRET", "must be at least 32 characters");
+  const secret = read("AUTH_SESSION_SECRET", "development-only-yazakia-session-secret-0123456789", env);
+  if (secret.length < 32) throw new ConfigurationError("AUTH_SESSION_SECRET", "must be at least 32 characters");
   return secret;
 }
 
@@ -52,28 +56,28 @@ export type MediaConfig =
   | { driver: "bunny"; zone: string; apiKey: string; endpoint: string; pullZoneHostname: string; tokenKey: string };
 
 /**
- * Where photos live (`STORAGE_DRIVER`): `bunny` — Bunny Storage zone + a pull zone with token authentication and the
+ * Where photos live (`MEDIA_STORAGE_PROVIDER`): `bunny` — Bunny Storage zone + a pull zone with token authentication and the
  * Optimizer — or `local` (a folder, development and tests only). Production is bunny or nothing (fail-closed).
  */
 export function mediaConfig(env: Env = process.env): MediaConfig {
-  const driver = env.STORAGE_DRIVER?.trim().toLowerCase() || (isProduction(env) ? "bunny" : "local");
+  const driver = env.MEDIA_STORAGE_PROVIDER?.trim().toLowerCase() || (isProduction(env) ? "bunny" : "local");
   if (driver === "local") {
-    if (isProduction(env)) throw new ConfigurationError("STORAGE_DRIVER", "must be bunny in production (container disks are not storage)");
-    return { driver: "local", dir: env.STORAGE_LOCAL_DIR?.trim() || defaultLocalDir() };
+    if (isProduction(env)) throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "must be bunny in production (container disks are not storage)");
+    return { driver: "local", dir: env.MEDIA_STORAGE_LOCAL_DIR?.trim() || defaultLocalDir() };
   }
-  if (driver !== "bunny") throw new ConfigurationError("STORAGE_DRIVER", "must be bunny or local");
+  if (driver !== "bunny") throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "must be bunny or local");
   const need = (name: string) => {
     const value = env[name]?.trim();
-    if (!value) throw new ConfigurationError(name, "is required with STORAGE_DRIVER=bunny");
+    if (!value) throw new ConfigurationError(name, "is required with MEDIA_STORAGE_PROVIDER=bunny");
     return value;
   };
   return {
     driver: "bunny",
-    zone: need("BUNNY_STORAGE_ZONE"),
-    apiKey: need("BUNNY_STORAGE_API_KEY"),
-    endpoint: env.BUNNY_STORAGE_ENDPOINT?.trim() || "storage.bunnycdn.com",
-    pullZoneHostname: need("BUNNY_PULL_ZONE_HOSTNAME"),
-    tokenKey: need("BUNNY_TOKEN_AUTH_KEY"),
+    zone: need("MEDIA_STORAGE_ZONE"),
+    apiKey: need("MEDIA_STORAGE_API_KEY"),
+    endpoint: env.MEDIA_STORAGE_ENDPOINT?.trim() || "storage.bunnycdn.com",
+    pullZoneHostname: need("MEDIA_CDN_HOSTNAME"),
+    tokenKey: need("MEDIA_CDN_TOKEN_AUTH_KEY"),
   };
 }
 
@@ -93,26 +97,26 @@ export interface RealtimeConfig {
 
 /**
  * The realtime bus (`REALTIME_BUS`): `postgres` (default — LISTEN/NOTIFY, no extra service), `redis` (Redis / Valkey at
- * `REDIS_URL`, for several instances and many streams) or `memory` (one process: tests). Fail-closed: `redis` without a
+ * `REALTIME_REDIS_URL`, for several instances and many streams) or `memory` (one process: tests). Fail-closed: `redis` without a
  * URL is a configuration error, never a silent fallback.
  */
 export function realtimeConfig(env: Env = process.env): RealtimeConfig {
   const kind = (env.REALTIME_BUS?.trim().toLowerCase() || "postgres") as RealtimeConfig["kind"];
   if (kind !== "memory" && kind !== "postgres" && kind !== "redis") throw new ConfigurationError("REALTIME_BUS", "must be memory, postgres or redis");
-  const redisUrl = env.REDIS_URL?.trim() || undefined;
-  if (kind === "redis" && !redisUrl) throw new ConfigurationError("REDIS_URL", "is required when REALTIME_BUS=redis");
+  const redisUrl = env.REALTIME_REDIS_URL?.trim() || undefined;
+  if (kind === "redis" && !redisUrl) throw new ConfigurationError("REALTIME_REDIS_URL", "is required when REALTIME_BUS=redis");
   return { kind, redisUrl, prefix: env.REALTIME_PREFIX?.trim() || "yazakia:rt:", streamMaxSeconds: setting("REALTIME_STREAM_MAX_SECONDS", 300, 0, 3600, env) };
 }
 
 /** The operators' service token (32+ characters) — without it, no admin route answers. */
 export function adminToken(env: Env = process.env): string | null {
-  const token = env.YAZAKIA_ADMIN_API_TOKEN?.trim();
+  const token = env.OPERATOR_API_TOKEN?.trim();
   return token && token.length >= 32 ? token : null;
 }
 
 /** The addresses the admin API answers (comma separated). Empty: every address outside production, none in production. */
 export function adminAllowedIps(env: Env = process.env): string[] | null {
-  const list = (env.ADMIN_ALLOWED_IPS ?? "")
+  const list = (env.OPERATOR_ALLOWED_IPS ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
@@ -142,7 +146,9 @@ export function assertProductionConfig(env: Env = process.env): void {
   attempt(() => mediaConfig(env));
   attempt(() => realtimeConfig(env));
   attempt(() => {
-    if (!(env.MAILGUN_API_KEY?.trim() && env.MAILGUN_DOMAIN?.trim())) throw new ConfigurationError("MAILGUN_API_KEY and MAILGUN_DOMAIN", "are required in production (the sign-in codes)");
+    if (env.MAIL_PROVIDER?.trim() !== "mailgun") throw new ConfigurationError("MAIL_PROVIDER", "must be mailgun in production (the sign-in codes)");
+    if (!(env.MAIL_API_KEY?.trim() && env.MAIL_DOMAIN?.trim())) throw new ConfigurationError("MAIL_API_KEY and MAIL_DOMAIN", "are required in production (the sign-in codes)");
   });
+  problems.push(...schemaProblems(env));
   if (problems.length) throw new ConfigurationError("Production configuration", `is incomplete — ${problems.join("; ")}`);
 }

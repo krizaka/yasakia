@@ -2,7 +2,7 @@
 /**
  * One-command local setup: `npm run setup`.
  *   1. checks Node ≥ 20 and Docker
- *   2. creates .env from .env.example with a fresh SESSION_SECRET and DATA_ENCRYPTION_KEY (an existing .env is kept,
+ *   2. creates .env from .env.example with a fresh AUTH_SESSION_SECRET and DATABASE_ENCRYPTION_KEY (an existing .env is kept,
  *      and a missing secret is added to it)
  *   3. starts PostgreSQL 16 + pgvector (deploy/docker/docker-compose.dev.yml, port 5435) and waits for it
  *      — on a branch (a session, a worktree), DATABASE_URL names the branch's own database (`yazakia_<branch>`), never
@@ -27,8 +27,8 @@ step("Environment (.env)");
 const envFile = path.join(ROOT, ".env");
 /** The secrets setup generates: never a shared placeholder, a fresh value per machine. */
 const SECRETS = {
-  SESSION_SECRET: () => crypto.randomBytes(32).toString("hex"),
-  DATA_ENCRYPTION_KEY: () => crypto.randomBytes(32).toString("base64"),
+  AUTH_SESSION_SECRET: () => crypto.randomBytes(32).toString("hex"),
+  DATABASE_ENCRYPTION_KEY: () => crypto.randomBytes(32).toString("base64"),
 };
 if (!fs.existsSync(envFile)) {
   let text = fs.readFileSync(path.join(ROOT, ".env.example"), "utf8");

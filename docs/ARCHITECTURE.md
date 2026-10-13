@@ -79,8 +79,8 @@ scan over every answer enforces it).
 - **Reports** are persisted before they are acknowledged, their details sealed (AES-256-GCM); a report in an intro
   freezes it; operators read them through `GET /api/admin/reports` — service token **and** IP allow-list.
 - **Encryption at rest** (`packages/db/src/crypto.ts`): sensitive facets, report details, stored exports; the key
-  (`DATA_ENCRYPTION_KEY`) is mandatory in production — the server refuses to start without it; rotation keeps the old
-  keys readable (`DATA_ENCRYPTION_KEYS_PREVIOUS`).
+  (`DATABASE_ENCRYPTION_KEY`) is mandatory in production — the server refuses to start without it; rotation keeps the old
+  keys readable (`DATABASE_ENCRYPTION_KEYS_PREVIOUS`).
 - **Export** (`GET /api/me/export`) and **deletion** (`DELETE /api/me`) are in the API from day one — see
   [PRIVACY.md](PRIVACY.md).
 

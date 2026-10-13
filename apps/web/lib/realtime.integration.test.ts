@@ -8,7 +8,7 @@ import { accountTopic, createYazakiaBus, isYazakiaEvent } from "./realtime";
  * reaches the subscribers of the other, in order. Runs with REALTIME_IT=1 (CI: PostgreSQL with pgvector and Valkey).
  */
 const enabled = process.env.REALTIME_IT === "1";
-const kinds = (["postgres", ...(process.env.REDIS_URL ? ["redis"] : [])] as const).map((kind) => kind);
+const kinds = (["postgres", ...(process.env.REALTIME_REDIS_URL ? ["redis"] : [])] as const).map((kind) => kind);
 
 describe.skipIf(!enabled)("realtime across instances", () => {
   for (const kind of kinds) {

@@ -8,10 +8,10 @@
  * that no raw media URL or storage key ever leaves the API.
  *
  *   npm run test:e2e                      # builds its own database and server (e2e/run.mjs)
- *   YAZAKIA_URL=http://localhost:3000 node e2e/scenarios.mjs   # against a server started with the e2e settings
+ *   APP_URL=http://localhost:3000 node e2e/scenarios.mjs   # against a server started with the e2e settings
  *
- * Settings the server must share (e2e/run.mjs E2E_ENV): MAIL_DELIVERY=file + MAIL_OUTBOX_DIR, YAZAKIA_ADMIN_API_TOKEN,
- * ADMIN_ALLOWED_IPS=203.0.113.7, STORAGE_DRIVER=local + STORAGE_LOCAL_DIR, ACCOUNT_PURGE_INTERVAL_SECONDS=1.
+ * Settings the server must share (e2e/run.mjs E2E_ENV): MAIL_DELIVERY=file + MAIL_OUTBOX_DIR, OPERATOR_API_TOKEN,
+ * OPERATOR_ALLOWED_IPS=203.0.113.7, MEDIA_STORAGE_PROVIDER=local + MEDIA_STORAGE_LOCAL_DIR, APP_ACCOUNT_PURGE_INTERVAL_SECONDS=1.
  * Time is moved and relationships (a batch, an intro) are set in SQL — the endpoints that create them come with PY3.
  */
 import fs from "node:fs";
@@ -24,11 +24,11 @@ import { readEnv, ROOT } from "../scripts/lib.mjs";
 
 const fileEnv = readEnv();
 const env = (name, fallback) => process.env[name] || fileEnv[name] || fallback;
-const B = env("YAZAKIA_URL", "http://localhost:3000").replace(/\/$/, "");
+const B = env("APP_URL", "http://localhost:3000").replace(/\/$/, "");
 const OUTBOX = path.resolve(env("MAIL_OUTBOX_DIR", path.join(ROOT, ".mail-outbox")));
-const STORAGE = path.resolve(env("STORAGE_LOCAL_DIR", path.join(ROOT, ".storage")));
-const ADMIN_TOKEN = env("YAZAKIA_ADMIN_API_TOKEN", "e2e-only-operator-token-0123456789abcdef0123");
-const ADMIN_IP = (env("ADMIN_ALLOWED_IPS", "203.0.113.7") || "203.0.113.7").split(",")[0].trim();
+const STORAGE = path.resolve(env("MEDIA_STORAGE_LOCAL_DIR", path.join(ROOT, ".storage")));
+const ADMIN_TOKEN = env("OPERATOR_API_TOKEN", "e2e-only-operator-token-0123456789abcdef0123");
+const ADMIN_IP = (env("OPERATOR_ALLOWED_IPS", "203.0.113.7") || "203.0.113.7").split(",")[0].trim();
 const db = new pg.Client({ connectionString: env("DATABASE_URL", "postgresql://yazakia_user:yazakia_secret@localhost:5435/yazakia_db?sslmode=disable") });
 await db.connect();
 const sql = async (text, values = []) => (await db.query(text, values)).rows;

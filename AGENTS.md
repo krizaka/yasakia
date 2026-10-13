@@ -38,7 +38,7 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 ## 1. Execution & developer experience
 
 - **One command to start**: `npm run setup` (checks Node ≥ 20 and Docker, writes `.env` with a generated
-  `SESSION_SECRET` and `DATA_ENCRYPTION_KEY`, starts PostgreSQL 16 + pgvector on :5435, migrates, seeds). Then `npm run dev`.
+  `AUTH_SESSION_SECRET` and `DATABASE_ENCRYPTION_KEY`, starts PostgreSQL 16 + pgvector on :5435, migrates, seeds). Then `npm run dev`.
 - **No shell scripts.** Tooling is Node (`scripts/*.mjs`, no dependencies) behind `npm run`.
 - **One `.env` at the repository root**, read by the web app (`next.config.mjs`), drizzle-kit, the migrator and the
   seed (`packages/db/src/load-env.ts`). Real environment variables always win; CI and production ship no file.
@@ -138,18 +138,24 @@ yazakia/                           npm workspaces — Apache-2.0
   withdrawn from the other's current batch (`applyBlockEffects`).
 - **Report**: normalised reasons (UNDERAGE and THREAT first), persisted **before** the acknowledgement, details
   **sealed**; a report in an intro freezes it; the reported person is never told. Operators read reports through
-  `/api/admin/*` only: `YAZAKIA_ADMIN_API_TOKEN` **and** `ADMIN_ALLOWED_IPS` (empty in production = nobody).
+  `/api/admin/*` only: `OPERATOR_API_TOKEN` **and** `OPERATOR_ALLOWED_IPS` (empty in production = nobody).
 - **Delete my account, in the app**: `DELETE /api/me` deletes everything at once (one transaction, cascades), the media
   are purged from storage right after and retried until done (≤ 30 days by policy), a confirmation e-mail leaves;
   `account_deletions` keeps nothing personal. **Export**: `GET /api/me/export` (JSON, background past 1 s, sealed, 24 h).
 
 ### E. Encryption at rest
 - Sensitive facets, report details and stored exports are sealed with AES-256-GCM (`packages/db/src/crypto.ts`), bound
-  to their row and column (AAD), with `DATA_ENCRYPTION_KEY` — **mandatory in production: the server refuses to start
+  to their row and column (AAD), with `DATABASE_ENCRYPTION_KEY` — **mandatory in production: the server refuses to start
   without it**. The `facets` table is written and read through `packages/db/src/facets.ts` only. Rotation:
-  `DATA_ENCRYPTION_KEYS_PREVIOUS`. No data is ever used to train a model.
+  `DATABASE_ENCRYPTION_KEYS_PREVIOUS`. No data is ever used to train a model.
 
 ### F. Fail-closed configuration and sessions
+- **Environment variables are named by bounded context** (krizaka/.github#46): `<CONTEXT>_<THING>` with CONTEXT one of
+  `APP_` `DATABASE_` `AUTH_` `MEDIA_` `MAIL_` `PUSH_` `PAYMENTS_` `REALTIME_` `ABUSE_` `OBSERVABILITY_` `AI_` `OPERATOR_` —
+  never the product (`YAZAKIA_…`) nor a vendor (`BUNNY_…`, `MAILGUN_…`): a vendor is a value (`MEDIA_STORAGE_PROVIDER=bunny`,
+  `MAIL_PROVIDER=mailgun`). `NEXT_PUBLIC_` only where the browser needs it. Every variable is declared once in
+  `apps/web/lib/env-vars.ts` (zod: context, need, secret, schema, what it does); `env.test.ts` refuses an undeclared or
+  misnamed one, `assertProductionConfig` checks every value set, `docs/DEPLOYMENT.md` *Configuration* is generated.
 - Secrets are read through `apps/web/lib/env.ts`: mandatory in production (503 + logged name when missing),
   development defaults otherwise; `assertProductionConfig` (instrumentation.ts) refuses to **start** a production server
   without the session secret, the encryption key, the database, the Bunny storage and Mailgun.
@@ -191,7 +197,7 @@ yazakia/                           npm workspaces — Apache-2.0
 - Ownership is enforced **in the query** (`where id = … and account_id = me`): another account's id is a 404.
 - Abusable mutations are rate-limited **per subject and per IP** (`limitAction`, `lib/rate-limit.ts`), 429 with
   `code: RATE_LIMITED` and `Retry-After`. The IP is `clientIp()` (`lib/client-ip.ts`), read from the right of
-  `X-Forwarded-For` or `CLIENT_IP_HEADER`. `RATE_LIMIT_STORE=postgres` before a second instance.
+  `X-Forwarded-For` or `ABUSE_CLIENT_IP_HEADER`. `ABUSE_RATE_LIMIT_STORE=postgres` before a second instance.
 - **Realtime goes through `lib/realtime.ts` only**, which knows typed events only (`batch.ready`, `intro.opened`,
   `intro.message`) — payloads are ids, never documents. Transport `@krizaka/realtime`: `REALTIME_BUS=postgres`
   (default; NOTIFY channel `yazakia_events`) or `redis` (prefix `yazakia:rt:`) — keep the names: two versions share

@@ -132,7 +132,7 @@ export async function completePhoto(accountId: string, photoId: string) {
     .update(profilePhotos)
     .set({ moderationStatus: "PENDING", mimeType: photo.mimeType, bytes: photo.body.length, width: photo.width, height: photo.height, blurhash: photo.blurhash, completedAt: new Date() })
     .where(eq(profilePhotos.id, photoId));
-  const verdict = await photoModeration(process.env.PHOTO_MODERATION).review({ id: photoId, accountId, width: photo.width, height: photo.height, body: photo.body });
+  const verdict = await photoModeration(process.env.MEDIA_PHOTO_MODERATION).review({ id: photoId, accountId, width: photo.width, height: photo.height, body: photo.body });
   const [reviewed] = await db
     .update(profilePhotos)
     .set({ moderationStatus: verdict, reviewedAt: verdict === "PENDING" ? null : new Date() })
