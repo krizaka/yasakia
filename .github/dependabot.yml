@@ -34,15 +34,15 @@ updates:
         applies-to: security-updates
         patterns: ["*"]
     ignore:
-      # @krizaka/config peers typescript ^5 (krizaka-ui#141)
+      # @krizaka/config peers typescript ^5; TS 6 also drops the default @types (krizaka-ui#141)
       - dependency-name: "typescript"
-        versions: [">=7"]
-      # types of the Node LTS we run, never a non-LTS line
-      - dependency-name: "@types/node"
-        versions: [">=26"]
+        versions: [">=6"]
       # krizaka/yazakia#19
       - dependency-name: "ioredis"
         versions: [">=6"]
+      # types of the Node LTS we run (22/24), never a non-LTS line
+      - dependency-name: "@types/node"
+        versions: [">=25"]
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
