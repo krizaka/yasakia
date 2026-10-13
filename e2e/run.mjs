@@ -5,7 +5,7 @@
  *   2. the API (`next dev`) on :3100 with the end-to-end settings: e-mails written to a folder (the scenarios read the
  *      codes there), photos in a temporary folder, an operator token and allow-list, a purge every second;
  *   3. e2e/scenarios.mjs against it, then the server stops.
- * With YAZAKIA_URL set (a server you started yourself, like CI's), only step 3 runs — with the same settings expected.
+ * With APP_URL set (a server you started yourself, like CI's), only step 3 runs — with the same settings expected.
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -18,15 +18,15 @@ import { c, databaseUrl, fail, isLocalDatabase, ok, ROOT, run, step } from "../s
 
 export const E2E_ENV = {
   MAIL_DELIVERY: "file",
-  YAZAKIA_ADMIN_API_TOKEN: "e2e-only-operator-token-0123456789abcdef0123",
-  ADMIN_ALLOWED_IPS: "203.0.113.7",
-  ACCOUNT_PURGE_INTERVAL_SECONDS: "1",
-  STORAGE_DRIVER: "local",
+  OPERATOR_API_TOKEN: "e2e-only-operator-token-0123456789abcdef0123",
+  OPERATOR_ALLOWED_IPS: "203.0.113.7",
+  APP_ACCOUNT_PURGE_INTERVAL_SECONDS: "1",
+  MEDIA_STORAGE_PROVIDER: "local",
   REALTIME_BUS: "postgres",
-  RATE_LIMIT_STORE: "postgres",
+  ABUSE_RATE_LIMIT_STORE: "postgres",
 };
 
-if (process.env.YAZAKIA_URL) {
+if (process.env.APP_URL) {
   await import("./scenarios.mjs");
 } else {
   if (process.env.NODE_ENV === "production") fail("Refusing to run the scenarios with NODE_ENV=production");
@@ -47,7 +47,7 @@ if (process.env.YAZAKIA_URL) {
     DATABASE_URL: e2eUrl.toString(),
     DATABASE_DIRECT_URL: "",
     MAIL_OUTBOX_DIR: path.join(tmp, "outbox"),
-    STORAGE_LOCAL_DIR: path.join(tmp, "storage"),
+    MEDIA_STORAGE_LOCAL_DIR: path.join(tmp, "storage"),
   };
   run("npm", ["run", "db:migrate", "--silent"], { env });
   run("npm", ["run", "db:seed", "--silent"], { env });
@@ -83,7 +83,7 @@ if (process.env.YAZAKIA_URL) {
   ok(`ready (log: ${path.join(tmp, "web.log")})`);
 
   step("Scenarios");
-  Object.assign(process.env, env, { YAZAKIA_URL: `http://localhost:${port}` });
+  Object.assign(process.env, env, { APP_URL: `http://localhost:${port}` });
   try {
     await import("./scenarios.mjs");
   } finally {

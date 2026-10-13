@@ -65,7 +65,7 @@ export const pushTokens = pgTable(
   (t) => [index("push_tokens_account_idx").on(t.accountId)],
 );
 
-/** Fixed-window counters of the shared rate limiter (`RATE_LIMIT_STORE=postgres`), one row per key. */
+/** Fixed-window counters of the shared rate limiter (`ABUSE_RATE_LIMIT_STORE=postgres`), one row per key. */
 export const rateLimitBuckets = pgTable("rate_limit_buckets", {
   key: varchar("key", { length: 200 }).primaryKey(),
   count: integer("count").notNull(),

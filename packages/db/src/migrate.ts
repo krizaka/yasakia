@@ -16,7 +16,7 @@ import { applyMigrations, databaseResetAllowed, dropPublicObjects, historyState,
 
 async function main(): Promise<void> {
   loadRootEnv(__dirname);
-  const migrationsFolder = process.env.MIGRATIONS_DIR ?? (path.basename(__dirname) === "src" ? path.resolve(__dirname, "../drizzle") : path.resolve(__dirname, "drizzle"));
+  const migrationsFolder = process.env.DATABASE_MIGRATIONS_DIR ?? (path.basename(__dirname) === "src" ? path.resolve(__dirname, "../drizzle") : path.resolve(__dirname, "drizzle"));
   const pool = new Pool({ ...connectionConfig(directDatabaseUrl(), CONNECTION_NAMES.migrate), max: 1 });
   try {
     const migrations = loadMigrations(migrationsFolder);
@@ -26,7 +26,7 @@ async function main(): Promise<void> {
       if (!databaseResetAllowed()) {
         throw new Error(
           "This database's migration history was rewritten (new baseline). It cannot migrate forward. On a development " +
-            "deployment set YAZAKIA_ALLOW_DATABASE_RESET=true to rebuild it; production data is never dropped.",
+            "deployment set DATABASE_ALLOW_RESET=true to rebuild it; production data is never dropped.",
         );
       }
       console.warn(`Migration history rewritten (${state.applied} applied, not all shipped by this release): rebuilding the database.`);

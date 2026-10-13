@@ -7,7 +7,7 @@ import { and, eq, inArray } from "drizzle-orm";
  * APNs). Best-effort: never throws, and forgets the tokens the push service reports as dead.
  *
  * Pushes leave only in production, or elsewhere with PUSH_DELIVERY=on (local runs and CI never call the push service).
- * EXPO_ACCESS_TOKEN (optional): with "enhanced push security" on in the Expo project, only this server may push.
+ * PUSH_ACCESS_TOKEN (optional): with "enhanced push security" on in the Expo project, only this server may push.
  */
 export function pushDeliveryEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
   return env.PUSH_DELIVERY === "on" || (env.NODE_ENV === "production" && env.PUSH_DELIVERY !== "off");
@@ -20,7 +20,7 @@ export async function pushToAccount(accountId: string, message: { title: string;
     if (devices.length === 0) return;
     const outcome = await sendExpoPush(
       devices.map((d) => ({ to: d.token, title: message.title, body: message.body, data: { path: message.path } })),
-      { fetch: (url, init) => fetch(url, init), accessToken: process.env.EXPO_ACCESS_TOKEN || undefined },
+      { fetch: (url, init) => fetch(url, init), accessToken: process.env.PUSH_ACCESS_TOKEN || undefined },
     );
     if (outcome.deadTokens.length > 0) await db.delete(pushTokens).where(inArray(pushTokens.token, outcome.deadTokens));
     if (outcome.errors.length > 0) console.warn(`push: ${outcome.errors.length} failed for ${accountId}: ${outcome.errors[0]}`);

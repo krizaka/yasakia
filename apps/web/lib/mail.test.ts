@@ -47,12 +47,12 @@ describe("delivery", () => {
 
   it("production always delivers through Mailgun — and without it, refuses (never a code in a log)", async () => {
     expect(mailDelivery({ NODE_ENV: "production", MAIL_DELIVERY: "file" } as unknown as NodeJS.ProcessEnv)).toBe("mailgun");
-    await expect(sendMail(mail, { NODE_ENV: "production" } as unknown as NodeJS.ProcessEnv)).rejects.toThrow(/MAILGUN_API_KEY/);
+    await expect(sendMail(mail, { NODE_ENV: "production" } as unknown as NodeJS.ProcessEnv)).rejects.toThrow(/MAIL_PROVIDER/);
   });
 
   it("sends through Mailgun's HTTP API with Basic auth", async () => {
     const fetchImpl = vi.fn(async () => new Response("{}", { status: 200 }));
-    const ok = await sendMail(mail, { NODE_ENV: "production", MAILGUN_API_KEY: "key", MAILGUN_DOMAIN: "mg.yazakia.com" } as unknown as NodeJS.ProcessEnv, fetchImpl as unknown as typeof fetch);
+    const ok = await sendMail(mail, { NODE_ENV: "production", MAIL_PROVIDER: "mailgun", MAIL_API_KEY: "key", MAIL_DOMAIN: "mg.yazakia.com" } as unknown as NodeJS.ProcessEnv, fetchImpl as unknown as typeof fetch);
     expect(ok).toBe(true);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://api.mailgun.net/v3/mg.yazakia.com/messages");

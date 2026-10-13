@@ -48,37 +48,40 @@ services:
       - key: DATABASE_MAX_CONNECTIONS
         scope: RUN_TIME
         value: "5"
-      - key: SESSION_SECRET
+      - key: AUTH_SESSION_SECRET
         scope: RUN_TIME
         type: SECRET
-      - key: DATA_ENCRYPTION_KEY
+      - key: DATABASE_ENCRYPTION_KEY
         scope: RUN_TIME
         type: SECRET
-      - key: STORAGE_DRIVER
+      - key: MEDIA_STORAGE_PROVIDER
         scope: RUN_TIME
         value: "bunny"
-      - key: BUNNY_STORAGE_ZONE
+      - key: MEDIA_STORAGE_ZONE
         scope: RUN_TIME
         value: "yazakia"
-      - key: BUNNY_STORAGE_API_KEY
+      - key: MEDIA_STORAGE_API_KEY
         scope: RUN_TIME
         type: SECRET
-      - key: BUNNY_STORAGE_ENDPOINT
+      - key: MEDIA_STORAGE_ENDPOINT
         scope: RUN_TIME
         type: GENERAL
-      - key: BUNNY_PULL_ZONE_HOSTNAME
+      - key: MEDIA_CDN_HOSTNAME
         scope: RUN_TIME
         type: GENERAL
-      - key: BUNNY_TOKEN_AUTH_KEY
+      - key: MEDIA_CDN_TOKEN_AUTH_KEY
         scope: RUN_TIME
         type: SECRET
-      - key: PHOTO_MODERATION
+      - key: MEDIA_PHOTO_MODERATION
         scope: RUN_TIME
         value: "auto"
-      - key: MAILGUN_API_KEY
+      - key: MAIL_PROVIDER
+        scope: RUN_TIME
+        value: "mailgun"
+      - key: MAIL_API_KEY
         scope: RUN_TIME
         type: SECRET
-      - key: MAILGUN_DOMAIN
+      - key: MAIL_DOMAIN
         scope: RUN_TIME
         type: GENERAL
       - key: MAIL_FROM
@@ -87,19 +90,19 @@ services:
       - key: REALTIME_BUS
         scope: RUN_TIME
         value: "postgres"
-      - key: RATE_LIMIT_STORE
+      - key: ABUSE_RATE_LIMIT_STORE
         scope: RUN_TIME
         value: "postgres"
-      - key: CLIENT_IP_HEADER
+      - key: ABUSE_CLIENT_IP_HEADER
         scope: RUN_TIME
         value: "do-connecting-ip"
-      - key: YAZAKIA_ADMIN_API_TOKEN
+      - key: OPERATOR_API_TOKEN
         scope: RUN_TIME
         type: SECRET
-      - key: ADMIN_ALLOWED_IPS
+      - key: OPERATOR_ALLOWED_IPS
         scope: RUN_TIME
         type: GENERAL
-      - key: EXPO_ACCESS_TOKEN
+      - key: PUSH_ACCESS_TOKEN
         scope: RUN_TIME
         type: SECRET
 

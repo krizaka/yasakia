@@ -1,7 +1,7 @@
 /**
  * Photo moderation behind one interface. V1 approves automatically (`autoApprove`) — a report reopens the review
  * (`reports.photo_id`, triaged by operators). A vision model through Orazaka is the planned V2 implementation: same
- * interface, chosen by `PHOTO_MODERATION`.
+ * interface, chosen by `MEDIA_PHOTO_MODERATION`.
  */
 export type ModerationVerdict = "APPROVED" | "REJECTED" | "PENDING";
 
@@ -26,9 +26,9 @@ export const autoApprove: PhotoModeration = {
   },
 };
 
-/** The moderation of this deployment (`PHOTO_MODERATION`, default `auto` — the only one in V1). */
+/** The moderation of this deployment (`MEDIA_PHOTO_MODERATION`, default `auto` — the only one in V1). */
 export function photoModeration(name: string | undefined): PhotoModeration {
   const chosen = name?.trim().toLowerCase() || "auto";
   if (chosen === "auto") return autoApprove;
-  throw new Error(`PHOTO_MODERATION must be "auto" (V1), not "${chosen}"`);
+  throw new Error(`MEDIA_PHOTO_MODERATION must be "auto" (V1), not "${chosen}"`);
 }

@@ -24,8 +24,8 @@ async function tick(name: string, work: () => Promise<unknown>): Promise<void> {
 
 export function startJobs(): void {
   if (holder.__yazakiaJobs) return;
-  const purgeEvery = setting("ACCOUNT_PURGE_INTERVAL_SECONDS", 60, 1, 3600) * 1000;
-  const sweepEvery = setting("SWEEP_INTERVAL_SECONDS", 600, 5, 86_400) * 1000;
+  const purgeEvery = setting("APP_ACCOUNT_PURGE_INTERVAL_SECONDS", 60, 1, 3600) * 1000;
+  const sweepEvery = setting("APP_SWEEP_INTERVAL_SECONDS", 600, 5, 86_400) * 1000;
   const purge = setInterval(() => void tick("purge", () => purgeDeletedMedia()), purgeEvery);
   const sweep = setInterval(
     () =>

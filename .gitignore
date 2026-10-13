@@ -27,7 +27,7 @@ npm-debug.log*
 .env.local
 .env.*.local
 
-# Local media storage (STORAGE_DRIVER=local) and the captured e-mails (MAIL_DELIVERY=file)
+# Local media storage (MEDIA_STORAGE_PROVIDER=local) and the captured e-mails (MAIL_DELIVERY=file)
 .storage/
 .mail-outbox/
 
