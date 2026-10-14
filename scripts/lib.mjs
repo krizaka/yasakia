@@ -1,4 +1,4 @@
-/** Shared helpers of the Yazakia developer scripts (no dependencies: Node 20+ only). */
+/** Shared helpers of the Yazakia developer scripts (no dependencies: Node 22+ only). */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";

@@ -11,7 +11,7 @@ iOS and Android app is [`yazakia-mobile`](https://github.com/krizaka/yazakia-mob
 
 ## Prerequisites
 
-- Node.js 20 or later
+- Node.js 22 or later
 - Docker (Desktop or the daemon) — PostgreSQL 16 with pgvector runs in a container on port **5435**
 
 ## Two commands
