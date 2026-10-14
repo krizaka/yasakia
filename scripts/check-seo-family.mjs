@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console -- a command-line script: its report is its output */
 /* The Krizaka family SEO guard (krizaka/krizaka-com#SEO-FAMILY) — one file, no dependency, copied unchanged into every
    site's repository (keep the copies identical; the contract lives in krizaka-com/AGENTS.md §2.4).
 

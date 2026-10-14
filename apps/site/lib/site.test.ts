@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import en from "../messages/en.json";
-import fr from "../messages/fr.json";
-import robots from "../app/robots";
 // @ts-expect-error -- the shared guard is plain JavaScript (scripts/check-seo-family.mjs)
 import { auditLlms, auditRobots } from "../../../scripts/check-seo-family.mjs";
+import robots from "../app/robots";
+import en from "../messages/en.json";
+import fr from "../messages/fr.json";
 import { llmsText } from "./llms";
 import { clip } from "./media";
 import { ORG_ID, pageMetadata, siteJsonLd } from "./seo";

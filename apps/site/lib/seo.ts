@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 
 import { getDictionary, type Locale } from "./i18n";
-import { KRIZAKA_URL, pagePath, type PageId, REPO_URL, SITE_URL } from "./site";
+import { KRIZAKA_URL, type PageId, pagePath, REPO_URL, SITE_URL } from "./site";
 
 /** The Krizaka Organization, defined by www.krizaka.com: every JSON-LD node of the family points back to it. */
 export const ORG_ID = `${KRIZAKA_URL}/#organization`;
