@@ -75,6 +75,7 @@ describe("search engines and AI assistants (the family contract, scripts/check-s
 
 /** MetadataRoute.Robots as the text Next serves. */
 function robotsText(r: ReturnType<typeof robots>): string {
-  const groups = ([] as NonNullable<ReturnType<typeof robots>["rules"]>[number][]).concat(r.rules).map((rule) => `User-Agent: ${rule.userAgent}\nAllow: ${rule.allow}`);
+  const rules = Array.isArray(r.rules) ? r.rules : [r.rules];
+  const groups = rules.map((rule) => `User-Agent: ${rule.userAgent}\nAllow: ${rule.allow}`);
   return `${groups.join("\n\n")}\n\nSitemap: ${r.sitemap}\n`;
 }
