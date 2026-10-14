@@ -18,8 +18,8 @@
     "product": "A Krizaka product",
     "sourceCode": "Source code",
     "contact": "Talk to us",
-    "version": "Version",
-    "footer": "Yasakia is an open-source product by <b>Krizaka</b>, made in Québec."
+    "menu": "Menu",
+    "footerLabel": "Footer"
   },
   "status": {
     "label": "Under development",

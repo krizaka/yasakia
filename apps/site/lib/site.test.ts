@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { auditLlms, auditRobots } from "../../../scripts/check-seo-family.mjs";
@@ -78,3 +80,14 @@ function robotsText(r: ReturnType<typeof robots>): string {
   const groups = rules.map((rule) => `User-Agent: ${rule.userAgent}\nAllow: ${rule.allow}`);
   return `${groups.join("\n\n")}\n\nSitemap: ${r.sitemap}\n`;
 }
+
+describe("the family navigation (@krizaka/ui 3.10)", () => {
+  it("the bar and the footer are the family's: current = yasakia, the family last on the phone, a DEV badge", () => {
+    const src = readFileSync(new URL("../components/SiteChrome.tsx", import.meta.url), "utf8");
+    expect(src).toContain('<NavBar.Family current="yasakia"');
+    expect(src).toContain("{family}\n          </NavBar.Mobile>");
+    expect(src).toContain('<NavBar.Badge env="dev"');
+    expect(src).toContain('<FamilyFooter current="yasakia"');
+    expect(src).not.toMatch(/KRIZAKA_URL/);
+  });
+});
