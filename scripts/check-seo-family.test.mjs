@@ -34,7 +34,7 @@ test("a site that is not indexed must say so in robots, meta and header", () => 
 
 test("sitemap.xml: a URL on another host is caught", () => {
   const xml = `<urlset><url><loc>${HOST}/</loc><lastmod>2026-10-14</lastmod></url><url><loc>https://other.com/x</loc></url></urlset>`;
-  assert.ok(auditSitemap(xml, { host: HOST }).some((p) => p.includes("other.com")));
+  assert.ok(auditSitemap(xml, { host: HOST }).some((p) => /other\.com/.test(p)));
   assert.deepEqual(auditSitemap(`<urlset><url><loc>${HOST}/</loc><lastmod>2026-10-14</lastmod></url></urlset>`, { host: HOST }), []);
 });
 

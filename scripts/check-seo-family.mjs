@@ -74,7 +74,7 @@ export function auditLlms(text, { host, full = false }) {
   if (!/^# \S/.test(text)) problems.push("llms.txt: must start with an H1 (# Name)");
   if (!/^> \S/m.test(text)) problems.push("llms.txt: no blockquote summary (> …)");
   if (!/^- \[[^\]]+\]\(https?:\/\/[^)]+\)/m.test(text) && !/^- .*https?:\/\//m.test(text)) problems.push("llms.txt: no list of key pages");
-  if (!text.includes("https://www.krizaka.com")) problems.push("llms.txt: does not link to https://www.krizaka.com");
+  if (!/(^|[\s(<])https:\/\/www\.krizaka\.com(?=[\s/)>#?]|$)/m.test(text)) problems.push("llms.txt: does not link to https://www.krizaka.com");
   if (!full && text.includes("{{")) problems.push("llms.txt: unfilled placeholder");
   if (/https:\/\/krizaka\.com/.test(text)) problems.push("llms.txt: declares the apex https://krizaka.com (use www)");
   if (host !== "https://www.krizaka.com" && !text.includes(host)) problems.push(`llms.txt: never mentions ${host}`);
