@@ -18,7 +18,7 @@ import { c, COMPOSE, CONTAINER, currentBranch, databaseForBranch, databaseUrl, f
 
 step("Prerequisites");
 const major = Number(process.versions.node.split(".")[0]);
-if (major < 20) fail(`Node ${process.versions.node} — Yazakia needs Node 20 or later`);
+if (major < 22) fail(`Node ${process.versions.node} — Yazakia needs Node 22 or later`);
 ok(`Node ${process.versions.node}`);
 if (run("docker", ["info"], { allowFail: true, quiet: true }).status !== 0) fail("Docker is not running — start Docker Desktop (or the daemon) and retry");
 ok("Docker is running");

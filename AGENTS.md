@@ -37,7 +37,7 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 
 ## 1. Execution & developer experience
 
-- **One command to start**: `npm run setup` (checks Node ≥ 20 and Docker, writes `.env` with a generated
+- **One command to start**: `npm run setup` (checks Node ≥ 22 and Docker, writes `.env` with a generated
   `AUTH_SESSION_SECRET` and `DATABASE_ENCRYPTION_KEY`, starts PostgreSQL 16 + pgvector on :5435, migrates, seeds). Then `npm run dev`.
 - **No shell scripts.** Tooling is Node (`scripts/*.mjs`, no dependencies) behind `npm run`.
 - **One `.env` at the repository root**, read by the web app (`next.config.mjs`), drizzle-kit, the migrator and the

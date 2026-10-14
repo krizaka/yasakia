@@ -18,7 +18,7 @@ will run on [Orazaka](https://krizaka.com/products/orazaka).
 ## Start
 
 ```bash
-npm run setup   # Node ≥ 20 and Docker: .env with fresh secrets, PostgreSQL 16 + pgvector, migrations, seed
+npm run setup   # Node ≥ 22 and Docker: .env with fresh secrets, PostgreSQL 16 + pgvector, migrations, seed
 npm run dev     # http://localhost:3000/api/healthz
 ```
 
