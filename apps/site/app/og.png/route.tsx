@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
 import { getDictionary } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 /* The social preview of every page (a static file at build: /og.png, 1200×630). */
 export const dynamic = "force-static";
@@ -26,7 +27,7 @@ export function GET() {
           YASAKIA<span style={{ color: "#2dd4bf" }}>.</span>
         </div>
         <div style={{ marginTop: 24, fontSize: 40, fontWeight: 600, maxWidth: 960, lineHeight: 1.25 }}>{t.home.title}</div>
-        <div style={{ marginTop: "auto", fontSize: 24, color: "#a1a1aa" }}>{`dev.yasakia.com · ${t.chrome.product}`}</div>
+        <div style={{ marginTop: "auto", fontSize: 24, color: "#a1a1aa" }}>{`${new URL(SITE_URL).host} · ${t.chrome.product}`}</div>
       </div>
     ),
     { width: 1200, height: 630 },
