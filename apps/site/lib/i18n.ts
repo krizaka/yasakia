@@ -1,7 +1,7 @@
 import { createI18n, type MessageKey as KeyOf } from "@krizaka/i18n";
 
-import en from "@/messages/en.json";
-import fr from "@/messages/fr.json";
+import en from "../messages/en.json";
+import fr from "../messages/fr.json";
 
 /** Every user-facing string lives in messages/<locale>.json — English is the reference, `fr.json` type-checks against it. */
 export type Locale = "en" | "fr";

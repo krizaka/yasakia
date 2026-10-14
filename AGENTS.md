@@ -294,3 +294,10 @@ yasakia/                           npm workspaces — Apache-2.0
   `pr-assets/<repo>/<pr-or-topic>/` with [`scripts/pr-assets.mjs`](https://github.com/krizaka/krizaka-com/blob/main/scripts/pr-assets.mjs)
   of krizaka-com, and the PR body links their CDN URLs.
 - Branches `feat/…`, `fix/…`, `chore/…`; Conventional Commits; never push to `main` (protected: PR + CI, squash only).
+
+## Search engines & AI assistants (Krizaka family contract)
+
+The contract is defined once, in krizaka-com `AGENTS.md` §2.4, and checked here by `scripts/check-seo-family.mjs` (a copy of
+the same dependency-free file in every site's repository — keep the copies identical; its unit test sits beside it).
+
+dev.yasakia.com is **indexed**: `apps/site/lib/seo.ts` (canonical, hreflang, cards, JSON-LD), `app/robots.ts`, `app/sitemap.ts`, `app/llms.txt`, `app/og.png`. CI serves `apps/site/out` and runs the guard.

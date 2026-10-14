@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 
 import { HowView } from "@/components/views";
-import { getDictionary } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
-  const t = getDictionary("fr");
-  return { title: t.how.title, description: t.meta.description, alternates: { canonical: "/fr/how-it-works/", languages: { en: "/how-it-works/" } } };
+  return pageMetadata("fr", "how-it-works");
 }
 
 export default function Page() {
