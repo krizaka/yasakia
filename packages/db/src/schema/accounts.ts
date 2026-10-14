@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { check, date, index, integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-import { accountStatusEnum, localeEnum, pushPlatformEnum } from "./enums";
+import { accountRoleEnum, accountStatusEnum, localeEnum, pushPlatformEnum } from "./enums";
 
 /**
  * One person. Created by `POST /api/auth/verify` once the e-mail code is right and the date of birth says 18+ (checked
@@ -12,9 +12,11 @@ export const accounts = pgTable(
   "accounts",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    /** Lower-cased. The only way to sign in (a 6-digit code by e-mail): no password exists. */
+    /** Lower-cased. The app signs in with a 6-digit code by e-mail; the web console may also hold a password (`account_credentials`). */
     email: varchar("email", { length: 254 }).notNull().unique(),
     status: accountStatusEnum("status").default("ACTIVE").notNull(),
+    /** USER by default; ADMIN is granted by an operator (`npm run db:qa-accounts`, never by the person). */
+    role: accountRoleEnum("role").default("USER").notNull(),
     locale: localeEnum("locale").default("en").notNull(),
     /** Checked 18+ by the server at creation. Private: never shown to anyone, only the age is. */
     birthDate: date("birth_date").notNull(),
@@ -71,3 +73,38 @@ export const rateLimitBuckets = pgTable("rate_limit_buckets", {
   count: integer("count").notNull(),
   resetAt: timestamp("reset_at", { withTimezone: true }).notNull(),
 });
+
+/**
+ * A password, for the web console only (the app keeps signing in by e-mail code). Provisioned by an operator
+ * (`npm run db:qa-accounts`), changed by the person; kept as a salted scrypt hash, never the password itself.
+ */
+export const accountCredentials = pgTable("account_credentials", {
+  accountId: uuid("account_id")
+    .primaryKey()
+    .references(() => accounts.id, { onDelete: "cascade" }),
+  passwordHash: text("password_hash").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+/**
+ * A browser session of the web console: an opaque random token in an HttpOnly cookie, kept only as its SHA-256. One row
+ * per device, so the person sees where they are signed in and can end any of them; revoked or expired rows are swept.
+ */
+export const webSessions = pgTable(
+  "web_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    accountId: uuid("account_id")
+      .references(() => accounts.id, { onDelete: "cascade" })
+      .notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull().unique(),
+    /** What the browser said it was, trimmed — shown as « Safari on macOS » style text, never trusted. */
+    userAgent: varchar("user_agent", { length: 300 }),
+    ip: varchar("ip", { length: 64 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (t) => [index("web_sessions_account_idx").on(t.accountId), index("web_sessions_expiry_idx").on(t.expiresAt)],
+);

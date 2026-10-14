@@ -51,7 +51,40 @@ export function setting(name: string, fallback: number, min: number, max: number
   return value;
 }
 
+/** True on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): the only place where e-mail and photo storage may be left unconfigured. */
+export function isDevDeployment(env: Env = process.env): boolean {
+  return env.NEXT_PUBLIC_APP_ENV?.trim() === "dev";
+}
+
+/**
+ * May a stranger create an account? `AUTH_SIGNUP_ENABLED`, **false unless it says `true`** — decided by the server,
+ * whatever any client shows: the e-mail-code flow then signs existing people in and creates nobody.
+ */
+export function signupEnabled(env: Env = process.env): boolean {
+  return env.AUTH_SIGNUP_ENABLED?.trim().toLowerCase() === "true";
+}
+
+/** The path the app is served under (`/app` on dev.yasakia.com), empty at the root. Read at build time. */
+export function basePath(env: Env = process.env): string {
+  const raw = env.NEXT_PUBLIC_APP_BASE_PATH?.trim() ?? "";
+  return raw && raw !== "/" ? `/${raw.replace(/^\/+|\/+$/g, "")}` : "";
+}
+
+/**
+ * The addresses the administration console answers (`AUTH_ALLOWED_IPS`, comma separated). Empty: every address outside
+ * production, **nobody** in production (fail-closed). A console that is not on the list does not exist (404).
+ */
+export function consoleAllowedIps(env: Env = process.env): string[] | null {
+  const list = (env.AUTH_ALLOWED_IPS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (list.length) return list;
+  return isProduction(env) ? [] : null;
+}
+
 export type MediaConfig =
+  | { driver: "none" }
   | { driver: "local"; dir: string }
   | { driver: "bunny"; zone: string; apiKey: string; endpoint: string; pullZoneHostname: string; tokenKey: string };
 
@@ -61,11 +94,16 @@ export type MediaConfig =
  */
 export function mediaConfig(env: Env = process.env): MediaConfig {
   const driver = env.MEDIA_STORAGE_PROVIDER?.trim().toLowerCase() || (isProduction(env) ? "bunny" : "local");
+  // A dev deployment may run without photo storage: the photo routes then answer 503, nothing is faked.
+  if (driver === "none") {
+    if (!isDevDeployment(env)) throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "may be none only on a dev deployment (NEXT_PUBLIC_APP_ENV=dev)");
+    return { driver: "none" };
+  }
   if (driver === "local") {
     if (isProduction(env)) throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "must be bunny in production (container disks are not storage)");
     return { driver: "local", dir: env.MEDIA_STORAGE_LOCAL_DIR?.trim() || defaultLocalDir() };
   }
-  if (driver !== "bunny") throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "must be bunny or local");
+  if (driver !== "bunny") throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "must be bunny, local or none");
   const need = (name: string) => {
     const value = env[name]?.trim();
     if (!value) throw new ConfigurationError(name, "is required with MEDIA_STORAGE_PROVIDER=bunny");
@@ -146,6 +184,7 @@ export function assertProductionConfig(env: Env = process.env): void {
   attempt(() => mediaConfig(env));
   attempt(() => realtimeConfig(env));
   attempt(() => {
+    if (env.MAIL_PROVIDER?.trim() === "none" && isDevDeployment(env)) return; // dev deployment: no e-mail yet, the code flow answers 503
     if (env.MAIL_PROVIDER?.trim() !== "mailgun") throw new ConfigurationError("MAIL_PROVIDER", "must be mailgun in production (the sign-in codes)");
     if (!(env.MAIL_API_KEY?.trim() && env.MAIL_DOMAIN?.trim())) throw new ConfigurationError("MAIL_API_KEY and MAIL_DOMAIN", "are required in production (the sign-in codes)");
   });

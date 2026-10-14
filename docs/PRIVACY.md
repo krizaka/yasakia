@@ -18,6 +18,9 @@ paperwork.
 | Date of birth | `accounts.birth_date` | never in any answer but the owner's export (`GET /api/me` shows the age) | while the account exists |
 | Sign-in codes | `auth_codes` | keyed hash only (HMAC-SHA256), 5 attempts | 10 minutes, swept |
 | Session tokens | the phone (secure storage) | signed; re-checked against the account on every request | 30 days or "sign out everywhere" |
+| Web sessions (the console) | `web_sessions` | one random token in an HttpOnly cookie, kept only as its SHA-256; the browser's name and the address it came from, to show you where you are signed in | 14 days, or until you end it; gone with the account |
+| Passwords (the console, if one was set for you) | `account_credentials` | salted scrypt hash only | while the account exists |
+| What the console did (sign-ins, password changes, suspensions, deletions) | `audit_log` | ids and a few words, never a secret or a message; your address is blanked from it when you delete your account | for safety reviews |
 | Profile (name, gender, seeking, age range, intent, radius) | `profiles` | — | while the account exists |
 | Position | `profiles.lat/lng` | **rounded to ~1 km before it is written**; `geo_precision_m` | while the account exists |
 | Photos | Bunny Storage (`photos/<account>/<photo>.jpg`) + `profile_photos` | re-encoded (EXIF/GPS stripped); private; viewed only through 300-second signed URLs after the access rule | until removed or the account is deleted; storage purge ≤ 30 days |

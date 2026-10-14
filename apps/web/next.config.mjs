@@ -7,7 +7,11 @@ import { fileURLToPath } from "node:url";
 const rootEnv = fileURLToPath(new URL("../../.env", import.meta.url));
 if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 
-const appVersion = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")).version;
+const packageVersion = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")).version;
+// package.json's version + the short commit DigitalOcean passes at build (APP_COMMIT_SHA), as the static site shows it.
+const appVersion = process.env.APP_COMMIT_SHA ? `${packageVersion}+${process.env.APP_COMMIT_SHA.slice(0, 7)}` : packageVersion;
+// dev.yasakia.com serves the static site at / and this app under /app (NEXT_PUBLIC_APP_BASE_PATH=/app); empty elsewhere.
+const basePath = process.env.NEXT_PUBLIC_APP_BASE_PATH?.trim() || "";
 const production = process.env.NODE_ENV === "production";
 
 /**
@@ -44,12 +48,14 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  ...(basePath ? { basePath } : {}),
   // The end-to-end run (e2e/run.mjs) builds into its own folder, so it never collides with a `next dev` already running.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   reactStrictMode: true,
   poweredByHeader: false,
   env: {
     NEXT_PUBLIC_APP_VERSION: appVersion,
+    NEXT_PUBLIC_APP_BASE_PATH: basePath,
   },
   transpilePackages: ["@yasakia/db", "@yasakia/media"],
   // Native and driver modules stay Node modules, required at run time: sharp (images), pg (the pool, LISTEN), ioredis

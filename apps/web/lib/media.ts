@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 
 import { bunnyStorage, localStorage, type MediaStorage, photoWidth, signBunnyUrl, signLocalMediaUrl, signUpload } from "@yasakia/media";
 
-import { appUrl, type MediaConfig, mediaConfig, sessionSecret } from "./env";
+import { appUrl, ConfigurationError, type MediaConfig, mediaConfig, sessionSecret } from "./env";
 
 /**
  * The media door: the storage of this deployment and the two signatures — a 300-second photo URL for one viewer, a
@@ -14,6 +14,7 @@ import { appUrl, type MediaConfig, mediaConfig, sessionSecret } from "./env";
 const holder = globalThis as unknown as { __yasakiaStorage?: { key: string; storage: MediaStorage } };
 
 export function mediaStorage(config: MediaConfig = mediaConfig()): MediaStorage {
+  if (config.driver === "none") throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "is none on this deployment: photos are not available");
   const key = JSON.stringify(config);
   if (holder.__yasakiaStorage?.key !== key) {
     holder.__yasakiaStorage = { key, storage: config.driver === "bunny" ? bunnyStorage(config) : localStorage(config.dir) };
@@ -34,6 +35,7 @@ export interface SignedPhoto {
 
 /** A photo URL for one viewer: the asked width snapped to the allowed ones, valid 300 seconds. */
 export function signPhotoUrl(storageKey: string, askedWidth?: number | null, config: MediaConfig = mediaConfig()): SignedPhoto {
+  if (config.driver === "none") throw new ConfigurationError("MEDIA_STORAGE_PROVIDER", "is none on this deployment: photos are not available");
   const width = photoWidth(askedWidth);
   const signed =
     config.driver === "bunny"

@@ -11,13 +11,20 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (25)
+## Endpoints (37)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
+| `GET` | `/api/admin/audit` | public | The audit log for the console — sign-ins, password changes, suspensions, restorations, deletions — searched, filtered and paged on the server. |
 | `GET` | `/api/admin/reports` | operator · service token + IP allow-list | The reports for operators — urgent reasons (UNDERAGE, THREAT) first, details decrypted; service token and IP allow-list. |
+| `GET` | `/api/admin/users` | public | Lists accounts for the console — searched by address or name, filtered by status and role, sorted and paged on the server. |
+| `GET` | `/api/admin/users/{id}` | public | One account for the console: state, role, counts and the audit lines about it — never a date of birth, a message or a photo. |
+| `POST` | `/api/admin/users/{id}/restore` | public | Lifts an account's suspension: it is ACTIVE again and can sign in; the restoration is logged. |
+| `POST` | `/api/admin/users/{id}/suspend` | public | Suspends an account: it cannot sign in and every session of the app and the browser ends at once; the reason is logged. |
 | `POST` | `/api/auth/logout` | bearer · account | Signs out: forgets this phone's push token, and with `everywhere` invalidates every session token of the account at once (the app also deletes its own token from secure storage). |
+| `POST` | `/api/auth/password` | public | Signs a person in to the web console with their e-mail and password: the answer sets an HttpOnly session cookie. |
 | `POST` | `/api/auth/request-code` | public | Sends a 6-digit sign-in code to an e-mail address — the same answer whether an account exists or not. |
+| `POST` | `/api/auth/sign-out` | public | Signs the web console out: this browser's session ends and its cookie is cleared (an unknown cookie is cleared too). |
 | `POST` | `/api/auth/verify` | public | Exchanges an e-mail code for a session token (`client: "native"`, sent back as `Authorization: Bearer`). |
 | `GET` | `/api/blocks` | bearer · account | The people the account blocked (the settings list), oldest first. |
 | `POST` | `/api/blocks` | bearer · account | Blocks someone — immediate, invisible to them, mutual in effect: their intro closes and each leaves the other's current batch. |
@@ -27,13 +34,18 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `DELETE` | `/api/me` | bearer · account | Deletes the account for good, at once — every row that is theirs, in one transaction; the photos are purged from storage right after (retried until done, 30 days at most) and a confirmation e-mail leaves. |
 | `GET` | `/api/me` | bearer · account | The signed-in account: e-mail, status, language, age (never the date of birth), profile, rounded position, the agent's state. |
 | `PATCH` | `/api/me` | bearer · account | Changes the profile, the language, or pauses the account (nobody is shown it any more; its batches and intros stay open). |
+| `GET` | `/api/me/dashboard` | bearer · account | The signed-in account's home: where the agent is, the open batch, the introductions, the phones — counts and dates, never a person's profile or a score. |
 | `GET` | `/api/me/export` | bearer · account | Everything the account holds, as JSON — at once when it takes under a second, else 202 with an export id to poll (`?id=`, kept 24 hours); `?mode=async` asks for the background build directly. |
 | `PUT` | `/api/me/location` | bearer · account | Sets the position from the phone's coordinates, rounded to about 1 km before it is written — the exact one is never stored; the answer is what was kept. |
+| `POST` | `/api/me/password` | bearer · account | Changes the account's password (the current one must be right); every other browser session of the account ends. |
 | `GET` | `/api/me/photos` | bearer · account | The account's own photos in their order, with status, size and blurhash — never a URL (GET /api/photos/&#123;id&#125; signs one). |
 | `PATCH` | `/api/me/photos` | bearer · account | Reorders the photos: `order` lists each of the account's photos once, the first one first. |
 | `POST` | `/api/me/photos` | bearer · account | Starts a photo: declares its type and size and answers a signed upload URL (PUT, 300 seconds, this photo only); then `PUT /api/me/photos/&#123;id&#125;/complete`. |
 | `DELETE` | `/api/me/photos/{id}` | bearer · account | Removes one of the account's photos — from storage first, then from the profile (another account's photo is a 404). |
 | `PUT` | `/api/me/photos/{id}/complete` | bearer · account | Completes an upload: checks the bytes are the declared picture, re-encodes them (orientation applied, metadata — GPS included — stripped), computes width, height and blurhash, then moderation (V1: approved automatically). |
+| `DELETE` | `/api/me/sessions` | bearer · account | Ends every other browser session of the account (the one making the call stays). |
+| `GET` | `/api/me/sessions` | bearer · account | The signed-in account's browser sessions — where they are signed in, since when, last used — the current one marked. |
+| `DELETE` | `/api/me/sessions/{id}` | bearer · account | Ends one browser session of the account; ending the current one signs this browser out. |
 | `GET` | `/api/media/{key…}` | signed media URL (300 s, development storage only) | Development storage only: serves a local photo at a URL `GET /api/photos/&#123;id&#125;` signed (300 seconds, one width) — what Bunny's pull zone and Optimizer do in production. |
 | `GET` | `/api/photos/{id}` | bearer · account | A photo for the signed-in viewer — after the access rule (its owner; someone with the owner in a current batch; an open intro), a URL signed for 300 seconds at the asked width (`?w=`, snapped to 160…1280). |
 | `DELETE` | `/api/push/tokens` | bearer · account | Forgets this phone's push token (notifications turned off on the device). |
@@ -41,6 +53,6 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/reports` | bearer · account | Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it. |
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
 
-## Database tables (21)
+## Database tables (24)
 
-See the Database Reference: `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports`.
+See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `web_sessions`.

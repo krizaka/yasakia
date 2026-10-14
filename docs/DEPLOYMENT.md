@@ -36,6 +36,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | Variable | Production | Secret | Default | What it does |
 | :--- | :---: | :---: | :--- | :--- |
 | `NEXT_PUBLIC_APP_URL` *(build)* | ✓ |  | `http://localhost:3000` | Public origin of the API: signed upload URLs and local media URLs are built on it. |
+| `NEXT_PUBLIC_APP_BASE_PATH` *(build)* | — |  |  | The path the app is served under (dev.yasakia.com serves it at `/app`, next to the static site at `/`). Empty: the root. |
 | `NEXT_PUBLIC_APP_ENV` *(build)* | — |  | `local` | Where the build runs, for the build information. |
 | `APP_ACCOUNT_PURGE_INTERVAL_SECONDS` | — |  | `60` | How often accounts past their deletion delay are purged. |
 | `APP_SWEEP_INTERVAL_SECONDS` | — |  | `600` | How often expired codes, sessions and uploads are swept. |
@@ -57,13 +58,15 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 
 | Variable | Production | Secret | Default | What it does |
 | :--- | :---: | :---: | :--- | :--- |
+| `AUTH_SIGNUP_ENABLED` | recommended |  | `false` | May a stranger create an account? **false unless `true`**, decided by the server: the e-mail-code flow then signs existing accounts in and creates none. |
+| `AUTH_ALLOWED_IPS` | recommended |  |  | Addresses that may open the administration console (comma separated; empty: any outside production, **none** in production). Elsewhere the console is a 404. |
 | `AUTH_SESSION_SECRET` | ✓ | ✓ |  | Signs the session tokens and, derived, the upload and local media URLs (32+ random characters). |
 
 ### Media — `MEDIA_`
 
 | Variable | Production | Secret | Default | What it does |
 | :--- | :---: | :---: | :--- | :--- |
-| `MEDIA_STORAGE_PROVIDER` | ✓ |  | `local` | Where photos live: `local` (development, `.storage/`) or `bunny` (production: required). |
+| `MEDIA_STORAGE_PROVIDER` | ✓ |  | `local` | Where photos live: `local` (development, `.storage/`) or `bunny` (production: required). `none` only on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): photos answer 503. |
 | `MEDIA_STORAGE_LOCAL_DIR` | — |  | `.storage/` | The folder of `local` storage. |
 | `MEDIA_STORAGE_ZONE` | ✓ |  |  | Storage zone name (`bunny`). |
 | `MEDIA_STORAGE_API_KEY` | ✓ | ✓ |  | Storage zone password (`bunny`). |
@@ -76,7 +79,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 
 | Variable | Production | Secret | Default | What it does |
 | :--- | :---: | :---: | :--- | :--- |
-| `MAIL_PROVIDER` | ✓ |  |  | The e-mail service: `mailgun`. Production is fail-closed without it (a sign-in code is never logged there). |
+| `MAIL_PROVIDER` | ✓ |  |  | The e-mail service: `mailgun`. Production is fail-closed without it (a sign-in code is never logged there). `none` only on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): the code flow answers 503. |
 | `MAIL_API_KEY` | ✓ | ✓ |  | The provider's API key. |
 | `MAIL_DOMAIN` | ✓ |  |  | Sending domain (e.g. `mg.yasakia.com`). |
 | `MAIL_API_URL` | — |  | `https://api.mailgun.net` | API base (EU region: `https://api.eu.mailgun.net`). |
@@ -168,7 +171,23 @@ The test suites need none of these: CI and `npm run test:e2e` run on the local s
 
 ## The public dev site (static)
 
-`dev.yasakia.com` is a DigitalOcean App Platform **static site** built from `apps/site` — `deploy/digitalocean/site.app.yaml`
+`dev.yasakia.com` is a DigitalOcean App Platform app: a **static site** at `/` built from `apps/site` and the web app at `/app` (next section) — `deploy/digitalocean/dev.app.yaml`
 (`npm ci && npm run build -w apps/site`, output `apps/site/out`). No service, no database, no secret; the only build
 variable is `APP_COMMIT_SHA` (`${_self.COMMIT_HASH}`), which the footer shows with `package.json`'s version. The app lives in
 the DigitalOcean project `yasakia`; the DNS is a CNAME `dev` → the app's default domain.
+
+## Dev deployment of the web app (`/app` on dev.yasakia.com)
+
+One app, one domain, one certificate (`deploy/digitalocean/dev.app.yaml`): the static site at `/`, the Next.js web app at
+`/app` (`preserve_path_prefix`, built with `NEXT_PUBLIC_APP_BASE_PATH=/app`). Why not `app.yasakia.com`: no new DNS or
+certificate, the same origin for the session cookie, the product's own address — at the price of one component.
+
+- **Cost**: one service on `apps-s-1vcpu-0.5gb` (**$5/month**); the `migrate` PRE_DEPLOY job is billed only while it runs; the
+  database is a database `yasakia_db` and a role `yasakia_user` on the shared dev cluster `krizaka-dev-pg` (no second
+  cluster), the app being in the cluster's trusted sources.
+- **Secrets** (type SECRET, entered once, never printed): `AUTH_SESSION_SECRET`, `DATABASE_ENCRYPTION_KEY`.
+- **Closed**: `AUTH_SIGNUP_ENABLED=false`, `AUTH_ALLOWED_IPS` = the one address that may open the console, `MAIL_PROVIDER=none` and
+  `MEDIA_STORAGE_PROVIDER=none` (allowed only with `NEXT_PUBLIC_APP_ENV=dev`).
+- **Accounts**: only `npm run db:qa-accounts` with `DATABASE_URL` and `QA_USER_PASSWORD` / `QA_ADMIN_PASSWORD` in the environment.
+- The extensions `vector`, `cube` and `earthdistance` are created once by the database owner before the first release.
+

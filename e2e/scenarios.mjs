@@ -450,6 +450,158 @@ let adaPhoto;
   check("the same address starts from nothing (a new account needs a date of birth)", (await call("/api/auth/verify", { method: "POST", body: { email: adaEmail, code, client: "native" }, ip: freshIp() })).json.code === "BIRTH_DATE_REQUIRED");
 }
 
+// ── The web console: sign-up closed, password sign-in, sessions, the administration console ───────────
+{
+  const CLOSED = env("CLOSED_URL", "");
+  const QA_USER = { email: "qa+user@yasakia.com", password: env("QA_USER_PASSWORD", "") };
+  const QA_ADMIN = { email: "qa+admin@yasakia.com", password: env("QA_ADMIN_PASSWORD", "") };
+  const ORIGIN = B;
+
+  /** A call as the browser makes it: the session cookie, a same-origin Origin on writes. */
+  async function web(pathname, { method = "GET", cookie, body, ip, origin = ORIGIN } = {}) {
+    const res = await fetch(B + pathname, {
+      method,
+      redirect: "manual",
+      headers: { ...(cookie ? { Cookie: cookie } : {}), ...(method !== "GET" && origin ? { Origin: origin } : {}), ...(body !== undefined ? { "Content-Type": "application/json" } : {}), ...(ip ? { "X-Forwarded-For": ip } : {}) },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+    const text = await res.text();
+    let json = {};
+    try {
+      json = JSON.parse(text);
+    } catch {}
+    return { status: res.status, json, headers: res.headers, text };
+  }
+  const cookieOf = (res) => /(yasakia_session=[^;]+)/.exec(res.headers.get("set-cookie") ?? "")?.[1];
+  const signIn = async (who, ip) => {
+    const r = await web("/api/auth/password", { method: "POST", body: who, ip: ip ?? freshIp() });
+    return { ...r, cookie: cookieOf(r) };
+  };
+  const ADMIN_IP_HEADER = ADMIN_IP;
+
+  // Sign-up is closed by the server, whatever a client shows.
+  if (CLOSED) {
+    const email = `closed-${run}@example.test`;
+    const ip = freshIp();
+    const asked = await fetch(`${CLOSED}/api/auth/request-code`, { method: "POST", headers: { "Content-Type": "application/json", "X-Forwarded-For": ip }, body: JSON.stringify({ email, locale: "en" }) });
+    check("closed sign-up: asking a code for a stranger still answers the same 200 (nothing revealed)", asked.status === 200);
+    await sleep(300);
+    check("closed sign-up: ...but no code is e-mailed to a stranger", mailsTo(email, "sign-in-code").length === 0);
+    const verify = await fetch(`${CLOSED}/api/auth/verify`, { method: "POST", headers: { "Content-Type": "application/json", "X-Forwarded-For": ip }, body: JSON.stringify({ email, code: "000000", client: "native", birthDate: "1990-01-01", acceptTerms: true }) });
+    check("closed sign-up: verifying a stranger creates no account", verify.status === 400 && (await sql("select 1 from accounts where email = $1", [email])).length === 0);
+    // A code issued while open still cannot create an account once closed: issue it on the open server, redeem on the closed one.
+    const open = await signUp("opened");
+    const email2 = `late-${run}@example.test`;
+    const ip2 = freshIp();
+    await call("/api/auth/request-code", { method: "POST", body: { email: email2, locale: "en" }, ip: ip2 });
+    const { code } = await codeFor(email2);
+    const late = await fetch(`${CLOSED}/api/auth/verify`, { method: "POST", headers: { "Content-Type": "application/json", "X-Forwarded-For": ip2 }, body: JSON.stringify({ email: email2, code, client: "native", birthDate: "1990-01-01", acceptTerms: true }) });
+    const lateJson = await late.json();
+    check("closed sign-up: a valid code cannot create an account (SIGNUP_CLOSED, 403)", late.status === 403 && lateJson.code === "SIGNUP_CLOSED" && (await sql("select 1 from accounts where email = $1", [email2])).length === 0, lateJson);
+    check("closed sign-up: the open server still signs people up", open.status < 300 && !!open.token);
+  } else {
+    check("closed sign-up: CLOSED_URL not set (scenario skipped by the caller)", true);
+  }
+
+  // Password sign-in.
+  const wrong = await signIn({ email: QA_USER.email, password: "not-the-password-0000" });
+  check("password sign-in: a wrong password is a 401 INVALID_CREDENTIALS and sets no cookie", wrong.status === 401 && wrong.json.code === "INVALID_CREDENTIALS" && !wrong.cookie);
+  const unknown = await signIn({ email: `nobody-${run}@example.test`, password: "not-the-password-0000" });
+  check("password sign-in: an unknown address gets the very same answer", unknown.status === 401 && unknown.json.code === "INVALID_CREDENTIALS" && unknown.json.error === wrong.json.error);
+  const user = await signIn(QA_USER);
+  check("password sign-in: the right password sets an HttpOnly, SameSite=Lax session cookie", user.status === 200 && !!user.cookie && /HttpOnly/i.test(user.headers.get("set-cookie")) && /SameSite=Lax/i.test(user.headers.get("set-cookie")), user.json);
+  check("the session cookie is opaque: its hash, not itself, is stored", user.cookie && (await sql("select 1 from web_sessions where token_hash = encode(sha256(convert_to($1, 'UTF8')), 'hex')", [user.cookie.split("=")[1]])).length === 1);
+  check("a cookie session reads /api/me", (await web("/api/me", { cookie: user.cookie })).json.account?.email === QA_USER.email);
+  check("no cookie: /api/me/dashboard is a 401", (await web("/api/me/dashboard")).status === 401);
+  const dash = await web("/api/me/dashboard", { cookie: user.cookie });
+  check("the dashboard answers counts and dates (agent state, profile completeness, no person, no score)", dash.status === 200 && dash.json.dashboard?.agentState === "ONBOARDING" && dash.json.dashboard?.profile?.total === 5 && dash.json.dashboard?.batch === null);
+  check("a write with another origin is refused (CROSS_ORIGIN) even with the cookie", (await web("/api/me", { method: "PATCH", cookie: user.cookie, body: { displayName: "Eve" }, origin: "https://evil.example" })).json.code === "CROSS_ORIGIN");
+
+  // Brute force is limited.
+  {
+    const ip = freshIp();
+    const statuses = [];
+    for (let i = 0; i < 12; i++) statuses.push((await web("/api/auth/password", { method: "POST", body: { email: `brute-${run}@example.test`, password: "guess-guess-guess" }, ip })).status);
+    check("password sign-in is rate limited per address (429 after 10 tries)", statuses.slice(0, 10).every((x) => x === 401) && statuses.slice(10).every((x) => x === 429), statuses.join(","));
+  }
+
+  // Sessions and devices.
+  const second = await signIn(QA_USER);
+  const list = await web("/api/me/sessions", { cookie: user.cookie });
+  check("sessions: both devices are listed, the current one marked", list.json.sessions?.length >= 2 && list.json.sessions.filter((x) => x.current).length === 1);
+  const other = list.json.sessions.find((x) => !x.current);
+  const ended = await web(`/api/me/sessions/${other.id}`, { method: "DELETE", cookie: user.cookie });
+  check("sessions: ending another session works", ended.status === 200 && ended.json.signedOut === false);
+  const pooled = await signIn(QA_USER);
+  const sweep = await web("/api/me/sessions", { method: "DELETE", cookie: user.cookie });
+  check("sessions: ending every other device keeps this one", sweep.status === 200 && (await web("/api/me", { cookie: user.cookie })).status === 200 && (await web("/api/me", { cookie: pooled.cookie })).status === 401);
+  check("sessions: a session ended elsewhere is a 401 at once", (await web("/api/me", { cookie: second.cookie })).status === 401);
+  check("sessions: another account's session id is a 404", (await web(`/api/me/sessions/${other.id}`, { method: "DELETE", cookie: user.cookie })).status === 404);
+
+  // The profile through the cookie, and the password.
+  const patched = await web("/api/me", { method: "PATCH", cookie: user.cookie, body: { displayName: "QA user (test)", locale: "en" } });
+  check("account: the profile is saved through the same API as the app", patched.status === 200 && patched.json.profile?.displayName === "QA user (test)");
+  const tooShort = await web("/api/me/password", { method: "POST", cookie: user.cookie, body: { current: QA_USER.password, next: "short" } });
+  check("account: a weak new password is refused (PASSWORD_TOO_SHORT)", tooShort.status === 400 && tooShort.json.code === "PASSWORD_TOO_SHORT");
+  const badCurrent = await web("/api/me/password", { method: "POST", cookie: user.cookie, body: { current: "wrong-current-pass", next: "a-new-long-passphrase-1" } });
+  check("account: the current password must be right (WRONG_PASSWORD)", badCurrent.status === 403 && badCurrent.json.code === "WRONG_PASSWORD");
+  const stay = await signIn(QA_USER);
+  const changed = await web("/api/me/password", { method: "POST", cookie: user.cookie, body: { current: QA_USER.password, next: `${QA_USER.password}-changed` } });
+  check("account: changing the password ends the other sessions", changed.status === 200 && (await web("/api/me", { cookie: stay.cookie })).status === 401 && (await web("/api/me", { cookie: user.cookie })).status === 200);
+  check("account: the new password signs in, the old one no longer does", (await signIn({ email: QA_USER.email, password: `${QA_USER.password}-changed` })).status === 200 && (await signIn(QA_USER)).status === 401);
+  await web("/api/me/password", { method: "POST", cookie: user.cookie, body: { current: `${QA_USER.password}-changed`, next: QA_USER.password } });
+
+  // The administration console: role AND address.
+  const adminIn = await signIn(QA_ADMIN, ADMIN_IP_HEADER);
+  check("admin: the administrator signs in", adminIn.status === 200 && adminIn.json.account?.role === "ADMIN");
+  check("admin: a person is refused the users list (403)", (await web("/api/admin/users", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403);
+  check("admin: an administrator on a wrong address is refused (IP_NOT_ALLOWED)", (await web("/api/admin/users", { cookie: adminIn.cookie, ip: "198.51.100.200" })).json.code === "IP_NOT_ALLOWED");
+  check("admin: no session, no users list (401)", (await web("/api/admin/users", { ip: ADMIN_IP_HEADER })).status === 401);
+  const users = await web("/api/admin/users?size=2&sort=email&dir=asc", { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
+  check("admin: the users list is paged and sorted on the server", users.status === 200 && users.json.rows.length === 2 && users.json.total > 2 && users.json.rows[0].email <= users.json.rows[1].email);
+  check("admin: a row carries no date of birth", users.json.rows.every((r) => !("birthDate" in r) && !("birth_date" in r)));
+  const found = await web(`/api/admin/users?search=${encodeURIComponent("qa+user")}&status=ACTIVE&role=USER`, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
+  check("admin: search and filters (status, role) are answered by the server", found.json.rows?.length === 1 && found.json.rows[0].email === QA_USER.email);
+  const someone = await signUp("target");
+  const detail = await web(`/api/admin/users/${someone.id}`, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
+  check("admin: one account's detail (counts, no secret)", detail.status === 200 && detail.json.user?.counts && !JSON.stringify(detail.json).includes("birth"));
+  check("admin: a malformed id is a 404", (await web("/api/admin/users/not-a-uuid", { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER })).status === 404);
+  const sus = await web(`/api/admin/users/${someone.id}/suspend`, { method: "POST", cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, body: { reason: "e2e: testing the suspension" } });
+  check("admin: suspend works", sus.status === 200);
+  check("admin: the suspended person's app token stops working at once", [401, 403].includes((await call("/api/me", { token: someone.token })).status));
+  check("admin: suspending twice is refused (ALREADY_SUSPENDED)", (await web(`/api/admin/users/${someone.id}/suspend`, { method: "POST", cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, body: { reason: "again please" } })).json.code === "ALREADY_SUSPENDED");
+  check("admin: an administrator cannot be suspended from the console", (await web(`/api/admin/users/${adminIn.json.account.id}/suspend`, { method: "POST", cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, body: { reason: "myself" } })).json.code === "SELF");
+  const res = await web(`/api/admin/users/${someone.id}/restore`, { method: "POST", cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
+  check("admin: restore works (the account is ACTIVE; its old tokens stay dead — it signs in again)", res.status === 200 && (await sql("select status from accounts where id = $1", [someone.id]))[0].status === "ACTIVE");
+  check("admin: restoring an active account is refused (NOT_SUSPENDED)", (await web(`/api/admin/users/${someone.id}/restore`, { method: "POST", cookie: adminIn.cookie, ip: ADMIN_IP_HEADER })).json.code === "NOT_SUSPENDED");
+  const audit = await web(`/api/admin/audit?size=50&action=admin.suspend,admin.restore&search=${encodeURIComponent("qa+admin")}`, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
+  check("audit: the suspension and the restoration are logged with who did it and why", audit.json.rows?.some((r) => r.action === "admin.suspend" && r.targetId === someone.id && r.detail?.reason?.includes("e2e")) && audit.json.rows.some((r) => r.action === "admin.restore" && r.targetId === someone.id), audit.json);
+  const refusedLog = await web("/api/admin/audit?action=auth.sign_in_refused&size=5", { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
+  check("audit: refused sign-ins are logged too", refusedLog.json.rows?.length > 0);
+  check("audit: the operator token reads the same API (no account)", (await call("/api/admin/users?size=1", { token: ADMIN_TOKEN, ip: ADMIN_IP })).status === 200);
+
+  // The console's pages.
+  const page = (p, cookie, ip) => web(p, { cookie, ip });
+  check("pages: the sign-in page is served (200) and not indexed", (await page("/en/sign-in")).status === 200 && (await page("/en/sign-in")).text.includes("noindex"));
+  check("pages: the home without a session goes to sign-in", (await page("/en")).status === 307 && (await page("/en")).headers.get("location")?.endsWith("/en/sign-in"));
+  check("pages: the home, the account render for a person", (await page("/en", user.cookie)).status === 200 && (await page("/fr/account", user.cookie)).status === 200);
+  check("pages: the administration console is a 404 for a person", (await page("/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
+  check("pages: ...and for an administrator on a wrong address", (await page("/en/admin/users", adminIn.cookie, "198.51.100.200")).status === 404);
+  check("pages: ...and renders for an administrator on the allowed address", (await page("/en/admin/users", adminIn.cookie, ADMIN_IP_HEADER)).status === 200 && (await page(`/fr/admin/users/${someone.id}`, adminIn.cookie, ADMIN_IP_HEADER)).status === 200);
+
+  // Delete my account, from the web.
+  const doomed = await signUp("doomed");
+  await sql("insert into audit_log (actor_id, actor_label, action, target_id) values ($1, $2, 'auth.sign_in', $1)", [doomed.id, doomed.email]);
+  const gone = await sql("select id from accounts where id = $1", [doomed.id]);
+  await sql("insert into web_sessions (account_id, token_hash, expires_at) values ($1, encode(sha256(convert_to('yw1.' || repeat('d', 43), 'UTF8')), 'hex'), now() + interval '1 day')", [doomed.id]);
+  const doomedCookie = "yasakia_session=yw1." + "d".repeat(43);
+  const del = await web("/api/me", { method: "DELETE", cookie: doomedCookie });
+  check("account: delete my account works from the web console and clears the cookie", gone.length === 1 && del.status === 200 && /Max-Age=0/.test(del.headers.get("set-cookie") ?? ""), del.json);
+  check("account: ...everything is gone, the audit log keeps no address", (await sql("select 1 from accounts where id = $1", [doomed.id])).length === 0 && (await sql("select 1 from audit_log where actor_label = $1", [doomed.email])).length === 0 && (await sql("select 1 from audit_log where action = 'account.deleted' and target_id = $1", [doomed.id])).length === 1);
+  const signOut = await web("/api/auth/sign-out", { method: "POST", cookie: adminIn.cookie });
+  check("sign-out: ends the session and clears the cookie", signOut.status === 200 && (await web("/api/me", { cookie: adminIn.cookie })).status === 401);
+}
+
 // ── The web pages ───────────────────────────────────────────────────────────────────────────────────
 {
   for (const [p, lang] of [["/en/privacy", "en"], ["/fr/privacy", "fr"], ["/en/terms", "en"], ["/fr/delete-account", "fr"]]) {

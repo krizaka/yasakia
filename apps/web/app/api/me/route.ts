@@ -1,4 +1,4 @@
-import { after } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { confirmDeletion, deleteAccount, meView, patchMe } from "@/lib/account";
@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { handle, ok, readJson } from "@/lib/http";
 import { purgeSoon } from "@/lib/jobs";
 import { limitAction } from "@/lib/rate-limit";
+import { sessionCookie } from "@/lib/web-session";
 
 const Gender = z.enum(["WOMAN", "MAN", "NON_BINARY"]);
 
@@ -54,6 +55,9 @@ export async function DELETE(req: Request) {
       purgeSoon();
       await confirmDeletion(deletion.email, deletion.locale);
     });
-    return ok({ deleted: true, purgeDeadlineDays: 30 });
+    const res = NextResponse.json({ success: true, deleted: true, purgeDeadlineDays: 30 });
+    // A browser's session rows went with the account; its cookie goes too.
+    if (me.via === "cookie") res.headers.append("Set-Cookie", sessionCookie(null));
+    return res;
   });
 }
