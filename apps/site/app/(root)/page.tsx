@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 
 import { HomeView } from "@/components/views";
-import { getDictionary } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
-  const t = getDictionary("en");
-  return { title: { absolute: t.meta.siteName }, description: t.meta.description, alternates: { canonical: "/", languages: { fr: "/fr/" } } };
+  return pageMetadata("en", "home");
 }
 
 export default function Page() {

@@ -38,6 +38,11 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
       - name: Static site build (dev.yasakia.com)
         run: npm run build:site
+      - name: SEO family contract (robots, AI crawlers, sitemap, llms.txt, canonical, JSON-LD back to Krizaka)
+        run: |
+          python3 -m http.server 3000 --directory apps/site/out >/dev/null 2>&1 &
+          sleep 2
+          node scripts/check-seo-family.mjs --base http://localhost:3000 --host https://dev.yasakia.com --types WebSite,SoftwareApplication
 
   database:
     name: Migrations & seed on PostgreSQL 16 + pgvector

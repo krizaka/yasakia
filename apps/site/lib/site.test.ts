@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { auditLlms, auditRobots } from "../../../scripts/check-seo-family.mjs";
+import robots from "../app/robots";
 import en from "../messages/en.json";
 import fr from "../messages/fr.json";
+import { llmsText } from "./llms";
 import { clip } from "./media";
-import { contactHref, pagePath,PAGES } from "./site";
+import { ORG_ID, pageMetadata, siteJsonLd } from "./seo";
+import { contactHref, pagePath,PAGES, SITE_URL } from "./site";
 
 const keys = (o: unknown, prefix = ""): string[] =>
   o && typeof o === "object" ? Object.entries(o).flatMap(([k, v]) => keys(v, `${prefix}${k}.`)) : [prefix.slice(0, -1)];
@@ -36,3 +40,41 @@ describe("the public dev site", () => {
     expect(contactHref("x y")).toBe("https://www.krizaka.com/contact?topic=yasakia&source=x%20y");
   });
 });
+
+describe("search engines and AI assistants (the family contract, scripts/check-seo-family.mjs)", () => {
+  it("every page is canonical to itself, names both languages and carries a social image", () => {
+    for (const locale of ["en", "fr"] as const) {
+      for (const page of PAGES) {
+        const m = pageMetadata(locale, page);
+        expect(m.alternates?.canonical).toBe(`${SITE_URL}${pagePath(locale, page)}`);
+        expect(m.alternates?.languages).toMatchObject({ en: `${SITE_URL}${pagePath("en", page)}`, fr: `${SITE_URL}${pagePath("fr", page)}`, "x-default": `${SITE_URL}${pagePath("en", page)}` });
+        expect(JSON.stringify(m.openGraph)).toContain(`${SITE_URL}/og.png`);
+      }
+    }
+  });
+
+  it("robots.txt welcomes the AI crawlers and names the sitemap", () => {
+    const text = robotsText(robots());
+    expect(auditRobots(text, { host: SITE_URL })).toEqual([]);
+  });
+
+  it("llms.txt follows llmstxt.org and links the family", () => {
+    expect(auditLlms(llmsText(), { host: SITE_URL })).toEqual([]);
+  });
+
+  it("every JSON-LD node leads back to the Krizaka Organization; nothing is offered", () => {
+    const graph = siteJsonLd("en")["@graph"];
+    expect(graph.every((n) => (n as { publisher?: { "@id": string } }).publisher?.["@id"] === ORG_ID)).toBe(true);
+    const app = graph.find((n) => n["@type"] === "SoftwareApplication") as Record<string, unknown>;
+    expect(app.applicationCategory).toBe("LifestyleApplication");
+    expect(app).not.toHaveProperty("offers");
+    expect(app).not.toHaveProperty("downloadUrl");
+  });
+});
+
+/** MetadataRoute.Robots as the text Next serves. */
+function robotsText(r: ReturnType<typeof robots>): string {
+  const rules = Array.isArray(r.rules) ? r.rules : [r.rules];
+  const groups = rules.map((rule) => `User-Agent: ${rule.userAgent}\nAllow: ${rule.allow}`);
+  return `${groups.join("\n\n")}\n\nSitemap: ${r.sitemap}\n`;
+}

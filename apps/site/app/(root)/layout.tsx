@@ -6,6 +6,7 @@ import { SITE_URL } from "@/lib/site";
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
+/** What every page of the language shares; each page sets its own canonical, title and cards (lib/seo.ts). */
 export function generateMetadata(): Metadata {
   const t = getDictionary("en");
   return { metadataBase: new URL(SITE_URL), title: { default: t.meta.siteName, template: t.meta.titleTemplate.replace("{title}", "%s") }, description: t.meta.description, applicationName: t.meta.siteName, authors: [{ name: "Krizaka", url: "https://www.krizaka.com" }] };
