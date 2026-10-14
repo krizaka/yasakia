@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { appUrl, ConfigurationError, isProduction } from "./env";
+import { appUrl, ConfigurationError, isDevDeployment, isProduction } from "./env";
 import { type MailTemplateId, type MailVars, renderMailTemplate } from "./mail-templates";
 
 /**
@@ -25,10 +25,10 @@ export interface Mail {
   template: MailTemplateId;
 }
 
-export type MailDelivery = "mailgun" | "file" | "log";
+export type MailDelivery = "mailgun" | "file" | "log" | "none";
 
 export function mailDelivery(env: NodeJS.ProcessEnv = process.env): MailDelivery {
-  if (isProduction(env)) return "mailgun";
+  if (isProduction(env)) return env.MAIL_PROVIDER?.trim().toLowerCase() === "none" && isDevDeployment(env) ? "none" : "mailgun";
   const mode = env.MAIL_DELIVERY?.trim().toLowerCase();
   if (mode === "on") return "mailgun";
   if (mode === "file") return "file";
@@ -46,6 +46,8 @@ const fromAddress = (env: NodeJS.ProcessEnv) => env.MAIL_FROM?.trim() || `Yasaki
 /** Sends one message. Throws a ConfigurationError when Mailgun is required and missing; resolves false when refused. */
 export async function sendMail(mail: Mail, env: NodeJS.ProcessEnv = process.env, fetchImpl: typeof fetch = fetch): Promise<boolean> {
   const delivery = mailDelivery(env);
+  // A dev deployment without e-mail: a sign-in code or a confirmation cannot leave, so the request fails closed (503).
+  if (delivery === "none") throw new ConfigurationError("MAIL_PROVIDER", "is none on this deployment: e-mail is not available");
   if (delivery === "log") {
     console.info(`mail (not delivered — MAIL_DELIVERY=on to send) to ${mail.to}: ${mail.subject}\n${mail.text}`);
     return true;

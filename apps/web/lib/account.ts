@@ -1,4 +1,4 @@
-import { accountDeletions, accounts, agentSessions, blocks, db, profilePhotos, profiles } from "@yasakia/db";
+import { accountDeletions, accounts, agentSessions, auditLog, blocks, db, profilePhotos, profiles } from "@yasakia/db";
 import { and, eq, sql } from "drizzle-orm";
 
 import { applyBlockEffects } from "./access";
@@ -157,6 +157,9 @@ export async function deleteAccount(accountId: string): Promise<{ deletionId: st
     const keys = photos.flatMap((p) => [p.key, stagingKey(accountId, p.id, p.mimeType)]);
     const [deletion] = await tx.insert(accountDeletions).values({ accountId, storageKeys: keys }).returning({ id: accountDeletions.id });
     await tx.execute(sql`update intros set state = 'CLOSED', closed_at = now(), closed_reason = 'DELETED' where (account_a = ${accountId} or account_b = ${accountId}) and state in ('OPEN', 'CONTINUED')`);
+    // The audit log keeps what was done, not who the person was: their address is blanked from every line they acted in.
+    await tx.update(auditLog).set({ actorLabel: null }).where(eq(auditLog.actorId, accountId));
+    await tx.insert(auditLog).values({ action: "account.deleted", targetId: accountId });
     await tx.delete(accounts).where(eq(accounts.id, accountId));
     return { deletionId: deletion.id, email: account.email, locale: account.locale };
   });

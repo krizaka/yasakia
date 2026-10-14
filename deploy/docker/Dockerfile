@@ -23,6 +23,14 @@ ENV NODE_ENV=production
 # The public origin of the API (signed upload URLs are built on it), passed by App Platform at build time.
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+# Where the app is served (dev.yasakia.com: /app, next to the static site at /), the deployment's kind and the commit
+# shown as the build's version — all inlined at build time.
+ARG NEXT_PUBLIC_APP_BASE_PATH
+ARG NEXT_PUBLIC_APP_ENV
+ARG APP_COMMIT_SHA
+ENV NEXT_PUBLIC_APP_BASE_PATH=$NEXT_PUBLIC_APP_BASE_PATH \
+    NEXT_PUBLIC_APP_ENV=$NEXT_PUBLIC_APP_ENV \
+    APP_COMMIT_SHA=$APP_COMMIT_SHA
 RUN npm run build --workspace=@yasakia/web
 # Self-contained migrator (drizzle-orm + pg bundled): `node migrate.cjs`
 RUN npm run build:migrator --workspace=@yasakia/db
@@ -34,6 +42,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ARG NEXT_PUBLIC_APP_BASE_PATH
+ENV NEXT_PUBLIC_APP_BASE_PATH=$NEXT_PUBLIC_APP_BASE_PATH
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
@@ -49,6 +59,6 @@ USER nextjs
 EXPOSE 3000
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/healthz || exit 1
+  CMD wget --no-verbose --tries=1 --spider "http://localhost:3000${NEXT_PUBLIC_APP_BASE_PATH}/api/healthz" || exit 1
 
 CMD ["node", "apps/web/server.js"]

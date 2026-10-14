@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 21 tables · 16 enums · 2 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 24 tables · 17 enums · 3 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -26,11 +26,13 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 | Table | References (columns) | Referenced by |
 | :--- | :--- | :--- |
+| `account_credentials` | `accounts` (`account_id`) | — |
 | `account_exports` | `accounts` (`account_id`) | — |
-| `accounts` | — | `account_exports` · `agent_sessions` · `ai_calls` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `reports` |
+| `accounts` | — | `account_credentials` · `account_exports` · `agent_sessions` · `ai_calls` · `audit_log` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `reports` · `web_sessions` |
 | `agent_messages` | `agent_sessions` (`session_id`) | `facets` |
 | `agent_sessions` | `accounts` (`account_id`) | `agent_messages` |
 | `ai_calls` | `accounts` (`account_id`) | — |
+| `audit_log` | `accounts` (`actor_id`) | — |
 | `batch_items` | `batches` (`batch_id`) · `accounts` (`candidate_id`) | — |
 | `batches` | `accounts` (`account_id`) | `batch_items` · `debriefs` |
 | `blocks` | `accounts` (`blocker_id`) · `accounts` (`blocked_id`) | — |
@@ -44,8 +46,17 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `profiles` | `accounts` (`account_id`) | — |
 | `push_tokens` | `accounts` (`account_id`) | — |
 | `reports` | `accounts` (`reporter_id`) · `accounts` (`reported_id`) | — |
+| `web_sessions` | `accounts` (`account_id`) | — |
 
 ## Tables
+
+### `account_credentials`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `account_id` | uuid | no |  | primary key · → `accounts.id` (on delete cascade) |
+| `password_hash` | text | no |  |  |
+| `updated_at` | timestamp with time zone | no | `now()` |  |
 
 ### `account_deletions`
 
@@ -82,6 +93,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `id` | uuid | no | `gen_random_uuid()` | primary key |
 | `email` | varchar(254) | no |  | unique |
 | `status` | account_status | no | `"ACTIVE"` |  |
+| `role` | account_role | no | `"USER"` |  |
 | `locale` | locale | no | `"en"` |  |
 | `birth_date` | date | no |  |  |
 | `terms_accepted_at` | timestamp with time zone | no |  |  |
@@ -139,6 +151,21 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
 **Indexes:** `ai_calls_created_idx` (created_at) · `ai_calls_account_idx` (account_id)
+
+### `audit_log`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `actor_id` | uuid | yes |  | → `accounts.id` (on delete set null) |
+| `actor_label` | varchar(254) | yes |  |  |
+| `action` | varchar(40) | no |  |  |
+| `target_id` | uuid | yes |  |  |
+| `detail` | jsonb | yes |  |  |
+| `ip` | varchar(64) | yes |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `audit_log_created_idx` (created_at) · `audit_log_target_idx` (target_id, created_at) · `audit_log_action_idx` (action, created_at)
 
 ### `auth_codes`
 
@@ -363,10 +390,27 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Indexes:** `reports_status_idx` (status, created_at) · `reports_reported_idx` (reported_id)
 
+### `web_sessions`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `account_id` | uuid | no |  | → `accounts.id` (on delete cascade) |
+| `token_hash` | varchar(64) | no |  | unique |
+| `user_agent` | varchar(300) | yes |  |  |
+| `ip` | varchar(64) | yes |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+| `last_seen_at` | timestamp with time zone | no | `now()` |  |
+| `expires_at` | timestamp with time zone | no |  |  |
+| `revoked_at` | timestamp with time zone | yes |  |  |
+
+**Indexes:** `web_sessions_account_idx` (account_id) · `web_sessions_expiry_idx` (expires_at)
+
 ## Enums
 
 | Enum | Values |
 | :--- | :--- |
+| `account_role` | `USER`, `ADMIN` |
 | `account_status` | `ACTIVE`, `PAUSED`, `SUSPENDED` |
 | `agent_message_role` | `USER`, `AGENT`, `SYSTEM` |
 | `agent_state` | `ONBOARDING`, `DISCOVERY`, `WAITING_POOL`, `BATCH_READY`, `BATCH_OPEN`, `DEBRIEF_DUE` |
@@ -388,3 +432,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 - `0000_extensions.sql`
 - `0001_initial_schema.sql`
+- `0002_console_accounts.sql`

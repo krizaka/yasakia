@@ -43,6 +43,7 @@ const v = (name: string, context: EnvContext, need: EnvNeed, schema: z.ZodTypeAn
 
 export const ENV_VARS: readonly EnvVar[] = [
   v("NEXT_PUBLIC_APP_URL", "APP", "required", url, "Public origin of the API: signed upload URLs and local media URLs are built on it.", { build: true, default: "http://localhost:3000" }),
+  v("NEXT_PUBLIC_APP_BASE_PATH", "APP", "optional", z.string().regex(/^\/[a-z0-9-]+$/, "must be a single path segment such as /app"), "The path the app is served under (dev.yasakia.com serves it at `/app`, next to the static site at `/`). Empty: the root.", { build: true }),
   v("NEXT_PUBLIC_APP_ENV", "APP", "optional", z.enum(["local", "dev", "staging", "production"]), "Where the build runs, for the build information.", { build: true, default: "local" }),
   v("APP_ACCOUNT_PURGE_INTERVAL_SECONDS", "APP", "optional", int(1, 3600), "How often accounts past their deletion delay are purged.", { default: "60" }),
   v("APP_SWEEP_INTERVAL_SECONDS", "APP", "optional", int(5, 86400), "How often expired codes, sessions and uploads are swept.", { default: "600" }),
@@ -54,8 +55,10 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("DATABASE_ENCRYPTION_KEY", "DATABASE", "required", z.string().min(32, "must be 32 random bytes in base64 (or 32+ characters)"), "Encrypts the sensitive fields at rest (AES-256-GCM): 32 random bytes in base64. Keep it.", { secret: true }),
   v("DATABASE_ENCRYPTION_KEYS_PREVIOUS", "DATABASE", "optional", text, "Rotation: previous keys, comma separated — what they sealed still opens.", { secret: true }),
   v("DATABASE_ALLOW_RESET", "DATABASE", "optional", z.enum(["true", "false"]), "Development deployments only: the release job may rebuild a database whose migration history was squashed."),
+  v("AUTH_SIGNUP_ENABLED", "AUTH", "recommended", z.enum(["true", "false"]), "May a stranger create an account? **false unless `true`**, decided by the server: the e-mail-code flow then signs existing accounts in and creates none.", { default: "false" }),
+  v("AUTH_ALLOWED_IPS", "AUTH", "recommended", text, "Addresses that may open the administration console (comma separated; empty: any outside production, **none** in production). Elsewhere the console is a 404."),
   v("AUTH_SESSION_SECRET", "AUTH", "required", z.string().min(32, "must be at least 32 characters"), "Signs the session tokens and, derived, the upload and local media URLs (32+ random characters).", { secret: true }),
-  v("MEDIA_STORAGE_PROVIDER", "MEDIA", "required", z.enum(["local", "bunny"]), "Where photos live: `local` (development, `.storage/`) or `bunny` (production: required).", { default: "local" }),
+  v("MEDIA_STORAGE_PROVIDER", "MEDIA", "required", z.enum(["local", "bunny", "none"]), "Where photos live: `local` (development, `.storage/`) or `bunny` (production: required). `none` only on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): photos answer 503.", { default: "local" }),
   v("MEDIA_STORAGE_LOCAL_DIR", "MEDIA", "optional", text, "The folder of `local` storage.", { default: ".storage/" }),
   v("MEDIA_STORAGE_ZONE", "MEDIA", "required", text, "Storage zone name (`bunny`)."),
   v("MEDIA_STORAGE_API_KEY", "MEDIA", "required", text, "Storage zone password (`bunny`).", { secret: true }),
@@ -63,7 +66,7 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("MEDIA_CDN_HOSTNAME", "MEDIA", "required", text, "Pull zone serving the photos (Optimizer and token authentication on)."),
   v("MEDIA_CDN_TOKEN_AUTH_KEY", "MEDIA", "required", text, "Signs the photo URLs (the pull zone's token authentication key).", { secret: true }),
   v("MEDIA_PHOTO_MODERATION", "MEDIA", "optional", z.enum(["auto"]), "Photo moderation: `auto` (V1 — approved at once; a report reopens the review).", { default: "auto" }),
-  v("MAIL_PROVIDER", "MAIL", "required", z.enum(["mailgun"]), "The e-mail service: `mailgun`. Production is fail-closed without it (a sign-in code is never logged there)."),
+  v("MAIL_PROVIDER", "MAIL", "required", z.enum(["mailgun", "none"]), "The e-mail service: `mailgun`. Production is fail-closed without it (a sign-in code is never logged there). `none` only on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): the code flow answers 503."),
   v("MAIL_API_KEY", "MAIL", "required", text, "The provider's API key.", { secret: true }),
   v("MAIL_DOMAIN", "MAIL", "required", text, "Sending domain (e.g. `mg.yasakia.com`)."),
   v("MAIL_API_URL", "MAIL", "optional", url, "API base (EU region: `https://api.eu.mailgun.net`).", { default: "https://api.mailgun.net" }),

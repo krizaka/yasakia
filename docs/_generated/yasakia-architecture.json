@@ -51,12 +51,14 @@
         "AES-256-GCM sealed columns"
       ],
       "tables": [
+        "account_credentials",
         "account_deletions",
         "account_exports",
         "accounts",
         "agent_messages",
         "agent_sessions",
         "ai_calls",
+        "audit_log",
         "auth_codes",
         "batch_items",
         "batches",
@@ -71,7 +73,8 @@
         "profiles",
         "push_tokens",
         "rate_limit_buckets",
-        "reports"
+        "reports",
+        "web_sessions"
       ]
     },
     {
@@ -133,6 +136,13 @@
   ],
   "tables": [
     {
+      "name": "account_credentials",
+      "columns": 3,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
       "name": "account_deletions",
       "columns": 7,
       "references": []
@@ -146,7 +156,7 @@
     },
     {
       "name": "accounts",
-      "columns": 13,
+      "columns": 14,
       "references": []
     },
     {
@@ -166,6 +176,13 @@
     {
       "name": "ai_calls",
       "columns": 10,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
+      "name": "audit_log",
+      "columns": 8,
       "references": [
         "accounts"
       ]
@@ -274,14 +291,51 @@
       "references": [
         "accounts"
       ]
+    },
+    {
+      "name": "web_sessions",
+      "columns": 9,
+      "references": [
+        "accounts"
+      ]
     }
   ],
   "apiEndpoints": [
     {
       "method": "GET",
+      "path": "/api/admin/audit",
+      "access": "public",
+      "summary": "The audit log for the console — sign-ins, password changes, suspensions, restorations, deletions — searched, filtered and paged on the server."
+    },
+    {
+      "method": "GET",
       "path": "/api/admin/reports",
       "access": "operator · service token + IP allow-list",
       "summary": "The reports for operators — urgent reasons (UNDERAGE, THREAT) first, details decrypted; service token and IP allow-list."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users",
+      "access": "public",
+      "summary": "Lists accounts for the console — searched by address or name, filtered by status and role, sorted and paged on the server."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users/{id}",
+      "access": "public",
+      "summary": "One account for the console: state, role, counts and the audit lines about it — never a date of birth, a message or a photo."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/users/{id}/restore",
+      "access": "public",
+      "summary": "Lifts an account's suspension: it is ACTIVE again and can sign in; the restoration is logged."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/users/{id}/suspend",
+      "access": "public",
+      "summary": "Suspends an account: it cannot sign in and every session of the app and the browser ends at once; the reason is logged."
     },
     {
       "method": "POST",
@@ -291,9 +345,21 @@
     },
     {
       "method": "POST",
+      "path": "/api/auth/password",
+      "access": "public",
+      "summary": "Signs a person in to the web console with their e-mail and password: the answer sets an HttpOnly session cookie."
+    },
+    {
+      "method": "POST",
       "path": "/api/auth/request-code",
       "access": "public",
       "summary": "Sends a 6-digit sign-in code to an e-mail address — the same answer whether an account exists or not."
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/sign-out",
+      "access": "public",
+      "summary": "Signs the web console out: this browser's session ends and its cookie is cleared (an unknown cookie is cleared too)."
     },
     {
       "method": "POST",
@@ -351,6 +417,12 @@
     },
     {
       "method": "GET",
+      "path": "/api/me/dashboard",
+      "access": "bearer · account",
+      "summary": "The signed-in account's home: where the agent is, the open batch, the introductions, the phones — counts and dates, never a person's profile or a score."
+    },
+    {
+      "method": "GET",
       "path": "/api/me/export",
       "access": "bearer · account",
       "summary": "Everything the account holds, as JSON — at once when it takes under a second, else 202 with an export id to poll (`?id=`, kept 24 hours); `?mode=async` asks for the background build directly."
@@ -360,6 +432,12 @@
       "path": "/api/me/location",
       "access": "bearer · account",
       "summary": "Sets the position from the phone's coordinates, rounded to about 1 km before it is written — the exact one is never stored; the answer is what was kept."
+    },
+    {
+      "method": "POST",
+      "path": "/api/me/password",
+      "access": "bearer · account",
+      "summary": "Changes the account's password (the current one must be right); every other browser session of the account ends."
     },
     {
       "method": "GET",
@@ -390,6 +468,24 @@
       "path": "/api/me/photos/{id}/complete",
       "access": "bearer · account",
       "summary": "Completes an upload: checks the bytes are the declared picture, re-encodes them (orientation applied, metadata — GPS included — stripped), computes width, height and blurhash, then moderation (V1: approved automatically)."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/me/sessions",
+      "access": "bearer · account",
+      "summary": "Ends every other browser session of the account (the one making the call stays)."
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/sessions",
+      "access": "bearer · account",
+      "summary": "The signed-in account's browser sessions — where they are signed in, since when, last used — the current one marked."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/me/sessions/{id}",
+      "access": "bearer · account",
+      "summary": "Ends one browser session of the account; ending the current one signs this browser out."
     },
     {
       "method": "GET",
@@ -429,6 +525,10 @@
     }
   ],
   "enums": {
+    "account_role": [
+      "USER",
+      "ADMIN"
+    ],
     "account_status": [
       "ACTIVE",
       "PAUSED",

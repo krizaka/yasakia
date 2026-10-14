@@ -2,7 +2,7 @@
   "name": "yasakia-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "Yasakia — the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
+  "description": "Yasakia \u2014 the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -25,6 +25,7 @@
     "db:generate": "npm run generate --workspace=packages/db --",
     "db:migrate": "npm run migrate --workspace=packages/db",
     "db:seed": "npm run seed --workspace=packages/db",
+    "db:qa-accounts": "npm run qa-accounts --workspace=packages/db",
     "db:check": "npm run check --workspace=packages/db",
     "db:studio": "npm run studio --workspace=packages/db",
     "db:status": "node scripts/db.mjs status",

@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "build:migrator": "esbuild src/migrate.ts --bundle --platform=node --target=node22 --external:pg-native --outfile=dist/migrate.cjs",
     "check": "drizzle-kit check",
-    "studio": "drizzle-kit studio"
+    "studio": "drizzle-kit studio",
+    "qa-accounts": "tsx src/qa-accounts.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",

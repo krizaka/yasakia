@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 
 /**
  * Session tokens: stateless and signed (HMAC-SHA256 over the payload), for the native app only — it keeps the token in
- * the device's secure storage and sends it as `Authorization: Bearer <token>`. No cookie exists: there is no web app.
+ * the device's secure storage and sends it as `Authorization: Bearer <token>`. The web console has its own cookie sessions (lib/web-session.ts).
  * The token says who and which session version; **authorisation is not in it** — `requireUser` re-reads the account on
  * every request (lib/auth.ts), so a suspension, a deletion or "sign out everywhere" applies at once.
  */

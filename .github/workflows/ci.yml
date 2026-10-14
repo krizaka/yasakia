@@ -109,6 +109,9 @@ jobs:
       REALTIME_BUS: postgres
       ABUSE_RATE_LIMIT_STORE: postgres
       NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # The web console: sign-up open on this server (the scenarios sign people up); one address may open the console.
+      AUTH_SIGNUP_ENABLED: "true"
+      AUTH_ALLOWED_IPS: 203.0.113.7
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -123,13 +126,21 @@ jobs:
           REALTIME_IT: "1"
           REALTIME_REDIS_URL: redis://localhost:6379
       - run: npm run db:seed
-      - name: Start the API (development server)
+      - name: Console test accounts (passwords drawn for this run, never printed)
+        run: |
+          echo "QA_USER_PASSWORD=$(openssl rand -base64 18 | tr -d '/+=')" >> "$GITHUB_ENV"
+          echo "QA_ADMIN_PASSWORD=$(openssl rand -base64 18 | tr -d '/+=')" >> "$GITHUB_ENV"
+      - run: npm run db:qa-accounts
+      - name: Start the API (development server) — and a second one with sign-up closed
         run: |
           npm run dev > web.log 2>&1 &
+          (cd apps/web && AUTH_SIGNUP_ENABLED= NEXT_DIST_DIR=.next-closed NEXT_PUBLIC_APP_URL=http://localhost:3101 npx next dev --port 3101 > ../../web-closed.log 2>&1 &)
           for i in $(seq 1 90); do curl -sf http://localhost:3000/api/healthz && break; sleep 2; done
+          for i in $(seq 1 90); do curl -sf http://localhost:3101/api/healthz && break; sleep 2; done
       - name: Scenarios
         run: npm run test:e2e
         env:
           APP_URL: http://localhost:3000
+          CLOSED_URL: http://localhost:3101
       - if: failure()
         run: tail -200 web.log

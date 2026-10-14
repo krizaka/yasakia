@@ -4,6 +4,7 @@ import { sweepExports } from "./export";
 import { sweepAbandonedUploads } from "./photos";
 import { sweepRateLimits } from "./rate-limit";
 import { sweepAuthCodes } from "./sign-in";
+import { sweepWebSessions } from "./web-session";
 
 /**
  * The background loops every instance runs (started by instrumentation.ts, never during the build): the purge of
@@ -34,6 +35,7 @@ export function startJobs(): void {
         await sweepAbandonedUploads();
         await sweepExports();
         await sweepRateLimits();
+        await sweepWebSessions();
       }),
     sweepEvery,
   );

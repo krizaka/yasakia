@@ -23,8 +23,8 @@ yasakia/                           npm workspaces — Apache-2.0
 └── scripts/                       setup, db lifecycle, docs generation, workspace
 ```
 
-The mobile app ([`yasakia-mobile`](https://github.com/krizaka/yasakia-mobile), Expo) is the only client. The web
-serves three pages the stores require and nothing else.
+The mobile app ([`yasakia-mobile`](https://github.com/krizaka/yasakia-mobile), Expo) is the product's client. The web serves the
+three pages the stores require and the signed-in console (sign-in, home, account, administration) under `/app` — AGENTS.md §6.2.
 
 ## Why these choices
 

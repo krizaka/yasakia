@@ -159,9 +159,9 @@ yasakia/                           npm workspaces — Apache-2.0
 - Secrets are read through `apps/web/lib/env.ts`: mandatory in production (503 + logged name when missing),
   development defaults otherwise; `assertProductionConfig` (instrumentation.ts) refuses to **start** a production server
   without the session secret, the encryption key, the database, the Bunny storage and Mailgun.
-- **Sessions**: sign-in = sign-up, by a 6-digit e-mail code (keyed hash, 10 minutes, 5 attempts, used once, 5 codes an
+- **Sessions**: sign-in = sign-up (while `AUTH_SIGNUP_ENABLED=true`; §6.2 for the web console's cookie sessions), by a 6-digit e-mail code (keyed hash, 10 minutes, 5 attempts, used once, 5 codes an
   hour per address); `POST /api/auth/verify` with `client: "native"` answers a stateless signed token (`yz1.…`, 30 days)
-  sent as `Authorization: Bearer` — **no cookie, no password**. Authorisation is not in the token: `requireUser`
+  sent as `Authorization: Bearer` — **no cookie, no password** for the app (the web console has its own cookie sessions and operator-provisioned passwords, §6.2). Authorisation is not in the token: `requireUser`
   re-reads the account on every request (suspension 403, deletion 401, `session_version` for "sign out everywhere").
 - No AI provider configured → the AI endpoints answer 503 (PY3), never a demo mode. `AI_PROVIDER=fake` is refused in
   production.
@@ -211,7 +211,7 @@ yasakia/                           npm workspaces — Apache-2.0
 
 ## 6. The web pages
 
-- Only three pages exist on the API's web app (`apps/web`) — `/privacy`, `/terms`, `/delete-account` — in English and French
+- The API's web app (`apps/web`) has the three public pages — `/privacy`, `/terms`, `/delete-account` — and the signed-in console (§6.2), in English and French
   (`/en/…`, `/fr/…`; `proxy.ts` sends an address without a language to the reader's: cookie, then `Accept-Language`).
   Anything else is a 404 (the owl). Errors: the falcon (`components/errors/PageState`, Orochia's pattern).
 - Built with `@krizaka/ui` (`PageHero`, `Page`, `Mascot`, `ThemeToggle`, `YasakiaLogo`), `@krizaka/tailwind` and the
@@ -225,17 +225,46 @@ yasakia/                           npm workspaces — Apache-2.0
 ### 6.1 The public dev site — `apps/site` (dev.yasakia.com)
 
 - A **static export** (`output: "export"`, no server, no database, no secret) on a DigitalOcean App Platform **static
-  site** (free), project `yasakia`, spec `deploy/digitalocean/site.app.yaml`. Three pages — landing, how it works, demo —
+  site** (free), project `yasakia`, spec `deploy/digitalocean/dev.app.yaml` (the same app that serves `/app`, §6.2). Three pages — landing, how it works, demo —
   English at the root, French under `/fr`. Built from the same bricks (`@krizaka/ui` `LandingPage`, `HowItWorksPage`,
   `PageHero`), strings in `apps/site/messages/{en,fr}.json`, the same lint rules and ratchet.
 - **It never offers what does not exist**: no sign-up, login, download, store button or waiting list (nothing to sign up
-  to: the API is not deployed; if it ever is, `AUTH_SIGNUP_ENABLED` and `AUTH_LOGIN_ENABLED` default to `false`), no
+  to: sign-up is closed by `AUTH_SIGNUP_ENABLED=false`, and the app under `/app` is for the people who test it), no
   invented profile or figure. Media come from the CDN only (`apps/site/lib/media.ts`, hashed).
 - The footer shows « A Krizaka product » (→ krizaka.com) and the build's version, `APP_VERSION` = `package.json`
   version + short commit (`next.config.mjs`; DigitalOcean passes the commit as `APP_COMMIT_SHA`).
 - `npm run build:site` builds it (CI too); `npm run dev:site` serves it on :3002.
 
 ---
+
+### 6.2 The signed-in console — `apps/web` (dev.yasakia.com/app)
+
+- **What it is**: the person's space and the administration console, on the product's own address: `/app` of
+  dev.yasakia.com (one DigitalOcean app, two components — the static site at `/`, this Next.js app at `/app` through
+  `NEXT_PUBLIC_APP_BASE_PATH=/app`; `deploy/digitalocean/dev.app.yaml`). Pages (`app/[locale]/(app)`): `sign-in`, the home
+  (`/`), `account`, `admin/users`, `admin/users/[id]`, `admin/audit`. Never indexed. Built **only** from our bricks:
+  `@krizaka/ui` (`AuthLayout`, `AppShell` — the console template —, `DashboardLayout`, `SettingsLayout`, `DetailLayout`,
+  `DataTable` in server mode, `form`, `Dialog`, `ConfirmButton`, `Timeline`), `@krizaka/query` (server state, the live
+  stream), `@krizaka/i18n` (the client receives only its `console` slice), the brand `yasakia`.
+- **Sessions**: a browser session is an opaque random token in an HttpOnly, SameSite=Lax cookie (`yasakia_session`,
+  Secure in production, scoped to the app path), kept only as its SHA-256 in `web_sessions` — one row per device, listed
+  and revocable on the account page. `requireUser` accepts the app's bearer token **or** the cookie (a cookie write must
+  come from this origin: `assertSameOrigin`). Password sign-in (`POST /api/auth/password`, scrypt hashes in
+  `account_credentials`) is for the console; the app keeps signing in by e-mail code. Passwords are provisioned by an
+  operator (`npm run db:qa-accounts`: the `qa+user@` / `qa+admin@` accounts, passwords from the environment, never printed).
+- **Sign-up is closed server-side**: `AUTH_SIGNUP_ENABLED` is false unless it says `true`. The e-mail-code flow then signs
+  existing accounts in and creates none (`SIGNUP_CLOSED`, 403; a stranger gets no e-mail and the same answer). e2e runs a
+  second server with it closed.
+- **Administration**: `accounts.role = ADMIN` **and** an address in `AUTH_ALLOWED_IPS` (empty in production = nobody) **and**
+  a session. A failed lock is a 404 on pages (the console does not announce itself) and a 403 on `/api/admin/*`, which also
+  answers the operator token. Operators see state, role and counts — never a date of birth, a message, a photo or a score.
+  Suspend (with a reason) ends every session at once; restore lifts it; an administrator cannot be suspended from the console.
+  Every sign-in (and refusal), password change, suspension, restoration and deletion is in `audit_log` (append-only; ids and
+  a few words; deleting an account blanks its address from the lines it acted in).
+- **A dev deployment** (`NEXT_PUBLIC_APP_ENV=dev`) may run with `MAIL_PROVIDER=none` and `MEDIA_STORAGE_PROVIDER=none`: those
+  routes answer 503 — nothing is faked, and production still refuses to start without Mailgun and Bunny.
+- Every string is a message (`console.*`); tables take their words from `console.admin.table`; errors are worded by the
+  server's stable `code`, never by its English.
 
 ## 7. Testing
 

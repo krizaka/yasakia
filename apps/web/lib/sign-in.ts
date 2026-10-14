@@ -2,13 +2,14 @@ import { accounts, agentSessions, authCodes, db, profiles } from "@yasakia/db";
 import { and, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
 
 import { checkBirthDate } from "./age";
-import { sessionSecret } from "./env";
+import { sessionSecret, signupEnabled } from "./env";
 import { refuse } from "./http";
 import { sendTemplate } from "./mail";
 import { generateCode, hashCode, sameHash, signSessionToken } from "./tokens";
 
 /**
- * Sign-in and sign-up are one flow, by e-mail code (no password exists):
+ * Sign-in and sign-up are one flow, by e-mail code (the web console also has passwords: lib/password-auth.ts). While
+ * `AUTH_SIGNUP_ENABLED` is not `true` the flow signs existing accounts in and creates nobody:
  * 1. `requestCode` — a 6-digit code, kept as a keyed hash, valid 10 minutes, sent by e-mail in the person's language.
  *    The answer is the same whether the address has an account or not (no enumeration).
  * 2. `verifyCode` — the right code for an existing account signs in; for a new address it creates the account, but only
@@ -22,6 +23,11 @@ export const MAX_CODE_ATTEMPTS = 5;
 export const CONSENT_VERSION = "2026-10";
 
 export async function requestCode(email: string, locale: "en" | "fr"): Promise<void> {
+  // Sign-up closed: an address without an account gets no code (and the answer is the same, so nothing is revealed).
+  if (!signupEnabled()) {
+    const [known] = await db.select({ id: accounts.id }).from(accounts).where(eq(accounts.email, email)).limit(1);
+    if (!known) return;
+  }
   const code = generateCode();
   // A new code replaces the previous ones: only the last e-mail works.
   await db.transaction(async (tx) => {
@@ -67,7 +73,9 @@ export async function verifyCode(input: VerifyInput): Promise<VerifyResult> {
     return { token: signSessionToken(existing.id, existing.sessionVersion, sessionSecret()), created: false, account: view(existing) };
   }
 
-  // A new person: the code stays valid while the app asks for the date of birth and the terms.
+  // A new person: refused outright while sign-up is closed (`AUTH_SIGNUP_ENABLED`), whatever the app shows.
+  if (!signupEnabled()) throw refuse(403, "SIGNUP_CLOSED", "Sign-up is closed");
+  // The code stays valid while the app asks for the date of birth and the terms.
   if (!input.birthDate) throw refuse(409, "BIRTH_DATE_REQUIRED", "A date of birth is needed to create the account");
   const age = checkBirthDate(input.birthDate);
   if (!age.ok) {

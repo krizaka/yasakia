@@ -12,6 +12,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+import crypto from "node:crypto";
+
 import pg from "pg";
 
 import { c, databaseUrl, fail, isLocalDatabase, ok, ROOT, run, step } from "../scripts/lib.mjs";
@@ -24,6 +26,9 @@ export const E2E_ENV = {
   MEDIA_STORAGE_PROVIDER: "local",
   REALTIME_BUS: "postgres",
   ABUSE_RATE_LIMIT_STORE: "postgres",
+  // The web console: sign-up open on the main server (the scenarios sign people up), the console answers one address.
+  AUTH_SIGNUP_ENABLED: "true",
+  AUTH_ALLOWED_IPS: "203.0.113.7",
 };
 
 if (process.env.APP_URL) {
@@ -44,6 +49,9 @@ if (process.env.APP_URL) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "yasakia-e2e-"));
   const env = {
     ...E2E_ENV,
+    // The console's test accounts: passwords drawn for this run only, shared with the scenarios through the environment.
+    QA_USER_PASSWORD: crypto.randomBytes(18).toString("base64url"),
+    QA_ADMIN_PASSWORD: crypto.randomBytes(18).toString("base64url"),
     DATABASE_URL: e2eUrl.toString(),
     DATABASE_DIRECT_URL: "",
     MAIL_OUTBOX_DIR: path.join(tmp, "outbox"),
@@ -51,6 +59,7 @@ if (process.env.APP_URL) {
   };
   run("npm", ["run", "db:migrate", "--silent"], { env });
   run("npm", ["run", "db:seed", "--silent"], { env });
+  run("npm", ["run", "db:qa-accounts", "--silent"], { env });
   ok("migrated and seeded");
 
   step("API on :3100 (next dev, its own build folder)");
@@ -82,12 +91,28 @@ if (process.env.APP_URL) {
   }
   ok(`ready (log: ${path.join(tmp, "web.log")})`);
 
+  // A second server, sign-up CLOSED (AUTH_SIGNUP_ENABLED unset: the default) on the same database — the scenarios prove the gate on it.
+  const closedPort = 3101;
+  const closed = spawn("npx", ["next", "dev", "--port", String(closedPort)], {
+    cwd: path.join(ROOT, "apps/web"),
+    env: { ...process.env, ...env, AUTH_SIGNUP_ENABLED: "", NEXT_DIST_DIR: ".next-e2e-closed", NEXT_PUBLIC_APP_URL: `http://localhost:${closedPort}`, PORT: String(closedPort) },
+    stdio: "ignore",
+  });
+  process.on("exit", () => closed.kill("SIGTERM"));
+  for (let i = 0; i < 120; i++) {
+    try {
+      if ((await fetch(`http://localhost:${closedPort}/api/healthz`)).ok) break;
+    } catch {
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
   step("Scenarios");
-  Object.assign(process.env, env, { APP_URL: `http://localhost:${port}` });
+  Object.assign(process.env, env, { APP_URL: `http://localhost:${port}`, CLOSED_URL: `http://localhost:${closedPort}` });
   try {
     await import("./scenarios.mjs");
   } finally {
     stop();
+    closed.kill("SIGTERM");
   }
   if (process.exitCode) console.log(c.dim(`server log: ${path.join(tmp, "web.log")}`));
 }
