@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-console -- a command-line script: its report is its output */
 /* The Krizaka family SEO guard (krizaka/krizaka-com#SEO-FAMILY) — one file, no dependency, copied unchanged into every
    site's repository (keep the copies identical; the contract lives in krizaka-com/AGENTS.md §2.4).
 
@@ -184,7 +183,7 @@ async function main() {
   const organizationHome = args.includes("--organization");
   let failed = 0;
   const report = (where, problems) => {
-    for (const p of problems) console.error(`✗ ${where}: ${p}`);
+    for (const p of problems) process.stderr.write(`${`✗ ${where}: ${p}`}\n`);
     failed += problems.length;
   };
   const get = async (p) => {
@@ -216,17 +215,17 @@ async function main() {
 
   function done(pages) {
     if (failed) {
-      console.error(`SEO family check: ${failed} problem(s) on ${pages} page(s) of ${host}`);
+      process.stderr.write(`${`SEO family check: ${failed} problem(s) on ${pages} page(s) of ${host}`}\n`);
       process.exit(1);
     }
-    console.log(`SEO family check: ${pages} page(s) and robots.txt of ${host} (${index ? "indexed" : "noindex"}${consoleMode ? ", console" : ""}) — all good`);
+    process.stdout.write(`${`SEO family check: ${pages} page(s) and robots.txt of ${host} (${index ? "indexed" : "noindex"}${consoleMode ? ", console" : ""}) — all good`}\n`);
   }
 }
 
 /* Run as a script (not when a test imports the auditors; also loadable by Jest, hence no import.meta). */
 if (/check-seo-family\.mjs$/.test(process.argv[1] ?? "")) {
   main().catch((e) => {
-    console.error(e);
+    process.stderr.write(`${e}\n`);
     process.exit(1);
   });
 }
