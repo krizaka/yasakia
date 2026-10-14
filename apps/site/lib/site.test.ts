@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-// @ts-expect-error -- the shared guard is plain JavaScript (scripts/check-seo-family.mjs)
 import { auditLlms, auditRobots } from "../../../scripts/check-seo-family.mjs";
 import robots from "../app/robots";
 import en from "../messages/en.json";
