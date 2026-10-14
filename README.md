@@ -7,7 +7,7 @@ before. No swipe, no catalogue, no fake match.
 
 [![CI](https://github.com/krizaka/yasakia/actions/workflows/ci.yml/badge.svg)](https://github.com/krizaka/yasakia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![krizaka.com](https://img.shields.io/badge/krizaka.com-Yasakia-14b8a6)](https://krizaka.com/products/yasakia)
+[![krizaka.com](https://img.shields.io/badge/dev.yasakia.com-Yasakia-14b8a6)](https://dev.yasakia.com)
 
 This repository is Yasakia's **API** (Next.js route handlers), its **packages** (data, photos), its **docs** and its
 three **web pages** (privacy, terms, account deletion). The app for iOS and Android is

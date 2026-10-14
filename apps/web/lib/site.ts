@@ -1,6 +1,6 @@
 /** Addresses and dates of the web pages — structure, not words (the words are in messages/). */
 
-export const PRODUCT_URL = "https://krizaka.com/products/yasakia";
+export const PRODUCT_URL = "https://dev.yasakia.com";
 export const REPO_URL = "https://github.com/krizaka/yasakia";
 
 /** The date and version of the legal pages; the version is the one an account accepts (lib/sign-in.ts CONSENT_VERSION). */
