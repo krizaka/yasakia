@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * The Yazakia repositories, side by side — `npm run workspace -- <command>`:
- *   clone    clones the missing repositories next to this one (../yazakia-mobile)
+ * The Yasakia repositories, side by side — `npm run workspace -- <command>`:
+ *   clone    clones the missing repositories next to this one (../yasakia-mobile)
  *   status   branch, ahead/behind and local changes of each repository
  *   pull     fast-forwards every clean repository
  */
@@ -9,8 +9,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { ROOT, c, run } from "./lib.mjs";
 
-const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "yazakia.workspace.json"), "utf8"));
-const dirOf = (name) => (name === "yazakia" ? ROOT : path.resolve(ROOT, "..", name));
+const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "yasakia.workspace.json"), "utf8"));
+const dirOf = (name) => (name === "yasakia" ? ROOT : path.resolve(ROOT, "..", name));
 const git = (dir, args) => run("git", ["-C", dir, ...args], { quiet: true, allowFail: true });
 const command = process.argv[2] ?? "status";
 

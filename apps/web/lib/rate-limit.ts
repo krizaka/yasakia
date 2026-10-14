@@ -1,4 +1,4 @@
-import { db, rateLimitBuckets } from "@yazakia/db";
+import { db, rateLimitBuckets } from "@yasakia/db";
 import { lt, sql } from "drizzle-orm";
 
 import { clientIp } from "./client-ip";
@@ -63,20 +63,20 @@ export function postgresStore(): RateLimitStore {
   };
 }
 
-const holder = globalThis as unknown as { __yazakiaRateLimit?: RateLimitStore };
+const holder = globalThis as unknown as { __yasakiaRateLimit?: RateLimitStore };
 
 /** The configured store (ABUSE_RATE_LIMIT_STORE=memory|postgres), one per process. */
 export function rateLimitStore(env: Record<string, string | undefined> = process.env): RateLimitStore {
-  if (holder.__yazakiaRateLimit) return holder.__yazakiaRateLimit;
+  if (holder.__yasakiaRateLimit) return holder.__yasakiaRateLimit;
   const kind = env.ABUSE_RATE_LIMIT_STORE?.trim().toLowerCase() || "memory";
   if (kind !== "memory" && kind !== "postgres") throw new Error(`ABUSE_RATE_LIMIT_STORE must be "memory" or "postgres", not "${kind}"`);
-  holder.__yazakiaRateLimit = kind === "postgres" ? postgresStore() : memoryStore();
-  return holder.__yazakiaRateLimit;
+  holder.__yasakiaRateLimit = kind === "postgres" ? postgresStore() : memoryStore();
+  return holder.__yasakiaRateLimit;
 }
 
 /** Tests: use this store (null: back to the configured one). */
 export function useRateLimitStore(next: RateLimitStore | null) {
-  holder.__yazakiaRateLimit = next ?? undefined;
+  holder.__yasakiaRateLimit = next ?? undefined;
 }
 
 /** Removes the windows that ended (postgres store; the background loop calls it). */

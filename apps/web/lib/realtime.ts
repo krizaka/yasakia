@@ -1,7 +1,7 @@
 import { createBus, eventStream, type RealtimeBus } from "@krizaka/realtime";
 import { pgChannel } from "@krizaka/realtime/pg";
 import { redisBus } from "@krizaka/realtime/redis";
-import { CONNECTION_NAMES, connectionConfig, directDatabaseUrl, getPool } from "@yazakia/db";
+import { CONNECTION_NAMES, connectionConfig, directDatabaseUrl, getPool } from "@yasakia/db";
 
 import { type RealtimeConfig, realtimeConfig } from "./env";
 
@@ -12,24 +12,24 @@ import { type RealtimeConfig, realtimeConfig } from "./env";
  *
  * Payloads are small facts (ids), never documents: what must not be lost is in the database and fetched from it.
  * LISTEN needs a session: it goes through DATABASE_DIRECT_URL (else DATABASE_URL) on its own connection named
- * `yazakia-listen`; NOTIFY goes through the app's pool.
+ * `yasakia-listen`; NOTIFY goes through the app's pool.
  */
 
-export type YazakiaEvent =
+export type YasakiaEvent =
   | { type: "batch.ready"; batchId: string }
   | { type: "intro.opened"; introId: string }
   | { type: "intro.message"; introId: string; messageId: string };
 
-export const EVENT_TYPES = ["batch.ready", "intro.opened", "intro.message"] as const satisfies readonly YazakiaEvent["type"][];
+export const EVENT_TYPES = ["batch.ready", "intro.opened", "intro.message"] as const satisfies readonly YasakiaEvent["type"][];
 
-/** The NOTIFY channel and the Redis prefix of Yazakia — keep them: two versions share them during a deploy. */
-export const CHANNEL = "yazakia_events";
+/** The NOTIFY channel and the Redis prefix of Yasakia — keep them: two versions share them during a deploy. */
+export const CHANNEL = "yasakia_events";
 
 /** One account's topic: its events, wherever they come from. */
 export const accountTopic = (accountId: string) => `account:${accountId}`;
 
-/** Whether a received payload is one of Yazakia's events (anything else on the bus is ignored). */
-export function isYazakiaEvent(value: unknown): value is YazakiaEvent {
+/** Whether a received payload is one of Yasakia's events (anything else on the bus is ignored). */
+export function isYasakiaEvent(value: unknown): value is YasakiaEvent {
   if (!value || typeof value !== "object") return false;
   const event = value as Record<string, unknown>;
   switch (event.type) {
@@ -45,7 +45,7 @@ export function isYazakiaEvent(value: unknown): value is YazakiaEvent {
 }
 
 /** A bus for a configuration — the app's one (below), or two in the integration test standing for two instances. */
-export function createYazakiaBus(config: RealtimeConfig): RealtimeBus {
+export function createYasakiaBus(config: RealtimeConfig): RealtimeBus {
   return createBus({
     kind: config.kind,
     postgres:
@@ -60,20 +60,20 @@ export function createYazakiaBus(config: RealtimeConfig): RealtimeBus {
 }
 
 // One bus per process, kept across hot reloads and Next's module graphs.
-const holder = globalThis as unknown as { __yazakiaBus?: RealtimeBus };
+const holder = globalThis as unknown as { __yasakiaBus?: RealtimeBus };
 
 export function realtimeBus(): RealtimeBus {
-  if (!holder.__yazakiaBus) holder.__yazakiaBus = createYazakiaBus(realtimeConfig());
-  return holder.__yazakiaBus;
+  if (!holder.__yasakiaBus) holder.__yasakiaBus = createYasakiaBus(realtimeConfig());
+  return holder.__yasakiaBus;
 }
 
 /** Tests: use this bus (null: back to the configured one). */
 export function useRealtimeBus(bus: RealtimeBus | null): void {
-  holder.__yazakiaBus = bus ?? undefined;
+  holder.__yasakiaBus = bus ?? undefined;
 }
 
 /** Sends an event to one account, on every instance. Never throws: realtime is best-effort. */
-export async function publishToAccount(accountId: string, event: YazakiaEvent): Promise<void> {
+export async function publishToAccount(accountId: string, event: YasakiaEvent): Promise<void> {
   try {
     await realtimeBus().publish(accountTopic(accountId), event);
   } catch (error) {
@@ -82,9 +82,9 @@ export async function publishToAccount(accountId: string, event: YazakiaEvent): 
 }
 
 /** Subscribes to an account's events on this instance; returns the unsubscribe function. */
-export function subscribeToAccount(accountId: string, onEvent: (event: YazakiaEvent) => void): () => void {
+export function subscribeToAccount(accountId: string, onEvent: (event: YasakiaEvent) => void): () => void {
   return realtimeBus().subscribe(accountTopic(accountId), (event) => {
-    if (isYazakiaEvent(event)) onEvent(event);
+    if (isYasakiaEvent(event)) onEvent(event);
   });
 }
 
@@ -107,5 +107,5 @@ export function accountEventStream(accountId: string): Response {
 
 /** Whether events from other instances reach this one (the health check reports it). */
 export function realtimeConnected(): boolean {
-  return holder.__yazakiaBus?.connected ?? false;
+  return holder.__yasakiaBus?.connected ?? false;
 }

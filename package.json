@@ -1,8 +1,8 @@
 {
-  "name": "yazakia-monorepo",
+  "name": "yasakia-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "Yazakia \u2014 the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
+  "description": "Yasakia — the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -13,10 +13,10 @@
     "build": "npm run build -w apps/web",
     "start": "npm run start -w apps/web",
     "lint": "npm run lint --workspaces --if-present && npm run check:i18n && npm run ratchet",
-    "check:i18n": "krizaka-i18n check apps/web/messages && krizaka-i18n check apps/web/messages/errors && krizaka-i18n scan apps/web/app apps/web/components --allow Yazakia,YAZAKIA,Krizaka,KRIZAKA,Bunny --skip /app/api/",
+    "check:i18n": "krizaka-i18n check apps/web/messages && krizaka-i18n check apps/web/messages/errors && krizaka-i18n scan apps/web/app apps/web/components --allow Yasakia,YASAKIA,Krizaka,KRIZAKA,Bunny --skip /app/api/ && krizaka-i18n check apps/site/messages && krizaka-i18n scan apps/site/app apps/site/components --allow Yasakia,YASAKIA,Krizaka,KRIZAKA,Bunny",
     "ratchet": "krizaka-ratchet",
     "ratchet:update": "krizaka-ratchet --update",
-    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json && tsc --noEmit -p apps/site/tsconfig.json",
     "test": "vitest run",
     "test:e2e": "node e2e/run.mjs",
     "check": "npm run lint && npm run typecheck && npm test && npm run docs:generate -- --check",
@@ -34,7 +34,9 @@
     "db:restore": "node scripts/db.mjs restore",
     "docs:generate": "node scripts/generate-docs.mjs",
     "workspace": "node scripts/workspace.mjs",
-    "mail:templates:preview": "tsx apps/web/scripts/mail-templates.ts"
+    "mail:templates:preview": "tsx apps/web/scripts/mail-templates.ts",
+    "build:site": "npm run build -w apps/site",
+    "dev:site": "npm run dev -w apps/site"
   },
   "keywords": [
     "dating-app",

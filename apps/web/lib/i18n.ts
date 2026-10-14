@@ -5,7 +5,7 @@ import fr from "@/messages/fr.json";
 
 /**
  * Every user-facing string of the web pages lives in messages/<locale>.json — English (en.json) is the reference, French
- * is a language of design (Yazakia is a Québec app), not a translation. The type arguments make fr.json type-check
+ * is a language of design (Yasakia is a Québec app), not a translation. The type arguments make fr.json type-check
  * against en.json: a missing key fails to compile; `krizaka-i18n check` (npm run lint) checks the rest.
  * The engine is @krizaka/i18n, shared with every Krizaka app — this file only binds it.
  */

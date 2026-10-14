@@ -3,12 +3,12 @@
    2. @krizaka/tailwind — the --kz-* tokens, the role utilities (bg-surface-1, text-fg-secondary, border-border-default,
       text-accent…), the dark / light variants and the motion signature;
    3. @krizaka/ui/tailwind.css — Tailwind scans the @krizaka/ui primitives;
-   4. the Yazakia brand of @krizaka/tokens — emerald → turquoise: the accent, the text on it, the ring, the section
+   4. the Yasakia brand of @krizaka/tokens — emerald → turquoise: the accent, the text on it, the ring, the section
       gradient — in both themes. No product token is needed yet: the roles express everything these pages draw. */
 @import "tailwindcss";
 @import "@krizaka/tailwind";
 @import "@krizaka/ui/tailwind.css";
-@import "@krizaka/tokens/brands/yazakia.css";
+@import "@krizaka/tokens/brands/yasakia.css";
 
 html {
   overflow-x: hidden;

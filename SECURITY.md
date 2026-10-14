@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 Please report vulnerabilities privately through
-[GitHub Security Advisories](https://github.com/krizaka/yazakia/security/advisories/new) or by e-mail to
+[GitHub Security Advisories](https://github.com/krizaka/yasakia/security/advisories/new) or by e-mail to
 **security@krizaka.com**. Do not open a public issue. We acknowledge reports within 72 hours.
 
 A person in danger, a minor on the app, a threat: use the in-app **Report** button (persisted and reviewed first) or

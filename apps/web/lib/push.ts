@@ -1,9 +1,9 @@
 import { isExpoPushToken, sendExpoPush } from "@krizaka/push";
-import { db, pushTokens } from "@yazakia/db";
+import { db, pushTokens } from "@yasakia/db";
 import { and, eq, inArray } from "drizzle-orm";
 
 /**
- * Push to the account's phones (the Yazakia app, krizaka/yazakia-mobile) through `@krizaka/push` (Expo Push → FCM /
+ * Push to the account's phones (the Yasakia app, krizaka/yasakia-mobile) through `@krizaka/push` (Expo Push → FCM /
  * APNs). Best-effort: never throws, and forgets the tokens the push service reports as dead.
  *
  * Pushes leave only in production, or elsewhere with PUSH_DELIVERY=on (local runs and CI never call the push service).

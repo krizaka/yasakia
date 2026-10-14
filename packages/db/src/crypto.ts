@@ -18,7 +18,7 @@ import crypto from "node:crypto";
 export const SEALED_PREFIX = "enc:v1:";
 
 /** The development key: only outside production, so a local database works without configuration. Never secret. */
-const DEVELOPMENT_KEY = "development-only-yazakia-data-encryption-key-not-a-secret";
+const DEVELOPMENT_KEY = "development-only-yasakia-data-encryption-key-not-a-secret";
 
 export class EncryptionKeyError extends Error {
   constructor(message: string) {

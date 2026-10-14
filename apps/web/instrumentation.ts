@@ -10,7 +10,7 @@ export async function register() {
   try {
     assertProductionConfig();
   } catch (error) {
-    console.error(`[yazakia] refusing to start: ${(error as Error).message}`);
+    console.error(`[yasakia] refusing to start: ${(error as Error).message}`);
     process.exit(1);
   }
   const { startJobs } = await import("./lib/jobs");

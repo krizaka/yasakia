@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 type Client = typeof import("./client");
-const holder = globalThis as unknown as { __yazakiaDb?: unknown; __yazakiaDbCreated?: number };
+const holder = globalThis as unknown as { __yasakiaDb?: unknown; __yasakiaDbCreated?: number };
 
 /** A fresh copy of the module, as Next.js loads one per module graph (pages, route handlers, instrumentation). */
 async function freshModule(): Promise<Client> {
@@ -12,7 +12,7 @@ async function freshModule(): Promise<Client> {
 afterEach(async () => {
   const { closeDb } = await import("./client");
   await closeDb();
-  holder.__yazakiaDbCreated = undefined;
+  holder.__yasakiaDbCreated = undefined;
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
 });
@@ -42,7 +42,7 @@ describe("the database pool", () => {
     vi.stubEnv("DATABASE_MAX_CONNECTIONS", "2");
     expect(getPool().options.max).toBe(2);
     expect(getPool().options.idleTimeoutMillis).toBe(10_000);
-    expect((getPool().options as { application_name?: string }).application_name).toBe("yazakia-web");
+    expect((getPool().options as { application_name?: string }).application_name).toBe("yasakia-web");
   });
 
   it("recognises a database that refuses connections, through Drizzle's wrapping", async () => {

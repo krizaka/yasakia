@@ -1,4 +1,4 @@
-/** Shared helpers of the Yazakia developer scripts (no dependencies: Node 22+ only). */
+/** Shared helpers of the Yasakia developer scripts (no dependencies: Node 22+ only). */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
@@ -8,8 +8,8 @@ import { fileURLToPath } from "node:url";
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const COMPOSE = ["compose", "-f", path.join(ROOT, "deploy/docker/docker-compose.dev.yml")];
 /** The dev container (deploy/docker/docker-compose.dev.yml) — port 5435, so it lives next to Orochia's and Orazaka's. */
-export const CONTAINER = "yazakia-postgres-dev";
-export const DEV_DATABASE_URL = "postgresql://yazakia_user:yazakia_secret@localhost:5435/yazakia_db?sslmode=disable";
+export const CONTAINER = "yasakia-postgres-dev";
+export const DEV_DATABASE_URL = "postgresql://yasakia_user:yasakia_secret@localhost:5435/yasakia_db?sslmode=disable";
 
 const tty = process.stdout.isTTY;
 const paint = (code) => (s) => (tty ? `\x1b[${code}m${s}\x1b[0m` : s);
@@ -77,7 +77,7 @@ export function waitForPort(port, host = "127.0.0.1", timeoutMs = 60_000) {
 export async function waitForPostgres(timeoutMs = 60_000) {
   const until = Date.now() + timeoutMs;
   while (Date.now() < until) {
-    const r = run("docker", ["exec", CONTAINER, "pg_isready", "-U", "yazakia_user", "-d", "yazakia_db"], { allowFail: true, quiet: true });
+    const r = run("docker", ["exec", CONTAINER, "pg_isready", "-U", "yasakia_user", "-d", "yasakia_db"], { allowFail: true, quiet: true });
     if (r.status === 0) return;
     await new Promise((r2) => setTimeout(r2, 700));
   }
@@ -85,16 +85,16 @@ export async function waitForPostgres(timeoutMs = 60_000) {
 }
 
 /** The shared development database: every session and worktree works on its own, never on this one. */
-export const SHARED_DATABASE = "yazakia_db";
+export const SHARED_DATABASE = "yasakia_db";
 
 /**
- * The database of a branch: `yazakia_<branch>` (lower-case, [a-z0-9_], at most 63 characters) — `main` (or no branch)
- * keeps the shared one. A session or a worktree on `feat/photos` works on `yazakia_feat_photos`.
+ * The database of a branch: `yasakia_<branch>` (lower-case, [a-z0-9_], at most 63 characters) — `main` (or no branch)
+ * keeps the shared one. A session or a worktree on `feat/photos` works on `yasakia_feat_photos`.
  */
 export function databaseForBranch(branch) {
   if (!branch || branch === "main" || branch === "HEAD") return SHARED_DATABASE;
   const slug = branch.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-  return `yazakia_${slug}`.slice(0, 63);
+  return `yasakia_${slug}`.slice(0, 63);
 }
 
 /**

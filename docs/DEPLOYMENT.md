@@ -1,6 +1,6 @@
 ---
 title: Deployment
-description: Deploying the Yazakia API on DigitalOcean App Platform — the image, the release job, the configuration, the database connection budget, and the manual prerequisites.
+description: Deploying the Yasakia API on DigitalOcean App Platform — the image, the release job, the configuration, the database connection budget, and the manual prerequisites.
 ---
 
 # Deployment
@@ -26,7 +26,7 @@ the first migration creates them, so run it with the database owner (`doadmin`) 
 
 > Generated from `apps/web/lib/env-vars.ts` (`ENV_VARS`) by `scripts/generate-docs.mjs` — do not hand-edit this section.
 
-Every variable is named `<CONTEXT>_<THING>` after the part of Yazakia it configures — never after the product or a
+Every variable is named `<CONTEXT>_<THING>` after the part of Yasakia it configures — never after the product or a
 vendor: a vendor is a value (`MEDIA_STORAGE_PROVIDER=bunny`, `MAIL_PROVIDER=mailgun`). **Production** ✓ = the server
 refuses to start without it (`assertProductionConfig`, which also checks every value set against its schema);
 **Secret** = a `SECRET` on App Platform. Every variable is also in `.env.example`.
@@ -78,9 +78,9 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | :--- | :---: | :---: | :--- | :--- |
 | `MAIL_PROVIDER` | ✓ |  |  | The e-mail service: `mailgun`. Production is fail-closed without it (a sign-in code is never logged there). |
 | `MAIL_API_KEY` | ✓ | ✓ |  | The provider's API key. |
-| `MAIL_DOMAIN` | ✓ |  |  | Sending domain (e.g. `mg.yazakia.com`). |
+| `MAIL_DOMAIN` | ✓ |  |  | Sending domain (e.g. `mg.yasakia.com`). |
 | `MAIL_API_URL` | — |  | `https://api.mailgun.net` | API base (EU region: `https://api.eu.mailgun.net`). |
-| `MAIL_FROM` | — |  | `Yazakia <no-reply@mg.yazakia.com>` | Sender address. |
+| `MAIL_FROM` | — |  | `Yasakia <no-reply@mg.yasakia.com>` | Sender address. |
 | `MAIL_DELIVERY` | — |  | `log` | Outside production: `on` sends, `file` writes to MAIL_OUTBOX_DIR (the e2e scenarios read the codes there), `log` logs. |
 | `MAIL_OUTBOX_DIR` | — |  | `.mail-outbox/` | Folder of `file` delivery. |
 | `MAIL_TEMPLATES_DIR` | — |  | `apps/web/mail-templates` | Another folder of templates. |
@@ -98,7 +98,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | :--- | :---: | :---: | :--- | :--- |
 | `REALTIME_BUS` | — |  | `postgres` | `postgres` (LISTEN/NOTIFY, no broker), `redis` (several instances), `memory` (tests). |
 | `REALTIME_REDIS_URL` | — | ✓ |  | Redis / Valkey — required with `REALTIME_BUS=redis`. |
-| `REALTIME_PREFIX` | — |  | `yazakia:rt:` | Channel prefix on the bus. |
+| `REALTIME_PREFIX` | — |  | `yasakia:rt:` | Channel prefix on the bus. |
 | `REALTIME_STREAM_MAX_SECONDS` | — |  | `300` | A stream ends after this long and the client resumes. |
 
 ### Abuse defences — `ABUSE_`
@@ -126,10 +126,10 @@ connection is named (`application_name`), so `pg_stat_activity` says who holds w
 
 | Name | What | How many |
 | :--- | :--- | :--- |
-| `yazakia-web` | the pool of an instance | ≤ `DATABASE_MAX_CONNECTIONS` |
-| `yazakia-listen` | the realtime bus's LISTEN (direct connection) | 1 per instance |
-| `yazakia-migrate` | the release job | 1, during the release |
-| `yazakia-seed` | the development seed | local only |
+| `yasakia-web` | the pool of an instance | ≤ `DATABASE_MAX_CONNECTIONS` |
+| `yasakia-listen` | the realtime bus's LISTEN (direct connection) | 1 per instance |
+| `yasakia-migrate` | the release job | 1, during the release |
+| `yasakia-seed` | the development seed | local only |
 
 `DATABASE_DIRECT_URL` is optional: when `DATABASE_URL` goes through a transaction pooler (PgBouncer, DigitalOcean
 connection pools), LISTEN and the migrations use the direct URL — a pooler breaks a LISTEN session and a migration's
@@ -159,9 +159,16 @@ durable lives on the bus.
 
 | What | Where | Then |
 | :--- | :--- | :--- |
-| Bunny Storage zone **`yazakia`** + a pull zone on it, **Optimizer on**, **token authentication on** | Bunny dashboard | `MEDIA_STORAGE_ZONE`, `MEDIA_STORAGE_API_KEY` (zone password), `MEDIA_STORAGE_ENDPOINT` (region host), `MEDIA_CDN_HOSTNAME`, `MEDIA_CDN_TOKEN_AUTH_KEY` (the pull zone's URL token key) |
-| A Mailgun sending domain for Yazakia (e.g. `mg.yazakia.com`), DNS verified | Mailgun + the DNS of the domain | `MAIL_API_KEY`, `MAIL_DOMAIN`, `MAIL_FROM` (`MAIL_API_URL` for the EU region) |
-| The domain `yazakia.com` | registrar | `NEXT_PUBLIC_APP_URL` and the spec's `domains` |
+| Bunny Storage zone **`yasakia`** + a pull zone on it, **Optimizer on**, **token authentication on** | Bunny dashboard | `MEDIA_STORAGE_ZONE`, `MEDIA_STORAGE_API_KEY` (zone password), `MEDIA_STORAGE_ENDPOINT` (region host), `MEDIA_CDN_HOSTNAME`, `MEDIA_CDN_TOKEN_AUTH_KEY` (the pull zone's URL token key) |
+| A Mailgun sending domain for Yasakia (e.g. `mg.yasakia.com`), DNS verified | Mailgun + the DNS of the domain | `MAIL_API_KEY`, `MAIL_DOMAIN`, `MAIL_FROM` (`MAIL_API_URL` for the EU region) |
+| The domain `yasakia.com` | registrar | `NEXT_PUBLIC_APP_URL` and the spec's `domains` |
 | The production secrets | App Platform → Settings → Environment | `AUTH_SESSION_SECRET` (`openssl rand -hex 32`), `DATABASE_ENCRYPTION_KEY` (`openssl rand -base64 32` — keep a copy in the secret store), `OPERATOR_API_TOKEN`, `OPERATOR_ALLOWED_IPS` |
 
 The test suites need none of these: CI and `npm run test:e2e` run on the local storage and the mail outbox.
+
+## The public dev site (static)
+
+`dev.yasakia.com` is a DigitalOcean App Platform **static site** built from `apps/site` — `deploy/digitalocean/site.app.yaml`
+(`npm ci && npm run build -w apps/site`, output `apps/site/out`). No service, no database, no secret; the only build
+variable is `APP_COMMIT_SHA` (`${_self.COMMIT_HASH}`), which the footer shows with `package.json`'s version. The app lives in
+the DigitalOcean project `yasakia`; the DNS is a CNAME `dev` → the app's default domain.

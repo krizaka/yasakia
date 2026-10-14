@@ -28,7 +28,7 @@ export function ServerError({ locale, digest, retry, as }: { locale?: string; di
           <Button size="lg" shape="pill" loading={pending} onClick={() => startTransition(() => retry())}>
             {pending ? t("retrying") : t("retry")}
           </Button>
-          <a href={contactHref("yazakia-error")} className={buttonVariants({ variant: "ghost", size: "lg", shape: "pill" })}>
+          <a href={contactHref("yasakia-error")} className={buttonVariants({ variant: "ghost", size: "lg", shape: "pill" })}>
             {t("contact")}
           </a>
         </>

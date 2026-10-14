@@ -1,4 +1,4 @@
-import { EncryptionKeyError, isDatabaseUnavailable } from "@yazakia/db";
+import { EncryptionKeyError, isDatabaseUnavailable } from "@yasakia/db";
 import { NextResponse } from "next/server";
 import { type z, ZodError } from "zod";
 

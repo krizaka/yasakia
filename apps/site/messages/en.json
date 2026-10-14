@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "siteName": "Yasakia",
+    "titleTemplate": "{title} — Yasakia",
+    "description": "Yasakia is the dating app where you talk first: an AI agent gets to know you, then opens a small batch of people who fit you both ways. In construction."
+  },
+  "chrome": {
+    "brandHome": "Yasakia — home",
+    "navLabel": "Main",
+    "nav": {
+      "home": "Home",
+      "how-it-works": "How it works",
+      "demo": "Demo"
+    },
+    "languageLabel": "Language",
+    "otherLanguage": "Français",
+    "themeToggle": "Switch between light and dark",
+    "product": "A Krizaka product",
+    "sourceCode": "Source code",
+    "contact": "Talk to us",
+    "version": "Version",
+    "footer": "Yasakia is an open-source product by <b>Krizaka</b>, made in Québec."
+  },
+  "status": {
+    "label": "Under development",
+    "text": "Yasakia is being built in the open. There is no app to download and no account to create yet — this site says what it will be and shows what already runs."
+  },
+  "home": {
+    "title": "Talk first. Meet both ways.",
+    "eyebrow": "The dating app where you talk first",
+    "lead": "No swipe, no catalogue, no score. An agent gets to know you in your own words, then opens a small batch of people who fit you in both directions.",
+    "ctaHow": "How it works",
+    "ctaDemo": "See the demo",
+    "ctaSource": "Follow the build",
+    "principlesTitle": "Four rules, kept by design",
+    "principlesLead": "What Yasakia refuses is as important as what it does.",
+    "principles": {
+      "talk": {
+        "title": "A conversation, not a form",
+        "text": "The agent asks one question at a time, with humour, in your language."
+      },
+      "batch": {
+        "title": "Three to five people, not a feed",
+        "text": "A small batch, each with why you two in words — never a score."
+      },
+      "both": {
+        "title": "Both ways, or not at all",
+        "text": "Someone appears only if you fit them and they fit you."
+      },
+      "debrief": {
+        "title": "The next batch waits for you",
+        "text": "You debrief the last one first, so every batch fits better than the one before."
+      }
+    },
+    "closingTitle": "Built in the open",
+    "closingLead": "Yasakia is open source, on the same foundations as Orochia and Orazaka. Read the code, or tell us what you expect from a dating app.",
+    "closingSource": "Source code",
+    "closingContact": "Talk to us about Yasakia"
+  },
+  "how": {
+    "title": "How it works",
+    "eyebrow": "Four steps",
+    "lead": "The whole loop, from the first question to the first message — what the app is built to do.",
+    "steps": {
+      "talk": {
+        "title": "1 · You talk",
+        "text": "An AI agent gets to know you, one question at a time, in your language. It runs on Orazaka, Krizaka's sovereign AI."
+      },
+      "batch": {
+        "title": "2 · A small batch opens",
+        "text": "Three to five people, never a catalogue. Each comes with the reasons you two fit, written in words."
+      },
+      "both": {
+        "title": "3 · It goes both ways",
+        "text": "Filters and fit are checked in both directions: nobody is shown to someone who would not be shown to them."
+      },
+      "debrief": {
+        "title": "4 · You debrief",
+        "text": "Tell the agent what you thought of the batch. The next one waits for that debrief, and fits better."
+      }
+    },
+    "privacyTitle": "Privacy by design",
+    "privacyLead": "What the foundations already do.",
+    "privacy": {
+      "position": "Your position is rounded to about one kilometre before it is stored.",
+      "photos": "Photos are re-encoded to strip every metadata block, GPS included, and shown only to someone in your batch or your intro, through a link that expires in minutes.",
+      "encrypted": "Sensitive answers are encrypted at rest.",
+      "control": "Export and deletion of your data are in the API from day one; blocks and reports work at once.",
+      "honest": "No demo mode and no fake profile: where there is nothing real, nothing is shown."
+    },
+    "stackTitle": "What it is built on",
+    "stackLead": "One database does the heavy lifting; no broker, no swipe engine.",
+    "stack": {
+      "db": "PostgreSQL with pgvector for who you are and who you seek, and the radius.",
+      "ui": "Krizaka UI, web and native — the same components as the other Krizaka products.",
+      "ai": "Orazaka for the agent; it never leaves Krizaka's own stack."
+    }
+  },
+  "demo": {
+    "title": "Demo",
+    "eyebrow": "What already runs",
+    "lead": "The app is not released. This is the one recording that exists: Krizaka UI's native components, the bricks Yasakia's screens are built from, running on a phone.",
+    "videoLabel": "A phone running Krizaka UI native components: a card deck, a tag selector and a location picker.",
+    "noteTitle": "Read this recording honestly",
+    "note": "It is a component demo, not the app. The portrait is generated for the demo — it is not a person and Yasakia has no members. The deck shown here is a building block; Yasakia itself has no swipe.",
+    "nextTitle": "When the app ships",
+    "nextText": "Its own recording, made on the real application, replaces this one here. Until then: the code is public."
+  }
+}

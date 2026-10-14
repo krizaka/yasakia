@@ -1,5 +1,5 @@
 {
-  "name": "@yazakia/db",
+  "name": "@yasakia/db",
   "version": "0.1.0",
   "description": "PostgreSQL 16 + pgvector schema (Drizzle, the source of truth), migrations and the bundled migrator, the process-wide pool, encryption at rest, development seed.",
   "private": true,

@@ -1,11 +1,11 @@
 {
   "meta": {
-    "siteName": "Yazakia",
-    "titleTemplate": "{title} — Yazakia",
-    "description": "Yazakia, l’app de rencontre où l’on parle d’abord : un agent IA apprend à te connaître, puis ouvre de petits lots de profils, compatibles dans les deux sens."
+    "siteName": "Yasakia",
+    "titleTemplate": "{title} — Yasakia",
+    "description": "Yasakia, l’app de rencontre où l’on parle d’abord : un agent IA apprend à te connaître, puis ouvre de petits lots de profils, compatibles dans les deux sens."
   },
   "chrome": {
-    "brandHome": "Yazakia sur krizaka.com",
+    "brandHome": "Yasakia sur krizaka.com",
     "navLabel": "Pages légales",
     "nav": {
       "privacy": "Confidentialité",
@@ -15,7 +15,7 @@
     "languageLabel": "Langue",
     "otherLanguage": "English",
     "themeToggle": "Passer du thème clair au sombre",
-    "footer": "Yazakia est un produit open source de <b>Krizaka</b>, conçu au Québec.",
+    "footer": "Yasakia est un produit open source de <b>Krizaka</b>, conçu au Québec.",
     "sourceCode": "Code source",
     "contact": "Nous écrire",
     "updated": "Mis à jour le {date} · version {version}",
@@ -24,7 +24,7 @@
   "privacy": {
     "metaTitle": "Politique de confidentialité",
     "eyebrow": "Confidentialité",
-    "title": "Ce que Yazakia garde de toi, et combien de temps",
+    "title": "Ce que Yasakia garde de toi, et combien de temps",
     "lead": "Une app de rencontre apprend des choses intimes. Voici exactement ce qu’on conserve, où, combien de temps, et comment ça disparaît — sans jargon.",
     "sections": [
       {
@@ -87,7 +87,7 @@
         "id": "age",
         "title": "Réservé aux adultes",
         "paragraphs": [
-          "Yazakia est réservé aux personnes de 18 ans et plus. On vérifie la date de naissance à la création du compte et on ferme tout compte dont on apprend qu’il appartient à une personne mineure."
+          "Yasakia est réservé aux personnes de 18 ans et plus. On vérifie la date de naissance à la création du compte et on ferme tout compte dont on apprend qu’il appartient à une personne mineure."
         ]
       }
     ]
@@ -95,19 +95,19 @@
   "terms": {
     "metaTitle": "Conditions d’utilisation",
     "eyebrow": "Conditions",
-    "title": "Les règles de Yazakia",
-    "lead": "Yazakia fonctionne parce que les gens sont honnêtes et bienveillants entre eux. Ces conditions disent ce qu’on attend de toi, et ce que tu peux attendre de nous.",
+    "title": "Les règles de Yasakia",
+    "lead": "Yasakia fonctionne parce que les gens sont honnêtes et bienveillants entre eux. Ces conditions disent ce qu’on attend de toi, et ce que tu peux attendre de nous.",
     "sections": [
       {
         "id": "who",
         "title": "Qui nous sommes",
         "paragraphs": [
-          "Yazakia est conçu par Krizaka, au Québec. L’app est gratuite ; son code est ouvert, sous licence Apache 2.0."
+          "Yasakia est conçu par Krizaka, au Québec. L’app est gratuite ; son code est ouvert, sous licence Apache 2.0."
         ]
       },
       {
         "id": "you",
-        "title": "Qui peut utiliser Yazakia",
+        "title": "Qui peut utiliser Yasakia",
         "paragraphs": [
           "Tu dois avoir 18 ans ou plus, n’utiliser qu’un seul compte et être qui tu dis être : tes photos te montrent, toi seul·e ; ton prénom est le tien.",
           "Tes codes de connexion restent à toi. Si tu penses que quelqu’un d’autre a utilisé ton compte, déconnecte-toi partout depuis les réglages et préviens-nous."
@@ -142,7 +142,7 @@
         "id": "content",
         "title": "Ce que tu partages",
         "paragraphs": [
-          "Tes photos et tes mots restent à toi. Tu nous permets de les conserver et de les montrer aux personnes que Yazakia te présente, seulement tant que ton compte existe."
+          "Tes photos et tes mots restent à toi. Tu nous permets de les conserver et de les montrer aux personnes que Yasakia te présente, seulement tant que ton compte existe."
         ]
       },
       {
@@ -150,7 +150,7 @@
         "title": "Partir, et le reste",
         "paragraphs": [
           "Tu peux mettre ton compte en pause ou le supprimer à tout moment depuis l’app. Ces conditions peuvent changer ; quand c’est important, l’app te prévient avant que ça s’applique.",
-          "Yazakia est fourni tel quel, sans promesse de rencontre. Ces conditions sont régies par les lois du Québec et du Canada."
+          "Yasakia est fourni tel quel, sans promesse de rencontre. Ces conditions sont régies par les lois du Québec et du Canada."
         ]
       }
     ]
@@ -158,11 +158,11 @@
   "deleteAccount": {
     "metaTitle": "Supprimer ton compte",
     "eyebrow": "Ton compte",
-    "title": "Supprimer ton compte Yazakia",
+    "title": "Supprimer ton compte Yasakia",
     "lead": "Tu peux supprimer ton compte à tout moment, depuis l’app, en quelques secondes. C’est définitif : tout ce qui est à toi disparaît.",
     "inAppTitle": "Depuis l’app",
     "inAppSteps": [
-      "Ouvre Yazakia et va dans <b>Réglages</b>.",
+      "Ouvre Yasakia et va dans <b>Réglages</b>.",
       "Choisis <b>Supprimer mon compte</b>.",
       "Confirme. Tu es déconnecté·e et ton compte n’existe plus."
     ],

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { bunnyStorage, localStorage, type MediaStorage, photoWidth, signBunnyUrl, signLocalMediaUrl, signUpload } from "@yazakia/media";
+import { bunnyStorage, localStorage, type MediaStorage, photoWidth, signBunnyUrl, signLocalMediaUrl, signUpload } from "@yasakia/media";
 
 import { appUrl, type MediaConfig, mediaConfig, sessionSecret } from "./env";
 
@@ -11,19 +11,19 @@ import { appUrl, type MediaConfig, mediaConfig, sessionSecret } from "./env";
  * `/api/media/…` route, signed the same way. A storage key never leaves the server unsigned.
  */
 
-const holder = globalThis as unknown as { __yazakiaStorage?: { key: string; storage: MediaStorage } };
+const holder = globalThis as unknown as { __yasakiaStorage?: { key: string; storage: MediaStorage } };
 
 export function mediaStorage(config: MediaConfig = mediaConfig()): MediaStorage {
   const key = JSON.stringify(config);
-  if (holder.__yazakiaStorage?.key !== key) {
-    holder.__yazakiaStorage = { key, storage: config.driver === "bunny" ? bunnyStorage(config) : localStorage(config.dir) };
+  if (holder.__yasakiaStorage?.key !== key) {
+    holder.__yasakiaStorage = { key, storage: config.driver === "bunny" ? bunnyStorage(config) : localStorage(config.dir) };
   }
-  return holder.__yazakiaStorage.storage;
+  return holder.__yasakiaStorage.storage;
 }
 
 /** The HMAC key of the API's own signatures (uploads, local media), derived from AUTH_SESSION_SECRET for this purpose only. */
 export function mediaSecret(): string {
-  return crypto.createHash("sha256").update(`yazakia-media:${sessionSecret()}`).digest("hex");
+  return crypto.createHash("sha256").update(`yasakia-media:${sessionSecret()}`).digest("hex");
 }
 
 export interface SignedPhoto {

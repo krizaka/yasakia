@@ -19,7 +19,7 @@ import {
   readFacets,
   reports,
   sealJson,
-} from "@yazakia/db";
+} from "@yasakia/db";
 import { and, asc, eq, gt, inArray, lt, or, sql } from "drizzle-orm";
 
 import { setting } from "./env";
@@ -35,7 +35,7 @@ import { refuse } from "./http";
  */
 
 export const EXPORT_TTL_HOURS = 24;
-export const EXPORT_FORMAT = "yazakia-export/1";
+export const EXPORT_FORMAT = "yasakia-export/1";
 
 const exportContext = (id: string) => `account_exports:${id}`;
 

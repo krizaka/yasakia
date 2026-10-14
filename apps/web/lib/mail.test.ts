@@ -15,7 +15,7 @@ describe("mail templates are data", () => {
     for (const id of Object.keys(MAIL_TEMPLATES) as MailTemplateId[]) {
       const declared = Object.keys(MAIL_TEMPLATES[id]).sort();
       for (const locale of MAIL_LOCALES) {
-        const rendered = renderMailTemplate(id, preview(id), { locale, appUrl: "https://api.yazakia.com", dir: DIR });
+        const rendered = renderMailTemplate(id, preview(id), { locale, appUrl: "https://api.yasakia.com", dir: DIR });
         expect(rendered.locale).toBe(locale);
         expect(rendered.subject.length).toBeGreaterThan(5);
         expect(rendered.html).toContain(`lang="${locale}"`);
@@ -29,7 +29,7 @@ describe("mail templates are data", () => {
 
   it("the sign-in code is in the subject and the body, in the person's language", () => {
     const fr = renderMailTemplate("sign-in-code", { code: "482913", minutes: 10 }, { locale: "fr", appUrl: "https://x", dir: DIR });
-    expect(fr.subject).toBe("Ton code Yazakia : 482913");
+    expect(fr.subject).toBe("Ton code Yasakia : 482913");
     expect(fr.text).toContain("482913");
     const unknown = renderMailTemplate("sign-in-code", { code: "1", minutes: 10 }, { locale: "de", appUrl: "https://x", dir: DIR });
     expect(unknown.locale).toBe("en");
@@ -52,15 +52,15 @@ describe("delivery", () => {
 
   it("sends through Mailgun's HTTP API with Basic auth", async () => {
     const fetchImpl = vi.fn(async () => new Response("{}", { status: 200 }));
-    const ok = await sendMail(mail, { NODE_ENV: "production", MAIL_PROVIDER: "mailgun", MAIL_API_KEY: "key", MAIL_DOMAIN: "mg.yazakia.com" } as unknown as NodeJS.ProcessEnv, fetchImpl as unknown as typeof fetch);
+    const ok = await sendMail(mail, { NODE_ENV: "production", MAIL_PROVIDER: "mailgun", MAIL_API_KEY: "key", MAIL_DOMAIN: "mg.yasakia.com" } as unknown as NodeJS.ProcessEnv, fetchImpl as unknown as typeof fetch);
     expect(ok).toBe(true);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toBe("https://api.mailgun.net/v3/mg.yazakia.com/messages");
+    expect(url).toBe("https://api.mailgun.net/v3/mg.yasakia.com/messages");
     expect(new Headers(init.headers).get("Authorization")).toBe(`Basic ${Buffer.from("api:key").toString("base64")}`);
   });
 
   it("MAIL_DELIVERY=file writes the message to the outbox (end-to-end scenarios)", async () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "yazakia-outbox-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "yasakia-outbox-"));
     await sendMail(mail, { MAIL_DELIVERY: "file", MAIL_OUTBOX_DIR: dir } as unknown as NodeJS.ProcessEnv);
     const [file] = fs.readdirSync(dir);
     expect(JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"))).toMatchObject({ to: "ada@example.test", template: "sign-in-code" });

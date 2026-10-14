@@ -1,4 +1,4 @@
-import { YazakiaLogo } from "@krizaka/ui";
+import { YasakiaLogo } from "@krizaka/ui";
 import { Page } from "@krizaka/ui/page";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
@@ -12,8 +12,8 @@ const navLink =
   "rounded-md px-2 py-1 text-sm text-fg-secondary transition-colors hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:text-fg-accent aria-[current=page]:font-semibold";
 
 /**
- * The frame of the three web pages: the animated mark (to krizaka.com's Yazakia page), the three pages, the other
- * language (the same page) and the theme; a footer that says who makes Yazakia.
+ * The frame of the three web pages: the animated mark (to krizaka.com's Yasakia page), the three pages, the other
+ * language (the same page) and the theme; a footer that says who makes Yasakia.
  */
 export function SiteHeader({ locale, current }: { locale: Locale; current?: LegalPage }) {
   const t = translator(locale);
@@ -23,8 +23,8 @@ export function SiteHeader({ locale, current }: { locale: Locale; current?: Lega
     <header className="border-b border-border-default bg-surface-0/80 backdrop-blur-md">
       <Page className="flex min-h-16 flex-wrap items-center gap-x-4 gap-y-2 py-3">
         <a href={PRODUCT_URL} aria-label={t("chrome.brandHome")} className="inline-flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <YazakiaLogo size={30} />
-          <span className="font-display text-lg font-bold tracking-tight text-fg">Yazakia</span>
+          <YasakiaLogo size={30} />
+          <span className="font-display text-lg font-bold tracking-tight text-fg">Yasakia</span>
         </a>
         <nav aria-label={t("chrome.navLabel")} className="order-3 flex w-full flex-wrap gap-1 sm:order-none sm:ml-6 sm:w-auto">
           {LEGAL_PAGES.map((page) => (

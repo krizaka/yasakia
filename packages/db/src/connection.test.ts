@@ -14,14 +14,14 @@ describe("connections", () => {
   });
 
   it("names every connection", () => {
-    expect(Object.values(CONNECTION_NAMES)).toEqual(["yazakia-web", "yazakia-listen", "yazakia-migrate", "yazakia-seed"]);
-    expect(connectionConfig("postgres://h/db", CONNECTION_NAMES.listen, {})).toEqual({ connectionString: "postgres://h/db", application_name: "yazakia-listen" });
+    expect(Object.values(CONNECTION_NAMES)).toEqual(["yasakia-web", "yasakia-listen", "yasakia-migrate", "yasakia-seed"]);
+    expect(connectionConfig("postgres://h/db", CONNECTION_NAMES.listen, {})).toEqual({ connectionString: "postgres://h/db", application_name: "yasakia-listen" });
   });
 
   it("verifies a managed database's certificate against DATABASE_CA_CERT (the URL's sslmode dropped)", () => {
     const config = connectionConfig("postgres://u:p@h:25060/db?sslmode=require", CONNECTION_NAMES.web, { DATABASE_CA_CERT: "-----BEGIN CERTIFICATE-----" });
     expect(config.connectionString).toBe("postgres://u:p@h:25060/db");
     expect(config.ssl).toEqual({ ca: "-----BEGIN CERTIFICATE-----", rejectUnauthorized: true });
-    expect(config.application_name).toBe("yazakia-web");
+    expect(config.application_name).toBe("yasakia-web");
   });
 });

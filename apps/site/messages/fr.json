@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "siteName": "Yasakia",
+    "titleTemplate": "{title} — Yasakia",
+    "description": "Yasakia est l'appli de rencontre où l'on se parle d'abord : un agent IA apprend à vous connaître, puis ouvre un petit lot de personnes qui vous conviennent dans les deux sens. En construction."
+  },
+  "chrome": {
+    "brandHome": "Yasakia — accueil",
+    "navLabel": "Principale",
+    "nav": {
+      "home": "Accueil",
+      "how-it-works": "Comment ça marche",
+      "demo": "Démo"
+    },
+    "languageLabel": "Langue",
+    "otherLanguage": "English",
+    "themeToggle": "Basculer entre clair et sombre",
+    "product": "Un produit Krizaka",
+    "sourceCode": "Code source",
+    "contact": "Nous écrire",
+    "version": "Version",
+    "footer": "Yasakia est un produit open source de <b>Krizaka</b>, fait au Québec."
+  },
+  "status": {
+    "label": "En développement",
+    "text": "Yasakia se construit à ciel ouvert. Il n'y a pas encore d'appli à télécharger ni de compte à créer — ce site dit ce qu'elle sera et montre ce qui tourne déjà."
+  },
+  "home": {
+    "title": "On se parle d'abord. On se rencontre dans les deux sens.",
+    "eyebrow": "L'appli de rencontre où l'on se parle d'abord",
+    "lead": "Pas de swipe, pas de catalogue, pas de score. Un agent apprend à vous connaître avec vos mots, puis ouvre un petit lot de personnes qui vous conviennent dans les deux sens.",
+    "ctaHow": "Comment ça marche",
+    "ctaDemo": "Voir la démo",
+    "ctaSource": "Suivre la construction",
+    "principlesTitle": "Quatre règles, tenues par conception",
+    "principlesLead": "Ce que Yasakia refuse compte autant que ce qu'elle fait.",
+    "principles": {
+      "talk": {
+        "title": "Une conversation, pas un formulaire",
+        "text": "L'agent pose une question à la fois, avec humour, dans votre langue."
+      },
+      "batch": {
+        "title": "Trois à cinq personnes, pas un fil",
+        "text": "Un petit lot, chacune avec « pourquoi vous deux » en mots — jamais un score."
+      },
+      "both": {
+        "title": "Dans les deux sens, ou pas du tout",
+        "text": "Quelqu'un n'apparaît que s'il vous convient et que vous lui convenez."
+      },
+      "debrief": {
+        "title": "Le prochain lot vous attend",
+        "text": "Vous faites le bilan du dernier d'abord : chaque lot vous va mieux que le précédent."
+      }
+    },
+    "closingTitle": "Construit à ciel ouvert",
+    "closingLead": "Yasakia est open source, sur les mêmes fondations qu'Orochia et Orazaka. Lisez le code, ou dites-nous ce que vous attendez d'une appli de rencontre.",
+    "closingSource": "Code source",
+    "closingContact": "Parler de Yasakia avec nous"
+  },
+  "how": {
+    "title": "Comment ça marche",
+    "eyebrow": "Quatre étapes",
+    "lead": "La boucle complète, de la première question au premier message — ce que l'appli est construite pour faire.",
+    "steps": {
+      "talk": {
+        "title": "1 · Vous parlez",
+        "text": "Un agent IA apprend à vous connaître, une question à la fois, dans votre langue. Il tourne sur Orazaka, l'IA souveraine de Krizaka."
+      },
+      "batch": {
+        "title": "2 · Un petit lot s'ouvre",
+        "text": "Trois à cinq personnes, jamais un catalogue. Chacune vient avec les raisons qui vous vont à tous les deux, écrites en mots."
+      },
+      "both": {
+        "title": "3 · Ça marche dans les deux sens",
+        "text": "Les filtres et l'affinité sont vérifiés dans les deux directions : personne n'est montré à quelqu'un à qui il ne serait pas montré."
+      },
+      "debrief": {
+        "title": "4 · Vous faites le bilan",
+        "text": "Dites à l'agent ce que vous avez pensé du lot. Le suivant attend ce bilan, et vous va mieux."
+      }
+    },
+    "privacyTitle": "Vie privée dès la conception",
+    "privacyLead": "Ce que les fondations font déjà.",
+    "privacy": {
+      "position": "Votre position est arrondie à environ un kilomètre avant d'être enregistrée.",
+      "photos": "Les photos sont ré-encodées pour retirer tous les blocs de métadonnées, GPS compris, et montrées seulement à quelqu'un de votre lot ou de votre mise en relation, par un lien qui expire en quelques minutes.",
+      "encrypted": "Les réponses sensibles sont chiffrées au repos.",
+      "control": "L'export et la suppression de vos données sont dans l'API dès le premier jour ; blocages et signalements agissent tout de suite.",
+      "honest": "Pas de mode démo ni de faux profil : là où il n'y a rien de réel, rien n'est montré."
+    },
+    "stackTitle": "Sur quoi elle repose",
+    "stackLead": "Une base de données fait le gros du travail ; pas de broker, pas de moteur de swipe.",
+    "stack": {
+      "db": "PostgreSQL avec pgvector pour qui vous êtes et qui vous cherchez, et le rayon.",
+      "ui": "Krizaka UI, web et natif — les mêmes composants que les autres produits Krizaka.",
+      "ai": "Orazaka pour l'agent ; il ne quitte jamais la pile propre de Krizaka."
+    }
+  },
+  "demo": {
+    "title": "Démo",
+    "eyebrow": "Ce qui tourne déjà",
+    "lead": "L'appli n'est pas sortie. Voici le seul enregistrement qui existe : les composants natifs de Krizaka UI, les briques dont les écrans de Yasakia sont faits, sur un téléphone.",
+    "videoLabel": "Un téléphone qui exécute des composants natifs de Krizaka UI : un paquet de cartes, un sélecteur de tags et un sélecteur de lieu.",
+    "noteTitle": "Lire cet enregistrement honnêtement",
+    "note": "C'est une démo de composants, pas l'appli. Le portrait est généré pour la démo — ce n'est pas une personne et Yasakia n'a aucun membre. Le paquet de cartes montré ici est une brique ; Yasakia elle-même n'a pas de swipe.",
+    "nextTitle": "Quand l'appli sortira",
+    "nextText": "Son propre enregistrement, fait sur l'application réelle, remplacera celui-ci. D'ici là : le code est public."
+  }
+}

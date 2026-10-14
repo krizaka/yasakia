@@ -1,5 +1,5 @@
 /**
- * Every environment variable of Yazakia, declared once: its bounded context, whether production needs it, whether it is
+ * Every environment variable of Yasakia, declared once: its bounded context, whether production needs it, whether it is
  * a secret, a zod schema and what it does. Names follow the Krizaka convention (krizaka/.github#46): `<CONTEXT>_<THING>`
  * — never the product nor a vendor (a vendor is a value: `MEDIA_STORAGE_PROVIDER=bunny`, `MAIL_PROVIDER=mailgun`);
  * `NEXT_PUBLIC_` only where the browser needs it. docs/DEPLOYMENT.md's tables are generated from this list
@@ -65,9 +65,9 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("MEDIA_PHOTO_MODERATION", "MEDIA", "optional", z.enum(["auto"]), "Photo moderation: `auto` (V1 — approved at once; a report reopens the review).", { default: "auto" }),
   v("MAIL_PROVIDER", "MAIL", "required", z.enum(["mailgun"]), "The e-mail service: `mailgun`. Production is fail-closed without it (a sign-in code is never logged there)."),
   v("MAIL_API_KEY", "MAIL", "required", text, "The provider's API key.", { secret: true }),
-  v("MAIL_DOMAIN", "MAIL", "required", text, "Sending domain (e.g. `mg.yazakia.com`)."),
+  v("MAIL_DOMAIN", "MAIL", "required", text, "Sending domain (e.g. `mg.yasakia.com`)."),
   v("MAIL_API_URL", "MAIL", "optional", url, "API base (EU region: `https://api.eu.mailgun.net`).", { default: "https://api.mailgun.net" }),
-  v("MAIL_FROM", "MAIL", "optional", text, "Sender address.", { default: "Yazakia <no-reply@mg.yazakia.com>" }),
+  v("MAIL_FROM", "MAIL", "optional", text, "Sender address.", { default: "Yasakia <no-reply@mg.yasakia.com>" }),
   v("MAIL_DELIVERY", "MAIL", "optional", z.enum(["log", "on", "file"]), "Outside production: `on` sends, `file` writes to MAIL_OUTBOX_DIR (the e2e scenarios read the codes there), `log` logs.", { default: "log" }),
   v("MAIL_OUTBOX_DIR", "MAIL", "optional", text, "Folder of `file` delivery.", { default: ".mail-outbox/" }),
   v("MAIL_TEMPLATES_DIR", "MAIL", "optional", text, "Another folder of templates.", { default: "apps/web/mail-templates" }),
@@ -75,7 +75,7 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("PUSH_ACCESS_TOKEN", "PUSH", "optional", text, "Expo access token — with enhanced push security only.", { secret: true }),
   v("REALTIME_BUS", "REALTIME", "optional", z.enum(["memory", "postgres", "redis"]), "`postgres` (LISTEN/NOTIFY, no broker), `redis` (several instances), `memory` (tests).", { default: "postgres" }),
   v("REALTIME_REDIS_URL", "REALTIME", "optional", url, "Redis / Valkey — required with `REALTIME_BUS=redis`.", { secret: true }),
-  v("REALTIME_PREFIX", "REALTIME", "optional", text, "Channel prefix on the bus.", { default: "yazakia:rt:" }),
+  v("REALTIME_PREFIX", "REALTIME", "optional", text, "Channel prefix on the bus.", { default: "yasakia:rt:" }),
   v("REALTIME_STREAM_MAX_SECONDS", "REALTIME", "optional", int(0, 3600), "A stream ends after this long and the client resumes.", { default: "300" }),
   v("ABUSE_RATE_LIMIT_STORE", "ABUSE", "recommended", z.enum(["memory", "postgres"]), "`memory` (one instance) or `postgres` (shared — required before a second instance).", { default: "memory" }),
   v("ABUSE_CLIENT_IP_HEADER", "ABUSE", "recommended", text, "The header the edge sets with the client's address (App Platform: `do-connecting-ip`)."),

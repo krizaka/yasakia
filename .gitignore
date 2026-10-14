@@ -43,3 +43,4 @@ docs/screenshots/
 # Written by next dev / next build (it changes between the two)
 apps/web/next-env.d.ts
 .next-e2e/
+.vitest/

@@ -12,7 +12,7 @@ import { sweepAuthCodes } from "./sign-in";
  * next tick tries again. One timer per process (globalThis), whatever Next loads twice.
  */
 
-const holder = globalThis as unknown as { __yazakiaJobs?: NodeJS.Timeout[] };
+const holder = globalThis as unknown as { __yasakiaJobs?: NodeJS.Timeout[] };
 
 async function tick(name: string, work: () => Promise<unknown>): Promise<void> {
   try {
@@ -23,7 +23,7 @@ async function tick(name: string, work: () => Promise<unknown>): Promise<void> {
 }
 
 export function startJobs(): void {
-  if (holder.__yazakiaJobs) return;
+  if (holder.__yasakiaJobs) return;
   const purgeEvery = setting("APP_ACCOUNT_PURGE_INTERVAL_SECONDS", 60, 1, 3600) * 1000;
   const sweepEvery = setting("APP_SWEEP_INTERVAL_SECONDS", 600, 5, 86_400) * 1000;
   const purge = setInterval(() => void tick("purge", () => purgeDeletedMedia()), purgeEvery);
@@ -39,7 +39,7 @@ export function startJobs(): void {
   );
   purge.unref();
   sweep.unref();
-  holder.__yazakiaJobs = [purge, sweep];
+  holder.__yasakiaJobs = [purge, sweep];
 }
 
 /** Purges right away (after a deletion's response) instead of waiting for the next tick. */

@@ -1,8 +1,8 @@
-# Yazakia — Governance Contract (agent-neutral)
+# Yasakia — Governance Contract (agent-neutral)
 
-> **Single source of truth** for architecture, code and agent-behaviour rules across the **Yazakia** repositories:
-> [`krizaka/yazakia`](https://github.com/krizaka/yazakia) (this one — the API, the packages, the docs, the legal pages)
-> and [`krizaka/yazakia-mobile`](https://github.com/krizaka/yazakia-mobile) (the iOS and Android app, Expo), which
+> **Single source of truth** for architecture, code and agent-behaviour rules across the **Yasakia** repositories:
+> [`krizaka/yasakia`](https://github.com/krizaka/yasakia) (this one — the API, the packages, the docs, the legal pages)
+> and [`krizaka/yasakia-mobile`](https://github.com/krizaka/yasakia-mobile) (the iOS and Android app, Expo), which
 > carries a short `AGENTS.md` that defers here.
 > This file is **agent-neutral**: `CLAUDE.md` (and any other agent file) only **imports** it (`@AGENTS.md`).
 > Every generation, review or refactor **must** enforce these rules without exception.
@@ -11,7 +11,7 @@
 > (every endpoint and its access rule) and [`docs/DATABASE.md`](docs/DATABASE.md) (every table, index, foreign key,
 > check, enum — and the design notes). How to work day to day: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
-**Yazakia** is the dating app where you talk first: an AI agent gets to know you, then opens a **small batch** (3 to 5)
+**Yasakia** is the dating app where you talk first: an AI agent gets to know you, then opens a **small batch** (3 to 5)
 of profiles that fit **both ways** — and the next batch waits for a **debrief** of the last one. No swipe, no catalogue,
 no score shown. The third open-source product of the [`krizaka`](https://github.com/krizaka) organisation, next to
 Orazaka (sovereign AI) and Orochia (video for creators).
@@ -20,8 +20,8 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 
 ## 0. Current phase — **foundations (PY2): production-ready code, local development, DigitalOcean deployable**
 
-- Two repositories, cloned side by side (`npm run workspace -- clone`, manifest [`yazakia.workspace.json`](yazakia.workspace.json)):
-  `yazakia` (:3000) and `yazakia-mobile` (:8081).
+- Two repositories, cloned side by side (`npm run workspace -- clone`, manifest [`yasakia.workspace.json`](yasakia.workspace.json)):
+  `yasakia` (:3000) and `yasakia-mobile` (:8081).
 - **Done**: the workspace, the data model of the whole product (21 tables), native sessions by e-mail code, the account
   (profile, rounded position, pause, export, deletion and the media purge), photos (signed upload → normalised →
   moderated → signed view), blocks, reports, push tokens, the event stream, encryption at rest, the three legal pages,
@@ -42,7 +42,7 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 - **No shell scripts.** Tooling is Node (`scripts/*.mjs`, no dependencies) behind `npm run`.
 - **One `.env` at the repository root**, read by the web app (`next.config.mjs`), drizzle-kit, the migrator and the
   seed (`packages/db/src/load-env.ts`). Real environment variables always win; CI and production ship no file.
-- The dev database is its own Docker Compose project (**`yazakia`**, container `yazakia-postgres-dev`, port **5435**):
+- The dev database is its own Docker Compose project (**`yasakia`**, container `yasakia-postgres-dev`, port **5435**):
   it never touches Orochia's (5432) or Orazaka's databases.
 
 | Command | What it does |
@@ -50,11 +50,11 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 | `npm run setup` | Zero to running: env, database, migrations, seed (idempotent) |
 | `npm run dev` / `build` / `start` | The API and the web pages on :3000 |
 | `npm run check` | lint (ESLint, `krizaka-i18n check` + `scan`, `krizaka-ratchet`) + type-check + unit tests + docs freshness — before every push |
-| `npm run test:e2e` | The feature scenarios over HTTP on their own database (`yazakia_e2e`) and server (:3100) |
+| `npm run test:e2e` | The feature scenarios over HTTP on their own database (`yasakia_e2e`) and server (:3100) |
 | `npm run db:up` / `db:down` | Start / stop PostgreSQL |
 | `npm run db:generate -- --name <what>` | SQL migration from a schema change (read it before committing) |
 | `npm run db:migrate` / `db:seed` / `db:status` | Apply migrations / the seed accounts (refuses production) / applied vs. pending, row counts |
-| `npm run db:reset -- --yes` | Drop the **local** schema of your branch's database, migrate, seed (refuses a non-local URL, the shared `yazakia_db` and `*_demo`; dumps first) |
+| `npm run db:reset -- --yes` | Drop the **local** schema of your branch's database, migrate, seed (refuses a non-local URL, the shared `yasakia_db` and `*_demo`; dumps first) |
 | `npm run db:studio` / `db:psql` / `db:dump` / `db:restore -- <file>` | Studio, psql, local backups |
 | `npm run docs:generate [-- --check]` | API + database references, architecture data, the krizaka.com sync |
 | `npm run workspace -- clone\|status\|pull` | The two repositories, side by side |
@@ -63,8 +63,8 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 - Destructive commands are **local-only by construction**: they refuse `NODE_ENV=production` and any `DATABASE_URL`
   whose host is not this machine, and act on **the database named in `DATABASE_URL`**.
 - **One database per branch (org rule).** A session or a worktree works on its own database, named from its branch
-  (`yazakia_<branch>`, `scripts/lib.mjs` `databaseForBranch`; `npm run setup` on a branch writes it into `.env` and
-  creates it) — never on the shared `yazakia_db`. `db:reset` and `db:restore` **refuse** `yazakia_db` and every
+  (`yasakia_<branch>`, `scripts/lib.mjs` `databaseForBranch`; `npm run setup` on a branch writes it into `.env` and
+  creates it) — never on the shared `yasakia_db`. `db:reset` and `db:restore` **refuse** `yasakia_db` and every
   `*_demo` database (only `demo:seed` writes `*_demo`) and **dump the target to `backups/` before any destruction**
   (`destructionRefusal`, tested in `scripts/db-guard.test.mjs`).
 
@@ -73,7 +73,7 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 ## 2. Architecture & boundaries
 
 ```
-yazakia/                           npm workspaces — Apache-2.0
+yasakia/                           npm workspaces — Apache-2.0
 ├── apps/web/                      Next.js 16 — app/api/**/route.ts (the only HTTP surface) + /privacy, /terms, /delete-account (en, fr)
 │   ├── lib/                       access.ts (who may see what) · auth.ts + tokens.ts + sign-in.ts (sessions) · account.ts ·
 │   │                              photos.ts + media.ts · export.ts · reports.ts · admin.ts · realtime.ts · push.ts ·
@@ -98,11 +98,11 @@ yazakia/                           npm workspaces — Apache-2.0
 - `apps/web` → `packages/*`. Packages never import the app; `packages/db` depends on no other package.
 - Route handlers stay thin: authenticate (`requireUser` / `requireAdmin`) → validate (zod) → call `lib/` → respond.
   **Every rule that decides access lives in `lib/access.ts` or the domain module** — never inline in a route.
-- **The database pool is `@yazakia/db`'s, and only it**: one pool per process on `globalThis`, `DATABASE_MAX_CONNECTIONS`
-  (default 5), named connections (`yazakia-web`, `yazakia-listen`, `yazakia-migrate`), `DATABASE_DIRECT_URL` (optional)
+- **The database pool is `@yasakia/db`'s, and only it**: one pool per process on `globalThis`, `DATABASE_MAX_CONNECTIONS`
+  (default 5), named connections (`yasakia-web`, `yasakia-listen`, `yasakia-migrate`), `DATABASE_DIRECT_URL` (optional)
   for LISTEN and migrations. Never `new Pool()` in the app. The budget is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 - **Shared UI and platform bricks come from npm, never from a copy** (`@krizaka/*`). A missing generic piece is built
-  in krizaka-ui first, released, then adopted. No product word (`yazakia`) goes into a platform brick.
+  in krizaka-ui first, released, then adopted. No product word (`yasakia`) goes into a platform brick.
 - The AI is consumed **over HTTP** (Orazaka's API, or an OpenAI-compatible endpoint) — never as a library (PY3).
 
 ---
@@ -112,8 +112,8 @@ yazakia/                           npm workspaces — Apache-2.0
 ### A. Never a score, never a fake person
 - No similarity, score or rank number ever reaches a client: reasons are **words**, both ways (PY3 adds an e2e check
   over batches; the foundations' e2e already scans every answer for `score` / `similarity` keys).
-- No fake profile and no invented figure in the real database. The development seed says it is one (`@seed.yazakia.test`,
-  "(seed)", generated geometric avatars — never a real photo). The demo (a fictional cast) lives only in `yazakia_demo`.
+- No fake profile and no invented figure in the real database. The development seed says it is one (`@seed.yasakia.test`,
+  "(seed)", generated geometric avatars — never a real photo). The demo (a fictional cast) lives only in `yasakia_demo`.
 
 ### B. Private photos, zero-trust media
 - **No raw media URL and no storage key ever reaches a client.** `GET /api/photos/{id}` evaluates access
@@ -152,7 +152,7 @@ yazakia/                           npm workspaces — Apache-2.0
 ### F. Fail-closed configuration and sessions
 - **Environment variables are named by bounded context** (krizaka/.github#46): `<CONTEXT>_<THING>` with CONTEXT one of
   `APP_` `DATABASE_` `AUTH_` `MEDIA_` `MAIL_` `PUSH_` `PAYMENTS_` `REALTIME_` `ABUSE_` `OBSERVABILITY_` `AI_` `OPERATOR_` —
-  never the product (`YAZAKIA_…`) nor a vendor (`BUNNY_…`, `MAILGUN_…`): a vendor is a value (`MEDIA_STORAGE_PROVIDER=bunny`,
+  never the product (`YASAKIA_…`) nor a vendor (`BUNNY_…`, `MAILGUN_…`): a vendor is a value (`MEDIA_STORAGE_PROVIDER=bunny`,
   `MAIL_PROVIDER=mailgun`). `NEXT_PUBLIC_` only where the browser needs it. Every variable is declared once in
   `apps/web/lib/env-vars.ts` (zod: context, need, secret, schema, what it does); `env.test.ts` refuses an undeclared or
   misnamed one, `assertProductionConfig` checks every value set, `docs/DEPLOYMENT.md` *Configuration* is generated.
@@ -200,7 +200,7 @@ yazakia/                           npm workspaces — Apache-2.0
   `X-Forwarded-For` or `ABUSE_CLIENT_IP_HEADER`. `ABUSE_RATE_LIMIT_STORE=postgres` before a second instance.
 - **Realtime goes through `lib/realtime.ts` only**, which knows typed events only (`batch.ready`, `intro.opened`,
   `intro.message`) — payloads are ids, never documents. Transport `@krizaka/realtime`: `REALTIME_BUS=postgres`
-  (default; NOTIFY channel `yazakia_events`) or `redis` (prefix `yazakia:rt:`) — keep the names: two versions share
+  (default; NOTIFY channel `yasakia_events`) or `redis` (prefix `yasakia:rt:`) — keep the names: two versions share
   them during a deploy. `GET /api/events` is the account's SSE stream.
 - Push through `lib/push.ts` → `@krizaka/push` (Expo Push), only in production or with `PUSH_DELIVERY=on`.
 - Background loops start in `instrumentation.ts` (`lib/jobs.ts`) and share work with `FOR UPDATE SKIP LOCKED`.
@@ -211,16 +211,29 @@ yazakia/                           npm workspaces — Apache-2.0
 
 ## 6. The web pages
 
-- Only three pages exist on the web — `/privacy`, `/terms`, `/delete-account` — in English and French
+- Only three pages exist on the API's web app (`apps/web`) — `/privacy`, `/terms`, `/delete-account` — in English and French
   (`/en/…`, `/fr/…`; `proxy.ts` sends an address without a language to the reader's: cookie, then `Accept-Language`).
   Anything else is a 404 (the owl). Errors: the falcon (`components/errors/PageState`, Orochia's pattern).
-- Built with `@krizaka/ui` (`PageHero`, `Page`, `Mascot`, `ThemeToggle`, `YazakiaLogo`), `@krizaka/tailwind` and the
-  brand `@krizaka/tokens/brands/yazakia.css` (emerald → turquoise). Both themes through the role utilities; **no raw
+- Built with `@krizaka/ui` (`PageHero`, `Page`, `Mascot`, `ThemeToggle`, `YasakiaLogo`), `@krizaka/tailwind` and the
+  brand `@krizaka/tokens/brands/yasakia.css` (emerald → turquoise). Both themes through the role utilities; **no raw
   palette colour, no `light:`, no `[var(--…)]`, no `className` template** — the ratchet (`lint-ratchet.json`) is at zero
   and stays there.
 - **Every user-facing string lives in `apps/web/messages/{en,fr}.json`** (`errors/` for the error pages, kept small for
   the client) — `krizaka-i18n check` + `scan` in `npm run lint`. Never choose a text with a locale ternary.
 - The legal texts and `docs/PRIVACY.md` describe the same code: change them together.
+
+### 6.1 The public dev site — `apps/site` (dev.yasakia.com)
+
+- A **static export** (`output: "export"`, no server, no database, no secret) on a DigitalOcean App Platform **static
+  site** (free), project `yasakia`, spec `deploy/digitalocean/site.app.yaml`. Three pages — landing, how it works, demo —
+  English at the root, French under `/fr`. Built from the same bricks (`@krizaka/ui` `LandingPage`, `HowItWorksPage`,
+  `PageHero`), strings in `apps/site/messages/{en,fr}.json`, the same lint rules and ratchet.
+- **It never offers what does not exist**: no sign-up, login, download, store button or waiting list (nothing to sign up
+  to: the API is not deployed; if it ever is, `AUTH_SIGNUP_ENABLED` and `AUTH_LOGIN_ENABLED` default to `false`), no
+  invented profile or figure. Media come from the CDN only (`apps/site/lib/media.ts`, hashed).
+- The footer shows « A Krizaka product » (→ krizaka.com) and the build's version, `APP_VERSION` = `package.json`
+  version + short commit (`next.config.mjs`; DigitalOcean passes the commit as `APP_COMMIT_SHA`).
+- `npm run build:site` builds it (CI too); `npm run dev:site` serves it on :3002.
 
 ---
 
@@ -242,9 +255,9 @@ yazakia/                           npm workspaces — Apache-2.0
 ## 8. Documentation generation
 
 - `npm run docs:generate` writes `docs/API_CONTRACTS.md`, `docs/DATABASE.md` and
-  `docs/_generated/yazakia-architecture.json`; `-- --check` fails CI when they are stale. Never hand-edit them.
-- When this repository is cloned inside krizaka-com (`products/yazakia`), the same command syncs the docs to
-  `yazakia-content/docs/` and the architecture data to `app/data/yazakia-architecture.json` (`--site <dir>` for a
+  `docs/_generated/yasakia-architecture.json`; `-- --check` fails CI when they are stale. Never hand-edit them.
+- When this repository is cloned inside krizaka-com (`products/yasakia`), the same command syncs the docs to
+  `yasakia-content/docs/` and the architecture data to `app/data/yasakia-architecture.json` (`--site <dir>` for a
   worktree); the site publishes what its manifest lists.
 - **No Mermaid.** A schema in a doc is a fenced block the site draws (` ```sequence `, ` ```states ` with `enum:` checked
   against the schema).

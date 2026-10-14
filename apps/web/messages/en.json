@@ -1,11 +1,11 @@
 {
   "meta": {
-    "siteName": "Yazakia",
-    "titleTemplate": "{title} — Yazakia",
-    "description": "Yazakia is the dating app where you talk first: an AI agent gets to know you, then opens small, mutual batches of profiles."
+    "siteName": "Yasakia",
+    "titleTemplate": "{title} — Yasakia",
+    "description": "Yasakia is the dating app where you talk first: an AI agent gets to know you, then opens small, mutual batches of profiles."
   },
   "chrome": {
-    "brandHome": "Yazakia on krizaka.com",
+    "brandHome": "Yasakia on krizaka.com",
     "navLabel": "Legal pages",
     "nav": {
       "privacy": "Privacy",
@@ -15,7 +15,7 @@
     "languageLabel": "Language",
     "otherLanguage": "Français",
     "themeToggle": "Switch between light and dark",
-    "footer": "Yazakia is an open-source product by <b>Krizaka</b>, made in Québec.",
+    "footer": "Yasakia is an open-source product by <b>Krizaka</b>, made in Québec.",
     "sourceCode": "Source code",
     "contact": "Contact us",
     "updated": "Last updated {date} · version {version}",
@@ -24,7 +24,7 @@
   "privacy": {
     "metaTitle": "Privacy policy",
     "eyebrow": "Privacy",
-    "title": "What Yazakia keeps about you, and for how long",
+    "title": "What Yasakia keeps about you, and for how long",
     "lead": "A dating app learns personal things. Here is exactly what we store, where, for how long, and how it disappears — in plain words.",
     "sections": [
       {
@@ -87,7 +87,7 @@
         "id": "age",
         "title": "Adults only",
         "paragraphs": [
-          "Yazakia is for people aged 18 and over. We check the date of birth when an account is created and close any account we learn belongs to a minor."
+          "Yasakia is for people aged 18 and over. We check the date of birth when an account is created and close any account we learn belongs to a minor."
         ]
       }
     ]
@@ -95,19 +95,19 @@
   "terms": {
     "metaTitle": "Terms of use",
     "eyebrow": "Terms",
-    "title": "The rules of Yazakia",
-    "lead": "Yazakia works because people are honest and kind to each other. These terms say what we expect from you, and what you can expect from us.",
+    "title": "The rules of Yasakia",
+    "lead": "Yasakia works because people are honest and kind to each other. These terms say what we expect from you, and what you can expect from us.",
     "sections": [
       {
         "id": "who",
         "title": "Who we are",
         "paragraphs": [
-          "Yazakia is made by Krizaka, in Québec. The app is free; its code is open source under the Apache 2.0 licence."
+          "Yasakia is made by Krizaka, in Québec. The app is free; its code is open source under the Apache 2.0 licence."
         ]
       },
       {
         "id": "you",
-        "title": "Who can use Yazakia",
+        "title": "Who can use Yasakia",
         "paragraphs": [
           "You must be 18 or older, use one account only, and be who you say you are: your photos show you, and only you; your name is yours.",
           "You keep your sign-in codes to yourself. If you think someone else used your account, sign out everywhere from the settings and tell us."
@@ -142,7 +142,7 @@
         "id": "content",
         "title": "What you share",
         "paragraphs": [
-          "Your photos and words remain yours. You allow us to store them and show them to the people Yazakia introduces you to, only for as long as your account exists."
+          "Your photos and words remain yours. You allow us to store them and show them to the people Yasakia introduces you to, only for as long as your account exists."
         ]
       },
       {
@@ -150,7 +150,7 @@
         "title": "Leaving, and the rest",
         "paragraphs": [
           "You can pause your account or delete it at any time from the app. We may change these terms; when it matters, the app tells you before it applies.",
-          "Yazakia is provided as it is, without a promise of a match. These terms are governed by the laws of Québec and Canada."
+          "Yasakia is provided as it is, without a promise of a match. These terms are governed by the laws of Québec and Canada."
         ]
       }
     ]
@@ -158,11 +158,11 @@
   "deleteAccount": {
     "metaTitle": "Delete your account",
     "eyebrow": "Your account",
-    "title": "Delete your Yazakia account",
+    "title": "Delete your Yasakia account",
     "lead": "You can delete your account at any time, from the app, in a few seconds. It is permanent: everything that is yours disappears.",
     "inAppTitle": "From the app",
     "inAppSteps": [
-      "Open Yazakia and go to <b>Settings</b>.",
+      "Open Yasakia and go to <b>Settings</b>.",
       "Choose <b>Delete my account</b>.",
       "Confirm. You are signed out and your account no longer exists."
     ],

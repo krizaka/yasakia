@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * End-to-end feature scenarios against a running Yazakia API on a freshly seeded PostgreSQL — every endpoint of the
+ * End-to-end feature scenarios against a running Yasakia API on a freshly seeded PostgreSQL — every endpoint of the
  * foundations, with real sessions: sign-up by e-mail code (18+ checked by the server), sign-in, bearer tokens and their
  * revocation, the profile, the rounded position, photos from the signed upload to the signed view (and who may see
  * them), blocks, reports (encrypted, read by operators behind a token and an allow-list), push tokens, the event stream
@@ -29,7 +29,7 @@ const OUTBOX = path.resolve(env("MAIL_OUTBOX_DIR", path.join(ROOT, ".mail-outbox
 const STORAGE = path.resolve(env("MEDIA_STORAGE_LOCAL_DIR", path.join(ROOT, ".storage")));
 const ADMIN_TOKEN = env("OPERATOR_API_TOKEN", "e2e-only-operator-token-0123456789abcdef0123");
 const ADMIN_IP = (env("OPERATOR_ALLOWED_IPS", "203.0.113.7") || "203.0.113.7").split(",")[0].trim();
-const db = new pg.Client({ connectionString: env("DATABASE_URL", "postgresql://yazakia_user:yazakia_secret@localhost:5435/yazakia_db?sslmode=disable") });
+const db = new pg.Client({ connectionString: env("DATABASE_URL", "postgresql://yasakia_user:yasakia_secret@localhost:5435/yasakia_db?sslmode=disable") });
 await db.connect();
 const sql = async (text, values = []) => (await db.query(text, values)).rows;
 
@@ -92,7 +92,7 @@ async function picture({ width = 640, height = 800, format = "jpeg", gps = false
   let image = sharp({ create: { width, height, channels: 3, background: { r: 20, g: 184, b: 166 } } }).composite([
     { input: { create: { width: Math.round(width / 2), height: Math.round(height / 2), channels: 3, background: { r: 16, g: 120, b: 90 } } }, left: 10, top: 10 },
   ]);
-  if (gps) image = image.withExif({ IFD0: { Make: "E2E Phone", Model: "Yazakia Test" }, IFD3: { GPSLatitudeRef: "N", GPSLatitude: "45/1 30/1 3180/100", GPSLongitudeRef: "W", GPSLongitude: "73/1 35/1 1200/100" } });
+  if (gps) image = image.withExif({ IFD0: { Make: "E2E Phone", Model: "Yasakia Test" }, IFD3: { GPSLatitudeRef: "N", GPSLatitude: "45/1 30/1 3180/100", GPSLongitudeRef: "W", GPSLongitude: "73/1 35/1 1200/100" } });
   return format === "png" ? image.png().toBuffer() : image.jpeg({ quality: 90 }).toBuffer();
 }
 
@@ -118,7 +118,7 @@ let ada;
   const r = await call("/api/auth/request-code", { method: "POST", body: { email: adaEmail.toUpperCase(), locale: "fr" }, ip: adaIp });
   check("a code is sent to a new address (same answer as for an existing one)", r.status === 200 && r.json.sent === true, r.json);
   const { code, mail } = await codeFor(adaEmail);
-  check("…by e-mail, in the person's language, the code in the template", /Ton code Yazakia/.test(mail.subject) && mail.html.includes(code), mail.subject);
+  check("…by e-mail, in the person's language, the code in the template", /Ton code Yasakia/.test(mail.subject) && mail.html.includes(code), mail.subject);
   check("…and no code is kept in clear in the database", (await sql("select count(*)::int as n from auth_codes where email = $1 and code_hash = $2", [adaEmail, code]))[0].n === 0);
   const wrong = await call("/api/auth/verify", { method: "POST", body: { email: adaEmail, code: code === "000000" ? "111111" : "000000", client: "native" }, ip: adaIp });
   check("a wrong code is refused and counted", wrong.status === 400 && wrong.json.code === "CODE_INVALID" && wrong.json.attemptsLeft === 4, wrong.json);
@@ -361,19 +361,19 @@ let adaPhoto;
   };
   check("…which opens with `connected`", await readUntil(/event: connected/, 5000), received);
   await sleep(500);
-  // Another process (this script) NOTIFYs on Yazakia's channel — exactly what another instance's publish does.
-  const notify = (event) => sql("select pg_notify('yazakia_events', $1)", [JSON.stringify({ topic: `account:${ada.id}`, event })]);
+  // Another process (this script) NOTIFYs on Yasakia's channel — exactly what another instance's publish does.
+  const notify = (event) => sql("select pg_notify('yasakia_events', $1)", [JSON.stringify({ topic: `account:${ada.id}`, event })]);
   await notify({ type: "not.an.event", id: "x" });
   await notify({ type: "batch.ready", batchId: "11111111-1111-4111-8111-111111111111" });
   check("a typed event published by another instance arrives, named by its type", await readUntil(/event: batch\.ready\ndata: \{[^\n]*11111111/, 8000), received);
-  check("…an event that is not one of Yazakia's never reaches the app", !received.includes("not.an.event"));
-  await sql("select pg_notify('yazakia_events', $1)", [JSON.stringify({ topic: `account:${bea.id}`, event: { type: "intro.opened", introId: "22222222-2222-4222-8222-222222222222" } })]);
+  check("…an event that is not one of Yasakia's never reaches the app", !received.includes("not.an.event"));
+  await sql("select pg_notify('yasakia_events', $1)", [JSON.stringify({ topic: `account:${bea.id}`, event: { type: "intro.opened", introId: "22222222-2222-4222-8222-222222222222" } })]);
   await sleep(800);
   await readUntil(/22222222/, 500);
   check("…and nobody receives another account's events", !received.includes("22222222"));
   controller.abort();
-  const [listen] = await sql("select count(*)::int as n from pg_stat_activity where application_name = 'yazakia-listen' and datname = current_database()");
-  const [web] = await sql("select count(*)::int as n from pg_stat_activity where application_name = 'yazakia-web' and datname = current_database()");
+  const [listen] = await sql("select count(*)::int as n from pg_stat_activity where application_name = 'yasakia-listen' and datname = current_database()");
+  const [web] = await sql("select count(*)::int as n from pg_stat_activity where application_name = 'yasakia-web' and datname = current_database()");
   check("one named LISTEN connection, the pool named and within DATABASE_MAX_CONNECTIONS (5)", listen.n === 1 && web.n >= 1 && web.n <= 5, { listen: listen.n, web: web.n });
 }
 
@@ -381,7 +381,7 @@ let adaPhoto;
 {
   const r = await call("/api/me/export", { token: ada.token });
   const data = r.json.export;
-  check("GET /api/me/export: everything of the account, at once", r.status === 200 && r.json.ready === true && data.format === "yazakia-export/1" && data.account.email === adaEmail && data.photos.length === 1 && data.profile.location.precisionM === 1000, r.json);
+  check("GET /api/me/export: everything of the account, at once", r.status === 200 && r.json.ready === true && data.format === "yasakia-export/1" && data.account.email === adaEmail && data.photos.length === 1 && data.profile.location.precisionM === 1000, r.json);
   check("…the date of birth is in her own export (it is hers)", data.account.birthDate === "1994-03-12");
   check("…but not the reports filed about her, nor anyone else's words", data.reportsFiled.length === 0 && !JSON.stringify(data).includes("Asked me for money"));
   const async = await call("/api/me/export?mode=async", { token: ada.token });

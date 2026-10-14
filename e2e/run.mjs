@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * `npm run test:e2e` — the feature scenarios over HTTP, on a real PostgreSQL, from zero:
- *   1. a database of its own, `yazakia_e2e`, dropped and rebuilt (migrations + seed) — never the shared yazakia_db;
+ *   1. a database of its own, `yasakia_e2e`, dropped and rebuilt (migrations + seed) — never the shared yasakia_db;
  *   2. the API (`next dev`) on :3100 with the end-to-end settings: e-mails written to a folder (the scenarios read the
  *      codes there), photos in a temporary folder, an operator token and allow-list, a purge every second;
  *   3. e2e/scenarios.mjs against it, then the server stops.
@@ -33,15 +33,15 @@ if (process.env.APP_URL) {
   const base = new URL(databaseUrl());
   if (!isLocalDatabase(base.toString())) fail(`DATABASE_URL is not local (${base.hostname}): the scenarios only run on a local database`);
   const e2eUrl = new URL(base);
-  e2eUrl.pathname = "/yazakia_e2e";
+  e2eUrl.pathname = "/yasakia_e2e";
 
-  step("Database yazakia_e2e (dropped and rebuilt)");
+  step("Database yasakia_e2e (dropped and rebuilt)");
   const admin = new pg.Client({ connectionString: base.toString() });
   await admin.connect();
-  await admin.query("drop database if exists yazakia_e2e with (force)");
-  await admin.query("create database yazakia_e2e");
+  await admin.query("drop database if exists yasakia_e2e with (force)");
+  await admin.query("create database yasakia_e2e");
   await admin.end();
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "yazakia-e2e-"));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "yasakia-e2e-"));
   const env = {
     ...E2E_ENV,
     DATABASE_URL: e2eUrl.toString(),

@@ -1,0 +1,32 @@
+/* The Krizaka platform, in this order:
+   1. Tailwind CSS v4;
+   2. @krizaka/tailwind — the --kz-* tokens, the role utilities (bg-surface-1, text-fg-secondary, border-border-default,
+      text-accent…), the dark / light variants and the motion signature;
+   3. @krizaka/ui/tailwind.css — Tailwind scans the @krizaka/ui primitives;
+   4. the Yasakia brand of @krizaka/tokens — emerald → turquoise: the accent, the text on it, the ring, the section
+      gradient — in both themes. No product token is needed yet: the roles express everything these pages draw. */
+@import "tailwindcss";
+@import "@krizaka/tailwind";
+@import "@krizaka/ui/tailwind.css";
+@import "@krizaka/tokens/brands/yasakia.css";
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--kz-surface-0);
+}
+
+/* The demo shows the recording of the active theme: dark on :root, light on html.light. */
+.yz-demo-light {
+  display: none;
+}
+
+html.light .yz-demo-dark {
+  display: none;
+}
+
+html.light .yz-demo-light {
+  display: block;
+}

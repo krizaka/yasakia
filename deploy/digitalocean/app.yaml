@@ -1,17 +1,17 @@
-# Yazakia API — DigitalOcean App Platform (production). Used to CREATE the app or change its structure only:
+# Yasakia API — DigitalOcean App Platform (production). Used to CREATE the app or change its structure only:
 #   doctl apps create --spec deploy/digitalocean/app.yaml
 #   doctl apps update <APP_ID> --spec deploy/digitalocean/app.yaml   # ⚠ can blank the SECRETs (no value here): check them afterwards
 # Secret values live in the app (Settings → Environment Variables), entered once. docs/DEPLOYMENT.md has the manual
-# prerequisites (Bunny zone `yazakia`, Mailgun domain, the domain) and the connection budget.
-name: yazakia
+# prerequisites (Bunny zone `yasakia`, Mailgun domain, the domain) and the connection budget.
+name: yasakia
 region: tor
 domains:
-  - domain: api.yazakia.com
+  - domain: api.yasakia.com
     type: PRIMARY
 services:
   - name: api
     github:
-      repo: krizaka/yazakia
+      repo: krizaka/yasakia
       branch: production
       deploy_on_push: true
     dockerfile_path: deploy/docker/Dockerfile
@@ -35,14 +35,14 @@ services:
         value: ${APP_URL}
       - key: DATABASE_URL
         scope: RUN_TIME
-        value: ${yazakia-db.DATABASE_URL}
+        value: ${yasakia-db.DATABASE_URL}
       # The direct connection for LISTEN — the same URL until a connection pool carries DATABASE_URL.
       - key: DATABASE_DIRECT_URL
         scope: RUN_TIME
-        value: ${yazakia-db.DATABASE_URL}
+        value: ${yasakia-db.DATABASE_URL}
       - key: DATABASE_CA_CERT
         scope: RUN_TIME
-        value: ${yazakia-db.CA_CERT}
+        value: ${yasakia-db.CA_CERT}
       # One pool per instance (default 5). (instances + 1 during a rolling deploy) × (this + 1 LISTEN) + migrate + admin
       # ≤ 70 % of the database's usable slots — docs/DEPLOYMENT.md, "Database connections".
       - key: DATABASE_MAX_CONNECTIONS
@@ -59,7 +59,7 @@ services:
         value: "bunny"
       - key: MEDIA_STORAGE_ZONE
         scope: RUN_TIME
-        value: "yazakia"
+        value: "yasakia"
       - key: MEDIA_STORAGE_API_KEY
         scope: RUN_TIME
         type: SECRET
@@ -112,7 +112,7 @@ jobs:
   - name: migrate
     kind: PRE_DEPLOY
     github:
-      repo: krizaka/yazakia
+      repo: krizaka/yasakia
       branch: production
     dockerfile_path: deploy/docker/Dockerfile
     source_dir: /
@@ -121,21 +121,21 @@ jobs:
     envs:
       - key: DATABASE_URL
         scope: RUN_TIME
-        value: ${yazakia-db.DATABASE_URL}
+        value: ${yasakia-db.DATABASE_URL}
       - key: DATABASE_DIRECT_URL
         scope: RUN_TIME
-        value: ${yazakia-db.DATABASE_URL}
+        value: ${yasakia-db.DATABASE_URL}
       - key: DATABASE_CA_CERT
         scope: RUN_TIME
-        value: ${yazakia-db.CA_CERT}
+        value: ${yasakia-db.CA_CERT}
 
 databases:
   # Managed PostgreSQL 16 cluster, created beforehand in the same region:
-  #   doctl databases create yazakia-pg --engine pg --version 16 --region tor1 --size db-s-1vcpu-1gb
-  - name: yazakia-db
+  #   doctl databases create yasakia-pg --engine pg --version 16 --region tor1 --size db-s-1vcpu-1gb
+  - name: yasakia-db
     engine: PG
     version: "16"
     production: true
-    cluster_name: yazakia-pg
-    db_name: yazakia_db
-    db_user: yazakia_user
+    cluster_name: yasakia-pg
+    db_name: yasakia_db
+    db_user: yasakia_user

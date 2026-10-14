@@ -13,7 +13,7 @@ interface Section {
   paragraphs: string[];
 }
 
-/** The regional form of each language (Yazakia is a Canadian app). */
+/** The regional form of each language (Yasakia is a Canadian app). */
 const INTL_TAG: Record<Locale, string> = { en: "en-CA", fr: "fr-CA" };
 
 /** The date of the legal pages, written in the page's language. */

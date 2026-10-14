@@ -1,9 +1,9 @@
 ---
-title: Yazakia API Reference
-description: Every HTTP endpoint of the Yazakia API, with the access rule that guards it — extracted from the code.
+title: Yasakia API Reference
+description: Every HTTP endpoint of the Yasakia API, with the access rule that guards it — extracted from the code.
 ---
 
-# Yazakia API Reference
+# Yasakia API Reference
 
 > Generated from code by `scripts/generate-docs.mjs` — do not hand-edit. The summary is the first sentence of each
 > handler's JSDoc; the access rule is read from what the handler calls.

@@ -41,7 +41,7 @@ export function outboxDir(env: NodeJS.ProcessEnv = process.env): string {
   return cwd.endsWith(`${path.sep}apps${path.sep}web`) ? path.resolve(cwd, "../../.mail-outbox") : path.join(cwd, ".mail-outbox");
 }
 
-const fromAddress = (env: NodeJS.ProcessEnv) => env.MAIL_FROM?.trim() || `Yazakia <no-reply@${env.MAIL_DOMAIN?.trim() || "mg.yazakia.com"}>`;
+const fromAddress = (env: NodeJS.ProcessEnv) => env.MAIL_FROM?.trim() || `Yasakia <no-reply@${env.MAIL_DOMAIN?.trim() || "mg.yasakia.com"}>`;
 
 /** Sends one message. Throws a ConfigurationError when Mailgun is required and missing; resolves false when refused. */
 export async function sendMail(mail: Mail, env: NodeJS.ProcessEnv = process.env, fetchImpl: typeof fetch = fetch): Promise<boolean> {

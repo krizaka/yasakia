@@ -1,4 +1,4 @@
-import { accounts, db, intros, open, profilePhotos, reports, seal } from "@yazakia/db";
+import { accounts, db, intros, open, profilePhotos, reports, seal } from "@yasakia/db";
 import { and, desc, eq, sql } from "drizzle-orm";
 
 import { refuse } from "./http";

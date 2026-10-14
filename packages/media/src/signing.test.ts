@@ -9,10 +9,10 @@ const NOW = Date.UTC(2026, 9, 11, 12, 0, 0);
 
 describe("Bunny token authentication", () => {
   it("signs key + path + expires + the sorted parameters (SHA-256, URL-safe base64), valid 300 s", () => {
-    const { url, expires } = signBunnyUrl({ hostname: "yazakia.b-cdn.net", path: "/photos/a/b.jpg", tokenKey: "secret-key", params: { width: 640 }, now: NOW });
+    const { url, expires } = signBunnyUrl({ hostname: "yasakia.b-cdn.net", path: "/photos/a/b.jpg", tokenKey: "secret-key", params: { width: 640 }, now: NOW });
     expect(expires).toBe(NOW / 1000 + 300);
     const expected = crypto.createHash("sha256").update(`secret-key/photos/a/b.jpg${expires}width=640`).digest("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-    expect(url).toBe(`https://yazakia.b-cdn.net/photos/a/b.jpg?token=${expected}&width=640&expires=${expires}`);
+    expect(url).toBe(`https://yasakia.b-cdn.net/photos/a/b.jpg?token=${expected}&width=640&expires=${expires}`);
   });
 
   it("a different width is a different token (the size is signed)", () => {

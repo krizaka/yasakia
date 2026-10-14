@@ -2,7 +2,7 @@
   "notFoundMetaTitle": "Page introuvable",
   "notFoundEyebrow": "Erreur 404",
   "notFoundTitle": "Cette page n’existe pas",
-  "notFoundBody": "Yazakia vit dans son app. Sur le web, il n’y a que les pages ci-dessous.",
+  "notFoundBody": "Yasakia vit dans son app. Sur le web, il n’y a que les pages ci-dessous.",
   "serverMetaTitle": "Un problème est survenu",
   "serverEyebrow": "Erreur",
   "serverTitle": "Un problème est survenu de notre côté",
@@ -14,5 +14,5 @@
   "privacy": "Confidentialité",
   "terms": "Conditions",
   "deleteAccount": "Supprimer ton compte",
-  "product": "Yazakia sur krizaka.com"
+  "product": "Yasakia sur krizaka.com"
 }

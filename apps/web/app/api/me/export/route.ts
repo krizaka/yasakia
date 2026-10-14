@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     const me = await requireUser(req);
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
-    const headers = { "Cache-Control": "no-store", "Content-Disposition": 'attachment; filename="yazakia-export.json"' };
+    const headers = { "Cache-Control": "no-store", "Content-Disposition": 'attachment; filename="yasakia-export.json"' };
     if (id) {
       const stored = await readExport(me.id, uuidParam(id));
       return stored.ready

@@ -1,4 +1,4 @@
-import { accounts, db } from "@yazakia/db";
+import { accounts, db } from "@yasakia/db";
 import { eq } from "drizzle-orm";
 
 import { sessionSecret } from "./env";

@@ -1,6 +1,6 @@
-# Contributing to Yazakia
+# Contributing to Yasakia
 
-Thank you for helping. Yazakia is open source (Apache-2.0) and built in the open by [Krizaka](https://krizaka.com).
+Thank you for helping. Yasakia is open source (Apache-2.0) and built in the open by [Krizaka](https://krizaka.com).
 
 ## Before you start
 

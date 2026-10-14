@@ -1,4 +1,4 @@
-import { MAX_PHOTO_BYTES } from "@yazakia/media";
+import { MAX_PHOTO_BYTES } from "@yasakia/media";
 import { z } from "zod";
 
 import { requireUser } from "@/lib/auth";

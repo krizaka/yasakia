@@ -1,12 +1,12 @@
 ---
 title: Privacy by design
-description: What Yazakia stores, where, for how long, and how it is deleted — the engineering behind the privacy policy, table by table.
+description: What Yasakia stores, where, for how long, and how it is deleted — the engineering behind the privacy policy, table by table.
 ---
 
 # Privacy by design
 
 The public policy is the web page `/privacy` (English and French, `apps/web/messages/*.json`); this document is the
-engineering side of it — what the code does, so the two can be checked against each other. Yazakia is a Québec app
+engineering side of it — what the code does, so the two can be checked against each other. Yasakia is a Québec app
 (Law 25) also used in Europe (GDPR): minimisation, consent, access, portability and deletion are features, not
 paperwork.
 
@@ -55,7 +55,7 @@ forbids retention and training.
 ## Minimisation
 
 No contacts, no exact position, no photo metadata, no score shown, no password. Codes are hashed. The API logs no
-message content. The development seed has no real photo; the demo will live in its own database (`yazakia_demo`).
+message content. The development seed has no real photo; the demo will live in its own database (`yasakia_demo`).
 
 ## Keys
 

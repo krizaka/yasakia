@@ -1,12 +1,12 @@
 ---
 title: Architecture
-description: How Yazakia is built — one API for a mobile app, PostgreSQL with pgvector and earthdistance, photos behind signatures, realtime over LISTEN/NOTIFY — and why each choice.
+description: How Yasakia is built — one API for a mobile app, PostgreSQL with pgvector and earthdistance, photos behind signatures, realtime over LISTEN/NOTIFY — and why each choice.
 ---
 
 # Architecture
 
 ```
-yazakia/                           npm workspaces — Apache-2.0
+yasakia/                           npm workspaces — Apache-2.0
 ├── apps/web/                      Next.js 16: app/api/**/route.ts (the only HTTP surface) + /privacy, /terms, /delete-account
 │   ├── lib/                       access · auth · tokens · sign-in · account · photos · media · export · reports · admin ·
 │   │                              realtime · push · rate-limit · client-ip · env · http · mail(+templates) · geo · age · jobs
@@ -23,20 +23,20 @@ yazakia/                           npm workspaces — Apache-2.0
 └── scripts/                       setup, db lifecycle, docs generation, workspace
 ```
 
-The mobile app ([`yazakia-mobile`](https://github.com/krizaka/yazakia-mobile), Expo) is the only client. The web
+The mobile app ([`yasakia-mobile`](https://github.com/krizaka/yasakia-mobile), Expo) is the only client. The web
 serves three pages the stores require and nothing else.
 
 ## Why these choices
 
 - **TypeScript on Orochia's foundations, not the JVM.** One developer, a product to ship: Orochia's proven template —
-  native Bearer sessions, SSE, push, Bunny media, migrations, seed, generated docs, e2e on a real PostgreSQL. Yazakia
+  native Bearer sessions, SSE, push, Bunny media, migrations, seed, generated docs, e2e on a real PostgreSQL. Yasakia
   will consume Orazaka (the AI, JVM) **over HTTP**, never as a library.
 - **PostgreSQL does the matching's heavy lifting.** pgvector holds two vectors per person (who I am, who I seek, HNSW
   cosine), `cube` + `earthdistance` filter by radius over a GiST index — no search engine, no geo service, one
   database to back up. See the design notes of [DATABASE.md](DATABASE.md).
 - **One pool per process, named.** `packages/db/src/client.ts` keeps one small pool on `globalThis` (Next.js loads a
   module once per module graph — three pools otherwise), `application_name` says who holds each slot
-  (`yazakia-web`, `yazakia-listen`, `yazakia-migrate`); LISTEN and migrations take `DATABASE_DIRECT_URL` when the
+  (`yasakia-web`, `yasakia-listen`, `yasakia-migrate`); LISTEN and migrations take `DATABASE_DIRECT_URL` when the
   queries go through a pooler. Budget: [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Sessions
@@ -51,8 +51,8 @@ everywhere" (`accounts.session_version`) applies at once.
 ## Photos
 
 ```sequence
-participant app: The Yazakia app
-participant api: Yazakia API
+participant app: The Yasakia app
+participant api: Yasakia API
 participant storage: Bunny Storage
 
 app -> api: POST /api/me/photos (type, size)
@@ -88,7 +88,7 @@ scan over every answer enforces it).
 
 `lib/realtime.ts` is the only door, and it knows typed events only: `batch.ready`, `intro.opened`, `intro.message`
 (ids, never documents — the app fetches what changed). Transport: `@krizaka/realtime` — PostgreSQL LISTEN/NOTIFY on
-channel `yazakia_events` by default, Redis / Valkey with `REALTIME_BUS=redis` (prefix `yazakia:rt:`). `GET /api/events`
+channel `yasakia_events` by default, Redis / Valkey with `REALTIME_BUS=redis` (prefix `yasakia:rt:`). `GET /api/events`
 streams an account's events as Server-Sent Events (heartbeat 15 s, ends every 5 minutes, the app reconnects). Pushes go
 through `@krizaka/push` (Expo → FCM / APNs), only in production or with `PUSH_DELIVERY=on`.
 
