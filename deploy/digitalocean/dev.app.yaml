@@ -5,7 +5,7 @@
 # CORS), the app's pages sit in the product's own address, and the static site stays untouched. The cost is one component:
 # a 0.5 GB instance (apps-s-1vcpu-0.5gb, $5/month); the database is a database + role on the shared cluster krizaka-dev-pg.
 #   doctl apps update <APP_ID> --spec deploy/digitalocean/dev.app.yaml   # ⚠ SECRET values are entered once in the app
-#   (docs/DEPLOYMENT.md, "Dev deployment"): AUTH_SESSION_SECRET, DATABASE_ENCRYPTION_KEY, OPERATOR_API_TOKEN.
+#   (docs/DEPLOYMENT.md, "Dev deployment"): AUTH_SESSION_SECRET, DATABASE_ENCRYPTION_KEY, DATABASE_URL, DATABASE_DIRECT_URL, DATABASE_CA_CERT.
 # A dev deployment: sign-up closed (AUTH_SIGNUP_ENABLED=false), the console answers one address (AUTH_ALLOWED_IPS), no
 # e-mail and no photo storage yet (MAIL_PROVIDER=none, MEDIA_STORAGE_PROVIDER=none: those routes answer 503), and
 # accounts exist only through `npm run db:qa-accounts`.
@@ -56,9 +56,11 @@ services:
       - { key: NEXT_PUBLIC_APP_BASE_PATH, scope: RUN_AND_BUILD_TIME, value: /app }
       - { key: NEXT_PUBLIC_APP_ENV, scope: RUN_AND_BUILD_TIME, value: dev }
       - { key: APP_COMMIT_SHA, scope: BUILD_TIME, value: "${_self.COMMIT_HASH}" }
-      - { key: DATABASE_URL, scope: RUN_TIME, value: "${yasakia-db.DATABASE_URL}" }
-      - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, value: "${yasakia-db.DATABASE_URL}" }
-      - { key: DATABASE_CA_CERT, scope: RUN_TIME, value: "${yasakia-db.CA_CERT}" }
+      # The shared dev cluster is not a component of this app (a `databases:` entry stalls the deploy on trusted sources):
+      # its connection string and CA are SECRETs, and the app is a trusted source of the cluster (doctl databases firewalls).
+      - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_CA_CERT, scope: RUN_TIME, type: SECRET }
       - { key: DATABASE_MAX_CONNECTIONS, scope: RUN_TIME, value: "4" }
       - { key: AUTH_SESSION_SECRET, scope: RUN_TIME, type: SECRET }
       - { key: DATABASE_ENCRYPTION_KEY, scope: RUN_TIME, type: SECRET }
@@ -81,15 +83,8 @@ jobs:
     run_command: node migrate.cjs
     instance_size_slug: apps-s-1vcpu-0.5gb
     envs:
-      - { key: DATABASE_URL, scope: RUN_TIME, value: "${yasakia-db.DATABASE_URL}" }
-      - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, value: "${yasakia-db.DATABASE_URL}" }
-      - { key: DATABASE_CA_CERT, scope: RUN_TIME, value: "${yasakia-db.CA_CERT}" }
-databases:
-  # A database and a role on the shared dev cluster (never a second cluster): `doctl databases db create` + `user create`.
-  - name: yasakia-db
-    engine: PG
-    version: "16"
-    production: true
-    cluster_name: krizaka-dev-pg
-    db_name: yasakia_db
-    db_user: yasakia_user
+      # The shared dev cluster is not a component of this app (a `databases:` entry stalls the deploy on trusted sources):
+      # its connection string and CA are SECRETs, and the app is a trusted source of the cluster (doctl databases firewalls).
+      - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_CA_CERT, scope: RUN_TIME, type: SECRET }

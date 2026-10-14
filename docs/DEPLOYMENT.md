@@ -185,7 +185,7 @@ certificate, the same origin for the session cookie, the product's own address �
 - **Cost**: one service on `apps-s-1vcpu-0.5gb` (**$5/month**); the `migrate` PRE_DEPLOY job is billed only while it runs; the
   database is a database `yasakia_db` and a role `yasakia_user` on the shared dev cluster `krizaka-dev-pg` (no second
   cluster), the app being in the cluster's trusted sources.
-- **Secrets** (type SECRET, entered once, never printed): `AUTH_SESSION_SECRET`, `DATABASE_ENCRYPTION_KEY`.
+- **Secrets** (type SECRET, entered once, never printed): `AUTH_SESSION_SECRET`, `DATABASE_ENCRYPTION_KEY`, `DATABASE_URL` and `DATABASE_DIRECT_URL` (the role's connection string, `sslmode=require`), `DATABASE_CA_CERT` (`doctl databases get-ca`). The cluster is not a `databases:` component of the app — that stalls the deploy on trusted sources — so the app is added to the cluster's trusted sources by hand: `doctl databases firewalls append <cluster> --rule app:<app-id>`.
 - **Closed**: `AUTH_SIGNUP_ENABLED=false`, `AUTH_ALLOWED_IPS` = the one address that may open the console, `MAIL_PROVIDER=none` and
   `MEDIA_STORAGE_PROVIDER=none` (allowed only with `NEXT_PUBLIC_APP_ENV=dev`).
 - **Accounts**: only `npm run db:qa-accounts` with `DATABASE_URL` and `QA_USER_PASSWORD` / `QA_ADMIN_PASSWORD` in the environment.
