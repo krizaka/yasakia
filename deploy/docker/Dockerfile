@@ -1,5 +1,5 @@
 # -------------------------------------------------------------
-# Yazakia API — production image: the Next.js standalone server + the bundled migrator (PRE_DEPLOY job).
+# Yasakia API — production image: the Next.js standalone server + the bundled migrator (PRE_DEPLOY job).
 # -------------------------------------------------------------
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat
@@ -23,9 +23,9 @@ ENV NODE_ENV=production
 # The public origin of the API (signed upload URLs are built on it), passed by App Platform at build time.
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-RUN npm run build --workspace=@yazakia/web
+RUN npm run build --workspace=@yasakia/web
 # Self-contained migrator (drizzle-orm + pg bundled): `node migrate.cjs`
-RUN npm run build:migrator --workspace=@yazakia/db
+RUN npm run build:migrator --workspace=@yasakia/db
 
 # 3. Run
 FROM node:22-alpine AS runner

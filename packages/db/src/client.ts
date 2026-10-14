@@ -63,7 +63,7 @@ interface DbHolder {
  * instrumentation — each with its own copy of module-level variables): without this, a production build opens three
  * pools of DATABASE_MAX_CONNECTIONS each (measured on Orochia, 2026-10-12).
  */
-const holder = globalThis as unknown as { __yazakiaDb?: DbHolder; __yazakiaDbCreated?: number };
+const holder = globalThis as unknown as { __yasakiaDb?: DbHolder; __yasakiaDbCreated?: number };
 
 const UNAVAILABLE_LOG_EVERY_MS = 30_000;
 
@@ -92,7 +92,7 @@ function createHolder(): DbHolder {
     // A script that only imports the client (seed) exits when its work is done.
     allowExitOnIdle: true,
   });
-  holder.__yazakiaDbCreated = (holder.__yazakiaDbCreated ?? 0) + 1;
+  holder.__yasakiaDbCreated = (holder.__yasakiaDbCreated ?? 0) + 1;
   const state: DbHolder = { pool, db: drizzle(pool, { schema }), unavailable: { lastLoggedAt: 0, suppressed: 0 } };
 
   // An idle connection dropped by the server (restart, failover) must not crash the process: the pool replaces it.
@@ -119,8 +119,8 @@ function createHolder(): DbHolder {
 }
 
 function current(): DbHolder {
-  if (!holder.__yazakiaDb) holder.__yazakiaDb = createHolder();
-  return holder.__yazakiaDb;
+  if (!holder.__yasakiaDb) holder.__yasakiaDb = createHolder();
+  return holder.__yasakiaDb;
 }
 
 /** The process-wide pool — for raw SQL, and the NOTIFY side of the realtime bus. */
@@ -134,13 +134,13 @@ export function getDb(): Database {
 
 /** How many pools this process created (1 once connected; read by tests and diagnostics). */
 export function poolsCreated(): number {
-  return holder.__yazakiaDbCreated ?? 0;
+  return holder.__yasakiaDbCreated ?? 0;
 }
 
 /** Ends the pool (tests, graceful shutdown); the next query opens a new one. */
 export async function closeDb(): Promise<void> {
-  const state = holder.__yazakiaDb;
-  holder.__yazakiaDb = undefined;
+  const state = holder.__yasakiaDb;
+  holder.__yasakiaDb = undefined;
   await state?.pool.end();
 }
 

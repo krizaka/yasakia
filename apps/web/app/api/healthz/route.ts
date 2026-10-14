@@ -1,4 +1,4 @@
-import { checkDbHealth } from "@yazakia/db";
+import { checkDbHealth } from "@yasakia/db";
 import { NextResponse } from "next/server";
 
 import { realtimeConnected } from "@/lib/realtime";

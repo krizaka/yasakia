@@ -1,6 +1,6 @@
 Your account is deleted.
 
-As you asked, your Yazakia account is gone: your profile, your conversation with your agent, your portrait, your batches and your intros were deleted at once. Nobody sees you any more.
+As you asked, your Yasakia account is gone: your profile, your conversation with your agent, your portrait, your batches and your intros were deleted at once. Nobody sees you any more.
 
 Your photos are removed from our storage within {purgeDays} days at most — usually within minutes.
 

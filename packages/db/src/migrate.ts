@@ -4,7 +4,7 @@
  * deploy/docker/Dockerfile) — as the DigitalOcean PRE_DEPLOY job, so a release never starts against an older schema.
  *
  * It connects through DATABASE_DIRECT_URL when set (a transaction pooler cannot run DDL in one transaction across the
- * statements), else DATABASE_URL, with one connection named `yazakia-migrate`.
+ * statements), else DATABASE_URL, with one connection named `yasakia-migrate`.
  */
 import path from "node:path";
 

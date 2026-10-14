@@ -1,5 +1,5 @@
-import { accounts, db, profilePhotos } from "@yazakia/db";
-import { InvalidImageError, MAX_PHOTO_BYTES, MAX_PHOTOS, normalisePhoto, PHOTO_TYPES, photoModeration, type PhotoType, verifyUpload } from "@yazakia/media";
+import { accounts, db, profilePhotos } from "@yasakia/db";
+import { InvalidImageError, MAX_PHOTO_BYTES, MAX_PHOTOS, normalisePhoto, PHOTO_TYPES, photoModeration, type PhotoType, verifyUpload } from "@yasakia/media";
 import { and, asc, eq, lt, ne, sql } from "drizzle-orm";
 
 import { photoAccess, relationshipFacts } from "./access";

@@ -16,7 +16,7 @@ describe("storage keys", () => {
 
 describe("local storage", () => {
   it("writes, reads, deletes (a missing object is null, deleting it again is fine)", async () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "yazakia-media-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "yasakia-media-"));
     const storage = localStorage(dir);
     await storage.put("photos/a/b.jpg", Buffer.from("bytes"), "image/jpeg");
     expect((await storage.get("photos/a/b.jpg"))?.toString()).toBe("bytes");
@@ -33,14 +33,14 @@ describe("Bunny storage", () => {
       calls.push({ url, method: init?.method ?? "GET", key: new Headers(init?.headers).get("AccessKey") });
       return new Response(init?.method === "PUT" ? "{}" : null, { status: init?.method === "PUT" ? 201 : 404 });
     }) as unknown as typeof fetch;
-    const storage = bunnyStorage({ zone: "yazakia", apiKey: "k", endpoint: "storage.bunnycdn.com" }, fake);
+    const storage = bunnyStorage({ zone: "yasakia", apiKey: "k", endpoint: "storage.bunnycdn.com" }, fake);
     await storage.put("photos/a/b.jpg", Buffer.from("x"), "image/jpeg");
     expect(await storage.get("photos/a/b.jpg")).toBeNull();
     await storage.delete("photos/a/b.jpg");
     expect(calls.map((c) => `${c.method} ${c.url} ${c.key}`)).toEqual([
-      "PUT https://storage.bunnycdn.com/yazakia/photos/a/b.jpg k",
-      "GET https://storage.bunnycdn.com/yazakia/photos/a/b.jpg k",
-      "DELETE https://storage.bunnycdn.com/yazakia/photos/a/b.jpg k",
+      "PUT https://storage.bunnycdn.com/yasakia/photos/a/b.jpg k",
+      "GET https://storage.bunnycdn.com/yasakia/photos/a/b.jpg k",
+      "DELETE https://storage.bunnycdn.com/yasakia/photos/a/b.jpg k",
     ]);
   });
 

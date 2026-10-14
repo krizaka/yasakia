@@ -1,19 +1,19 @@
 {
-  "product": "yazakia",
-  "title": "Yazakia Architecture",
-  "source": "generated from code by products/yazakia/scripts/generate-docs.mjs — do not hand-edit",
+  "product": "yasakia",
+  "title": "Yasakia Architecture",
+  "source": "generated from code by products/yasakia/scripts/generate-docs.mjs — do not hand-edit",
   "repositories": [
     {
-      "name": "yazakia",
-      "repo": "krizaka/yazakia",
-      "url": "https://github.com/krizaka/yazakia",
+      "name": "yasakia",
+      "repo": "krizaka/yasakia",
+      "url": "https://github.com/krizaka/yasakia",
       "port": 3000,
       "role": "API (route handlers), packages (db, media), docs, legal pages — this repository"
     },
     {
-      "name": "yazakia-mobile",
-      "repo": "krizaka/yazakia-mobile",
-      "url": "https://github.com/krizaka/yazakia-mobile",
+      "name": "yasakia-mobile",
+      "repo": "krizaka/yasakia-mobile",
+      "url": "https://github.com/krizaka/yasakia-mobile",
       "port": 8081,
       "role": "iOS and Android app (Expo) over the same API — the agent, the batch, the debrief, the intros"
     }

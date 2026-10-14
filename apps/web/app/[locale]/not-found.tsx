@@ -9,7 +9,7 @@ import { errorLocale, errorStrings } from "@/lib/error-strings";
 import { contactHref, PRODUCT_URL } from "@/lib/site";
 
 /**
- * Every address of a language that is not one of the three pages: the owl read everything and did not find it. Yazakia
+ * Every address of a language that is not one of the three pages: the owl read everything and did not find it. Yasakia
  * lives in its app — the way out is the three pages and the product's page on krizaka.com.
  */
 export default function NotFound() {
@@ -38,7 +38,7 @@ export default function NotFound() {
           <a href={PRODUCT_URL} className={buttonVariants({ variant: "ghost", size: "lg", shape: "pill" })}>
             {t("product")}
           </a>
-          <a href={contactHref("yazakia-not-found")} className={buttonVariants({ variant: "ghost", size: "lg", shape: "pill" })}>
+          <a href={contactHref("yasakia-not-found")} className={buttonVariants({ variant: "ghost", size: "lg", shape: "pill" })}>
             {t("contact")}
           </a>
         </>

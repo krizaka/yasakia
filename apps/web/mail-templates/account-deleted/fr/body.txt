@@ -1,6 +1,6 @@
 Ton compte est supprimé.
 
-Comme tu l’as demandé, ton compte Yazakia n’existe plus : ton profil, ta conversation avec ton agent, ton portrait, tes lots et tes intros ont été supprimés sur-le-champ. Plus personne ne te voit.
+Comme tu l’as demandé, ton compte Yasakia n’existe plus : ton profil, ta conversation avec ton agent, ton portrait, tes lots et tes intros ont été supprimés sur-le-champ. Plus personne ne te voit.
 
 Tes photos sont retirées de notre stockage en {purgeDays} jours au plus — en général en quelques minutes.
 

@@ -2,4 +2,4 @@
 
 —
 {footer}
-© {year} Yazakia · {appUrl}
+© {year} Yasakia · {appUrl}

@@ -5,7 +5,7 @@ import { PHOTO_TYPES, type PhotoType, STORED_MAX_EDGE } from "./limits";
 
 /**
  * What the API keeps of an uploaded photo: the picture re-encoded to JPEG — orientation applied, at most 2048 px, and
- * **every metadata block stripped** (EXIF GPS included: a phone's photo often carries where it was taken, and Yazakia
+ * **every metadata block stripped** (EXIF GPS included: a phone's photo often carries where it was taken, and Yasakia
  * never keeps an exact position) — its size and its blurhash (the placeholder the app paints before the photo loads).
  */
 export interface NormalisedPhoto {

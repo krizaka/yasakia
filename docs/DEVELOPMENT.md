@@ -1,6 +1,6 @@
 ---
 title: Development
-description: The day-to-day of the Yazakia repository — commands, database lifecycle, schema changes, tests, docs, and the rules a change must keep.
+description: The day-to-day of the Yasakia repository — commands, database lifecycle, schema changes, tests, docs, and the rules a change must keep.
 ---
 
 # Development
@@ -12,25 +12,25 @@ description: The day-to-day of the Yazakia repository — commands, database lif
 | `npm run setup` | Zero to running: `.env` (generated secrets), PostgreSQL + pgvector on :5435, migrations, seed — idempotent |
 | `npm run dev` / `build` / `start` | The API and the web pages on :3000 |
 | `npm run check` | lint (ESLint, i18n check + scan, UI ratchet) + type-check + unit tests + docs freshness — before every push |
-| `npm run test:e2e` | The feature scenarios over HTTP, on their own database (`yazakia_e2e`) and server (:3100) |
+| `npm run test:e2e` | The feature scenarios over HTTP, on their own database (`yasakia_e2e`) and server (:3100) |
 | `npm run db:up` / `db:down` | Start / stop the dev database |
 | `npm run db:generate -- --name <what>` | A SQL migration from a schema change (read it before committing) |
 | `npm run db:migrate` | Apply pending migrations |
 | `npm run db:seed` | The seed accounts (idempotent, refuses `NODE_ENV=production`) |
 | `npm run db:status` | Applied vs. pending migrations, row counts |
-| `npm run db:reset -- --yes` | Drop the **local** schema of your branch's database, migrate, seed (refuses a non-local URL, the shared `yazakia_db` and `*_demo`; dumps first) |
+| `npm run db:reset -- --yes` | Drop the **local** schema of your branch's database, migrate, seed (refuses a non-local URL, the shared `yasakia_db` and `*_demo`; dumps first) |
 | `npm run db:studio` / `db:psql` | Drizzle Studio / psql in the dev container |
 | `npm run db:dump` / `db:restore -- <file>` | Local backups in `backups/` (git-ignored) |
 | `npm run docs:generate [-- --check]` | API and database references, the architecture data, the krizaka.com sync |
-| `npm run workspace -- clone\|status\|pull` | The Yazakia repositories side by side (`yazakia.workspace.json`) |
+| `npm run workspace -- clone\|status\|pull` | The Yasakia repositories side by side (`yasakia.workspace.json`) |
 | `npm run mail:templates:preview` | Every e-mail template and language rendered to `apps/web/.mail-preview/` |
 
 Destructive commands are local-only **by construction**: they refuse `NODE_ENV=production`, any `DATABASE_URL` whose
 host is not this machine, and they act on the database named in `DATABASE_URL`. **One database per branch**: on a
-branch, `npm run setup` points `.env` at `yazakia_<branch>` and creates it; `db:reset` / `db:restore` refuse the shared
-`yazakia_db` and any `*_demo` database, and dump the target to `backups/` before destroying anything.
+branch, `npm run setup` points `.env` at `yasakia_<branch>` and creates it; `db:reset` / `db:restore` refuse the shared
+`yasakia_db` and any `*_demo` database, and dump the target to `backups/` before destroying anything.
 
-The dev database is the Docker Compose project **`yazakia`** (container `yazakia-postgres-dev`, port 5435): it lives
+The dev database is the Docker Compose project **`yasakia`** (container `yasakia-postgres-dev`, port 5435): it lives
 next to Orochia's (`orochia-postgres-dev`, 5432) and Orazaka's without touching them.
 
 ## Schema changes
@@ -66,4 +66,4 @@ Never edit an applied migration: fix forward. Migration `0000_extensions` (hand-
 - No user-facing string outside `apps/web/messages/` (`npm run check:i18n`). No raw palette colour, no `light:`
   (`npm run ratchet`, at zero).
 - Media: never a raw URL or a storage key in an answer (the e2e scan fails the suite).
-- The pool: `@yazakia/db` only — never `new Pool()` in the app (one pool per process, `docs/DEPLOYMENT.md`).
+- The pool: `@yasakia/db` only — never `new Pool()` in the app (one pool per process, `docs/DEPLOYMENT.md`).

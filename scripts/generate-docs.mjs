@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * YAZAKIA — code-driven documentation.
+ * YASAKIA — code-driven documentation.
  *
  * Reads the Drizzle schema and the Next.js API route tree and writes:
  *   - docs/API_CONTRACTS.md                        every endpoint, its access rule and its summary
  *   - docs/DATABASE.md                             every table, column, index, foreign key, check and enum
- *   - docs/_generated/yazakia-architecture.json    repositories, modules, services, tables, endpoints, enums (krizaka.com)
- * and, when this repository is cloned inside krizaka-com (products/yazakia), syncs them to the site:
- *   - app/data/yazakia-architecture.json
- *   - yazakia-content/docs/*.md                    (published through the site's manifest)
+ *   - docs/_generated/yasakia-architecture.json    repositories, modules, services, tables, endpoints, enums (krizaka.com)
+ * and, when this repository is cloned inside krizaka-com (products/yasakia), syncs them to the site:
+ *   - app/data/yasakia-architecture.json
+ *   - yasakia-content/docs/*.md                    (published through the site's manifest)
  *
  * Deterministic (no timestamps), so `--check` can fail a build when the docs are stale.
  *
@@ -78,12 +78,12 @@ const endpoints = walk(apiDir, (p) => /route\.(ts|js)$/.test(p))
 
 // ── Schema (Drizzle objects) ──────────────────────────────────────────────────────────────────────
 const schema = readSchema(ROOT);
-const workspace = JSON.parse(read(path.join(ROOT, "yazakia.workspace.json")));
+const workspace = JSON.parse(read(path.join(ROOT, "yasakia.workspace.json")));
 
 const model = {
-  product: "yazakia",
-  title: "Yazakia Architecture",
-  source: "generated from code by products/yazakia/scripts/generate-docs.mjs — do not hand-edit",
+  product: "yasakia",
+  title: "Yasakia Architecture",
+  source: "generated from code by products/yasakia/scripts/generate-docs.mjs — do not hand-edit",
   repositories: workspace.repositories.map((r) => ({
     name: r.name,
     repo: `${workspace.org}/${r.name}`,
@@ -113,11 +113,11 @@ const model = {
 };
 
 const apiMarkdown = `---
-title: Yazakia API Reference
-description: Every HTTP endpoint of the Yazakia API, with the access rule that guards it — extracted from the code.
+title: Yasakia API Reference
+description: Every HTTP endpoint of the Yasakia API, with the access rule that guards it — extracted from the code.
 ---
 
-# Yazakia API Reference
+# Yasakia API Reference
 
 > Generated from code by \`scripts/generate-docs.mjs\` — do not hand-edit. The summary is the first sentence of each
 > handler's JSDoc; the access rule is read from what the handler calls.
@@ -146,7 +146,7 @@ const configMarkdown = [
   "",
   "> Generated from `apps/web/lib/env-vars.ts` (`ENV_VARS`) by `scripts/generate-docs.mjs` — do not hand-edit this section.",
   "",
-  "Every variable is named `<CONTEXT>_<THING>` after the part of Yazakia it configures — never after the product or a",
+  "Every variable is named `<CONTEXT>_<THING>` after the part of Yasakia it configures — never after the product or a",
   "vendor: a vendor is a value (`MEDIA_STORAGE_PROVIDER=bunny`, `MAIL_PROVIDER=mailgun`). **Production** ✓ = the server",
   "refuses to start without it (`assertProductionConfig`, which also checks every value set against its schema);",
   "**Secret** = a `SECRET` on App Platform. Every variable is also in `.env.example`.",
@@ -171,7 +171,7 @@ const deploymentMarkdown = read(deploymentPath).replace(configBlock, () => confi
 
 const outputs = {
   [deploymentPath]: deploymentMarkdown,
-  [path.join(ROOT, "docs/_generated/yazakia-architecture.json")]: JSON.stringify(model, null, 2) + "\n",
+  [path.join(ROOT, "docs/_generated/yasakia-architecture.json")]: JSON.stringify(model, null, 2) + "\n",
   [path.join(ROOT, "docs/API_CONTRACTS.md")]: apiMarkdown,
   [path.join(ROOT, "docs/DATABASE.md")]: buildDatabaseMarkdown(ROOT, schema),
 };
@@ -193,10 +193,10 @@ for (const [p, content] of Object.entries(outputs)) {
 }
 console.log(`✓ docs generated (${endpoints.length} endpoints, ${schema.tables.length} tables).`);
 
-// ── Sync into krizaka-com when cloned at products/yazakia ──────────────────────────────────────────
+// ── Sync into krizaka-com when cloned at products/yasakia ──────────────────────────────────────────
 if (fs.existsSync(path.join(SITE, "app/data")) && fs.existsSync(path.join(SITE, "lib/docs-manifest.ts"))) {
-  fs.writeFileSync(path.join(SITE, "app/data/yazakia-architecture.json"), outputs[path.join(ROOT, "docs/_generated/yazakia-architecture.json")]);
-  const dest = path.join(SITE, "yazakia-content/docs");
+  fs.writeFileSync(path.join(SITE, "app/data/yasakia-architecture.json"), outputs[path.join(ROOT, "docs/_generated/yasakia-architecture.json")]);
+  const dest = path.join(SITE, "yasakia-content/docs");
   fs.rmSync(dest, { recursive: true, force: true });
   fs.mkdirSync(dest, { recursive: true });
   const docs = fs.readdirSync(path.join(ROOT, "docs")).filter((n) => n.endsWith(".md"));

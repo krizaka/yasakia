@@ -37,7 +37,7 @@ updates:
       # @krizaka/config peers typescript ^5; TS 6 also drops the default @types (krizaka-ui#141)
       - dependency-name: "typescript"
         versions: [">=6"]
-      # krizaka/yazakia#19
+      # krizaka/yasakia#19
       - dependency-name: "ioredis"
         versions: [">=6"]
       # types of the Node LTS we run (22/24), never a non-LTS line

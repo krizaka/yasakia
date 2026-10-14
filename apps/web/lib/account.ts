@@ -1,4 +1,4 @@
-import { accountDeletions, accounts, agentSessions, blocks, db, profilePhotos, profiles } from "@yazakia/db";
+import { accountDeletions, accounts, agentSessions, blocks, db, profilePhotos, profiles } from "@yasakia/db";
 import { and, eq, sql } from "drizzle-orm";
 
 import { applyBlockEffects } from "./access";

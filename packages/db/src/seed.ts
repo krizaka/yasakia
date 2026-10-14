@@ -2,7 +2,7 @@
  * Development data — `npm run db:seed` (also run by `npm run setup` and `db:reset`). Idempotent (accounts by e-mail),
  * refuses NODE_ENV=production.
  *
- * Every seed account says it is one: an address `@seed.yazakia.test` (the `.test` domain never delivers), a name
+ * Every seed account says it is one: an address `@seed.yasakia.test` (the `.test` domain never delivers), a name
  * ending in "(seed)", and a **generated** avatar (geometric, no real photo). They exist so the API answers something
  * locally; the real demo — a fictional cast, licensed pictures — lives only in its own database (`npm run demo:seed`,
  * PY6), never here.
@@ -34,7 +34,7 @@ interface SeedPerson {
   colors: [Rgb, Rgb, Rgb];
 }
 
-export const SEED_DOMAIN = "seed.yazakia.test";
+export const SEED_DOMAIN = "seed.yasakia.test";
 
 const PEOPLE: SeedPerson[] = [
   { name: "Ada", birthDate: "1994-03-12", locale: "fr", gender: "WOMAN", seeking: ["MAN"], intent: "LONG_TERM", lat: 45.513, lng: -73.575, state: "DISCOVERY", colors: [[16, 185, 129], [20, 184, 166], [236, 253, 245]] },
@@ -49,7 +49,7 @@ const PEOPLE: SeedPerson[] = [
 function localStorageDir(): string {
   if (process.env.MEDIA_STORAGE_LOCAL_DIR) return path.resolve(process.env.MEDIA_STORAGE_LOCAL_DIR);
   let dir = __dirname;
-  for (let i = 0; i < 6 && !fs.existsSync(path.join(dir, "yazakia.workspace.json")); i++) dir = path.dirname(dir);
+  for (let i = 0; i < 6 && !fs.existsSync(path.join(dir, "yasakia.workspace.json")); i++) dir = path.dirname(dir);
   return path.join(dir, ".storage");
 }
 

@@ -1,17 +1,17 @@
-# Yazakia
+# Yasakia
 
 **The dating app where you talk first.** An AI agent gets to know you — one question at a time, with humour, in your
 language — then opens a **small batch** of three to five people who fit you **both ways**, each with *why you two* in
 words, never a score. The next batch waits until you **debrief** the last one, so every batch fits better than the one
 before. No swipe, no catalogue, no fake match.
 
-[![CI](https://github.com/krizaka/yazakia/actions/workflows/ci.yml/badge.svg)](https://github.com/krizaka/yazakia/actions/workflows/ci.yml)
+[![CI](https://github.com/krizaka/yasakia/actions/workflows/ci.yml/badge.svg)](https://github.com/krizaka/yasakia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![krizaka.com](https://img.shields.io/badge/krizaka.com-Yazakia-14b8a6)](https://krizaka.com/products/yazakia)
+[![krizaka.com](https://img.shields.io/badge/krizaka.com-Yasakia-14b8a6)](https://krizaka.com/products/yasakia)
 
-This repository is Yazakia's **API** (Next.js route handlers), its **packages** (data, photos), its **docs** and its
+This repository is Yasakia's **API** (Next.js route handlers), its **packages** (data, photos), its **docs** and its
 three **web pages** (privacy, terms, account deletion). The app for iOS and Android is
-[`krizaka/yazakia-mobile`](https://github.com/krizaka/yazakia-mobile). Yazakia is the third open-source product of
+[`krizaka/yasakia-mobile`](https://github.com/krizaka/yasakia-mobile). Yasakia is the third open-source product of
 [Krizaka](https://krizaka.com), built on the same foundations as Orochia and on the shared `@krizaka/*` bricks; its AI
 will run on [Orazaka](https://krizaka.com/products/orazaka).
 

@@ -1,13 +1,13 @@
 ---
 title: Getting Started
-description: Run the Yazakia API locally in two commands, sign up the way the app does, upload a photo, and know where to go next.
+description: Run the Yasakia API locally in two commands, sign up the way the app does, upload a photo, and know where to go next.
 ---
 
 # Getting Started
 
-Yazakia is the dating app where you talk first: an AI agent gets to know you, then opens small batches of profiles
+Yasakia is the dating app where you talk first: an AI agent gets to know you, then opens small batches of profiles
 that fit **both ways**. This repository is its API (Next.js route handlers), its packages and its three web pages; the
-iOS and Android app is [`yazakia-mobile`](https://github.com/krizaka/yazakia-mobile).
+iOS and Android app is [`yasakia-mobile`](https://github.com/krizaka/yasakia-mobile).
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ npm run dev       # the API on http://localhost:3000
 ```
 
 `npm run setup` is idempotent: run it again after pulling. It writes `.env` from `.env.example` with a generated
-`AUTH_SESSION_SECRET` and `DATABASE_ENCRYPTION_KEY`, and seeds six **seed** accounts (`*@seed.yazakia.test`, names ending in
+`AUTH_SESSION_SECRET` and `DATABASE_ENCRYPTION_KEY`, and seeds six **seed** accounts (`*@seed.yasakia.test`, names ending in
 "(seed)", generated geometric avatars — never a real photo).
 
 Check it answers:

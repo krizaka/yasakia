@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 const listCard = "rounded-2xl border border-border-default bg-surface-1 p-5 sm:p-6";
 
 /**
- * How to delete a Yazakia account — the page the stores require: the steps in the app, the way without it, what is
+ * How to delete a Yasakia account — the page the stores require: the steps in the app, the way without it, what is
  * deleted at once, what goes within 30 days, and what remains (nothing that identifies the person).
  */
 export default async function DeleteAccountPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -50,7 +50,7 @@ export default async function DeleteAccountPage({ params }: { params: Promise<{ 
               {t.withoutAppTitle}
             </h2>
             <p className="mb-4 text-fg-secondary">{t.withoutApp}</p>
-            <a href={contactHref("yazakia-delete-account")} className={buttonVariants({ variant: "secondary", shape: "pill" })}>
+            <a href={contactHref("yasakia-delete-account")} className={buttonVariants({ variant: "secondary", shape: "pill" })}>
               {t.contactAction}
             </a>
           </section>
@@ -79,7 +79,7 @@ export default async function DeleteAccountPage({ params }: { params: Promise<{ 
           <p className="text-sm text-fg-muted">{t.exportHint}</p>
         </Page>
       </main>
-      <SiteFooter locale={locale} source="yazakia-delete-account" />
+      <SiteFooter locale={locale} source="yasakia-delete-account" />
     </>
   );
 }

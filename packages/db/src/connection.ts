@@ -1,17 +1,17 @@
 import type { PoolConfig } from "pg";
 
 /** The local development database (deploy/docker/docker-compose.dev.yml, port 5435). */
-export const DEV_DATABASE_URL = "postgresql://yazakia_user:yazakia_secret@localhost:5435/yazakia_db?sslmode=disable";
+export const DEV_DATABASE_URL = "postgresql://yasakia_user:yasakia_secret@localhost:5435/yasakia_db?sslmode=disable";
 
 /**
- * The names Yazakia's connections carry (`application_name`, visible in `pg_stat_activity`): what holds a slot is
+ * The names Yasakia's connections carry (`application_name`, visible in `pg_stat_activity`): what holds a slot is
  * always known — the web pool, the LISTEN connection of the realtime bus, the release job's migrator.
  */
 export const CONNECTION_NAMES = {
-  web: "yazakia-web",
-  listen: "yazakia-listen",
-  migrate: "yazakia-migrate",
-  seed: "yazakia-seed",
+  web: "yasakia-web",
+  listen: "yasakia-listen",
+  migrate: "yasakia-migrate",
+  seed: "yasakia-seed",
 } as const;
 
 /** DATABASE_URL — the pooled connection of the app. Mandatory in production; the local default exists for development only. */

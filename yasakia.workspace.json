@@ -1,14 +1,14 @@
 {
-  "$comment": "Yazakia workspace — the repositories of the product, cloned side by side (../<name>). Read by scripts/workspace.mjs.",
+  "$comment": "Yasakia workspace — the repositories of the product, cloned side by side (../<name>). Read by scripts/workspace.mjs.",
   "org": "krizaka",
   "repositories": [
     {
-      "name": "yazakia",
+      "name": "yasakia",
       "role": "API (route handlers), packages (db, media), docs, legal pages — this repository",
       "port": 3000
     },
     {
-      "name": "yazakia-mobile",
+      "name": "yasakia-mobile",
       "role": "iOS and Android app (Expo) over the same API — the agent, the batch, the debrief, the intros",
       "port": 8081
     }

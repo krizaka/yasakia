@@ -1,4 +1,4 @@
--- The extensions Yazakia's schema stands on, created before any table (idempotent):
+-- The extensions Yasakia's schema stands on, created before any table (idempotent):
 --   vector         pgvector — facet_embeddings.vector (SELF / SEEKING), searched with an HNSW index (cosine)
 --   cube           the n-dimensional cube type earthdistance is built on
 --   earthdistance  ll_to_earth / earth_box / earth_distance — the radius filter over profiles (GiST index)

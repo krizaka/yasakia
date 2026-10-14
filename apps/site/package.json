@@ -1,0 +1,34 @@
+{
+  "name": "@yasakia/site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Yasakia's public dev site (dev.yasakia.com): landing, how it works, demo \u2014 a static export, no backend, no sign-up.",
+  "scripts": {
+    "dev": "next dev --port 3002",
+    "build": "next build",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "dependencies": {
+    "@krizaka/i18n": "^0.1.0",
+    "@krizaka/icons": "^0.3.0",
+    "@krizaka/tailwind": "^3.8.0",
+    "@krizaka/tokens": "^3.8.0",
+    "@krizaka/ui": "^3.8.0",
+    "next": "^16.4.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@krizaka/config": "^0.1.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@yasakia/config": "*",
+    "eslint": "^10.12.0",
+    "eslint-config-next": "^16.4.0",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.5.4"
+  }
+}

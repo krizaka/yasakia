@@ -3,7 +3,7 @@ import { pgEnum } from "drizzle-orm/pg-core";
 /** ACTIVE · PAUSED (no longer shown to anyone; open batches and intros stay open) · SUSPENDED (by an operator: cannot sign in). */
 export const accountStatusEnum = pgEnum("account_status", ["ACTIVE", "PAUSED", "SUSPENDED"]);
 
-/** The languages Yazakia is designed in (French is a language of design, not a translation). */
+/** The languages Yasakia is designed in (French is a language of design, not a translation). */
 export const localeEnum = pgEnum("locale", ["en", "fr"]);
 
 export const genderEnum = pgEnum("gender", ["WOMAN", "MAN", "NON_BINARY"]);
@@ -14,7 +14,7 @@ export const relationshipIntentEnum = pgEnum("relationship_intent", ["LONG_TERM"
 /** UPLOADING (signed URL issued) → PENDING (bytes verified) → APPROVED | REJECTED (PhotoModeration). */
 export const photoModerationStatusEnum = pgEnum("photo_moderation_status", ["UPLOADING", "PENDING", "APPROVED", "REJECTED"]);
 
-/** The account's state machine (prompts-yazakia.md §1.2). PAUSED is orthogonal: it is the account's status. */
+/** The account's state machine (prompts-yasakia.md §1.2). PAUSED is orthogonal: it is the account's status. */
 export const agentStateEnum = pgEnum("agent_state", ["ONBOARDING", "DISCOVERY", "WAITING_POOL", "BATCH_READY", "BATCH_OPEN", "DEBRIEF_DUE"]);
 
 export const agentMessageRoleEnum = pgEnum("agent_message_role", ["USER", "AGENT", "SYSTEM"]);

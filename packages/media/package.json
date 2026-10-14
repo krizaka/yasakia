@@ -1,5 +1,5 @@
 {
-  "name": "@yazakia/media",
+  "name": "@yasakia/media",
   "version": "0.1.0",
   "description": "Profile photos: Bunny Storage (or a local folder), signed upload URLs, Optimizer URLs signed for 300 s, image normalisation (orientation, metadata stripped, blurhash), PhotoModeration.",
   "private": true,

@@ -13,7 +13,7 @@ export default defineConfig({
     url:
       process.env.DATABASE_DIRECT_URL ||
       process.env.DATABASE_URL ||
-      "postgresql://yazakia_user:yazakia_secret@localhost:5435/yazakia_db?sslmode=disable",
+      "postgresql://yasakia_user:yasakia_secret@localhost:5435/yasakia_db?sslmode=disable",
   },
   // The migrations log lives in `public`: a managed dev database lets its user create objects there only
   // (CREATE SCHEMA is denied). Same place in every environment (see src/migrations.ts).

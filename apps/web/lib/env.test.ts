@@ -6,15 +6,15 @@ const prodSecrets = {
   NODE_ENV: "production",
   AUTH_SESSION_SECRET: "x".repeat(40),
   DATABASE_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString("base64"),
-  DATABASE_URL: "postgres://db/yazakia",
+  DATABASE_URL: "postgres://db/yasakia",
   MEDIA_STORAGE_PROVIDER: "bunny",
-  MEDIA_STORAGE_ZONE: "yazakia",
+  MEDIA_STORAGE_ZONE: "yasakia",
   MEDIA_STORAGE_API_KEY: "k",
-  MEDIA_CDN_HOSTNAME: "yazakia.b-cdn.net",
+  MEDIA_CDN_HOSTNAME: "yasakia.b-cdn.net",
   MEDIA_CDN_TOKEN_AUTH_KEY: "t",
   MAIL_PROVIDER: "mailgun",
   MAIL_API_KEY: "m",
-  MAIL_DOMAIN: "mg.yazakia.com",
+  MAIL_DOMAIN: "mg.yasakia.com",
 };
 
 describe("fail-closed configuration", () => {
@@ -28,7 +28,7 @@ describe("fail-closed configuration", () => {
     expect(mediaConfig({}).driver).toBe("local");
     expect(() => mediaConfig({ NODE_ENV: "production", MEDIA_STORAGE_PROVIDER: "local" })).toThrow(/must be bunny in production/);
     expect(() => mediaConfig({ NODE_ENV: "production" })).toThrow(/MEDIA_STORAGE_ZONE/);
-    expect(mediaConfig(prodSecrets)).toMatchObject({ driver: "bunny", endpoint: "storage.bunnycdn.com", pullZoneHostname: "yazakia.b-cdn.net" });
+    expect(mediaConfig(prodSecrets)).toMatchObject({ driver: "bunny", endpoint: "storage.bunnycdn.com", pullZoneHostname: "yasakia.b-cdn.net" });
   });
 
   it("a production server refuses to start without what every request needs — and names it", () => {
@@ -40,7 +40,7 @@ describe("fail-closed configuration", () => {
   });
 
   it("realtime: postgres by default, redis only with a URL", () => {
-    expect(realtimeConfig({})).toMatchObject({ kind: "postgres", prefix: "yazakia:rt:", streamMaxSeconds: 300 });
+    expect(realtimeConfig({})).toMatchObject({ kind: "postgres", prefix: "yasakia:rt:", streamMaxSeconds: 300 });
     expect(() => realtimeConfig({ REALTIME_BUS: "redis" })).toThrow(/REALTIME_REDIS_URL/);
     expect(realtimeConfig({ REALTIME_BUS: "redis", REALTIME_REDIS_URL: "redis://r" }).redisUrl).toBe("redis://r");
     expect(() => realtimeConfig({ REALTIME_BUS: "kafka" })).toThrow(ConfigurationError);
@@ -57,7 +57,7 @@ describe("ENV_VARS — every variable named by its bounded context (krizaka/.git
   const FRAMEWORK = new Set(["NODE_ENV", "PORT", "HOSTNAME", "NEXT_PHASE", "NEXT_RUNTIME", "NEXT_PUBLIC_APP_VERSION", "NEXT_DIST_DIR", "CI"]);
   const TOOLING = new Set(["APP_URL", "DATABASE_MIGRATIONS_DIR", "REALTIME_IT"]);
   const CONTEXT = /^(NEXT_PUBLIC_)?(APP|DATABASE|AUTH|MEDIA|MAIL|PUSH|PAYMENTS|REALTIME|ABUSE|OBSERVABILITY|AI|OPERATOR)_[A-Z0-9_]+$/;
-  const VENDOR_OR_PRODUCT = /^(NEXT_PUBLIC_|EXPO_PUBLIC_)?(YAZAKIA|KRIZAKA|BUNNY|MAILGUN|RESEND|EXPO|GOOGLE|REDIS|VERCEL|DO|DIGITALOCEAN|ADMIN)_/;
+  const VENDOR_OR_PRODUCT = /^(NEXT_PUBLIC_|EXPO_PUBLIC_)?(YASAKIA|KRIZAKA|BUNNY|MAILGUN|RESEND|EXPO|GOOGLE|REDIS|VERCEL|DO|DIGITALOCEAN|ADMIN)_/;
 
   it("names every variable <CONTEXT>_<THING>, never after a product or a vendor", async () => {
     const { ENV_VARS } = await import("./env");

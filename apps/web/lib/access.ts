@@ -1,4 +1,4 @@
-import { accounts, batches, batchItems, blocks, db, intros } from "@yazakia/db";
+import { accounts, batches, batchItems, blocks, db, intros } from "@yasakia/db";
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
 /**

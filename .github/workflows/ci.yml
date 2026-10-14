@@ -36,6 +36,8 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
+      - name: Static site build (dev.yasakia.com)
+        run: npm run build:site
 
   database:
     name: Migrations & seed on PostgreSQL 16 + pgvector
@@ -44,14 +46,14 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USER: yazakia_user
-          POSTGRES_PASSWORD: yazakia_secret
-          POSTGRES_DB: yazakia_db
+          POSTGRES_USER: yasakia_user
+          POSTGRES_PASSWORD: yasakia_secret
+          POSTGRES_DB: yasakia_db
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      DATABASE_URL: postgresql://yazakia_user:yazakia_secret@localhost:5432/yazakia_db
+      DATABASE_URL: postgresql://yasakia_user:yasakia_secret@localhost:5432/yasakia_db
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -75,9 +77,9 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USER: yazakia_user
-          POSTGRES_PASSWORD: yazakia_secret
-          POSTGRES_DB: yazakia_db
+          POSTGRES_USER: yasakia_user
+          POSTGRES_PASSWORD: yasakia_secret
+          POSTGRES_DB: yasakia_db
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
@@ -88,7 +90,7 @@ jobs:
           - 6379:6379
         options: --health-cmd "valkey-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      DATABASE_URL: postgresql://yazakia_user:yazakia_secret@localhost:5432/yazakia_db
+      DATABASE_URL: postgresql://yasakia_user:yasakia_secret@localhost:5432/yasakia_db
       # The scenarios' settings (e2e/run.mjs E2E_ENV) — test values, no real secret anywhere.
       AUTH_SESSION_SECRET: ci-only-session-secret-0123456789abcdef0123456789
       DATABASE_ENCRYPTION_KEY: Y2ktb25seS1kYXRhLWVuY3J5cHRpb24ta2V5LTMyYnk=

@@ -2,7 +2,7 @@
 /**
  * Database lifecycle for development — `npm run db:<command>`:
  *   status   migrations applied vs. files, row counts of the main tables
- * reset and restore refuse the shared yazakia_db and every *_demo database, and dump the target to backups/ first.
+ * reset and restore refuse the shared yasakia_db and every *_demo database, and dump the target to backups/ first.
  *   reset    drops the local schema, re-applies every migration, re-seeds (asks for confirmation;
  *            `--yes` skips it). Refuses any non-local DATABASE_URL and NODE_ENV=production.
  *   psql     opens psql in the dev container
@@ -17,13 +17,13 @@ import readline from "node:readline/promises";
 import { c, CONTAINER, databaseUrl, destructionRefusal, fail, isLocalDatabase, ok, ROOT, run, step, warn } from "./lib.mjs";
 
 const [command, ...rest] = process.argv.slice(2);
-// The database and role of DATABASE_URL — never a hard-coded name: a worktree on its own database (e.g. yazakia_e2e)
-// must never reset, dump or restore the shared yazakia_db.
+// The database and role of DATABASE_URL — never a hard-coded name: a worktree on its own database (e.g. yasakia_e2e)
+// must never reset, dump or restore the shared yasakia_db.
 const target = (() => {
   const url = new URL(databaseUrl());
-  const name = decodeURIComponent(url.pathname.replace(/^\//, "")) || "yazakia_db";
+  const name = decodeURIComponent(url.pathname.replace(/^\//, "")) || "yasakia_db";
   if (!/^[A-Za-z0-9_-]{1,63}$/.test(name)) fail(`Unexpected database name in DATABASE_URL: ${name}`);
-  return { name, user: decodeURIComponent(url.username) || "yazakia_user" };
+  return { name, user: decodeURIComponent(url.username) || "yasakia_user" };
 })();
 const PSQL = ["exec", "-i", CONTAINER, "psql", "-U", target.user, "-d", target.name, "-v", "ON_ERROR_STOP=1"];
 // The extensions live in `public` too (vector, cube, earthdistance): dropping the schema drops them, the migrations
@@ -43,7 +43,7 @@ function guardDestruction(action) {
   const refusal = destructionRefusal(target.name);
   if (refusal) fail(`Refusing to ${action}: ${refusal}`);
   fs.mkdirSync(path.join(ROOT, "backups"), { recursive: true });
-  const file = path.join(ROOT, "backups", `yazakia-${target.name}-before-${action.split(" ")[0]}-${new Date().toISOString().replace(/[:.]/g, "-")}.sql`);
+  const file = path.join(ROOT, "backups", `yasakia-${target.name}-before-${action.split(" ")[0]}-${new Date().toISOString().replace(/[:.]/g, "-")}.sql`);
   const r = run("docker", ["exec", CONTAINER, "pg_dump", "-U", target.user, "-d", target.name, "--no-owner"], { quiet: true });
   fs.writeFileSync(file, r.stdout);
   ok(`Dumped ${target.name} first: ${path.relative(ROOT, file)}`);
@@ -92,7 +92,7 @@ switch (command) {
   case "dump": {
     guardLocal("dump the database");
     fs.mkdirSync(path.join(ROOT, "backups"), { recursive: true });
-    const file = path.join(ROOT, "backups", `yazakia-${target.name}-${new Date().toISOString().replace(/[:.]/g, "-")}.sql`);
+    const file = path.join(ROOT, "backups", `yasakia-${target.name}-${new Date().toISOString().replace(/[:.]/g, "-")}.sql`);
     const r = run("docker", ["exec", CONTAINER, "pg_dump", "-U", target.user, "-d", target.name, "--no-owner"], { quiet: true });
     fs.writeFileSync(file, r.stdout);
     ok(`Dump written to ${path.relative(ROOT, file)}`);

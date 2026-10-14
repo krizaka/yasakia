@@ -4,7 +4,7 @@
  * and `assertProductionConfig` (instrumentation.ts) refuses to start a production server without the secrets every
  * request needs. Development defaults exist only outside production.
  */
-import { keyring } from "@yazakia/db";
+import { keyring } from "@yasakia/db";
 
 import { schemaProblems } from "./env-vars";
 
@@ -32,7 +32,7 @@ function read(name: string, developmentDefault: string, env: Env = process.env):
 
 /** Signs the session tokens (and, derived, the media URLs). At least 32 characters. */
 export function sessionSecret(env: Env = process.env): string {
-  const secret = read("AUTH_SESSION_SECRET", "development-only-yazakia-session-secret-0123456789", env);
+  const secret = read("AUTH_SESSION_SECRET", "development-only-yasakia-session-secret-0123456789", env);
   if (secret.length < 32) throw new ConfigurationError("AUTH_SESSION_SECRET", "must be at least 32 characters");
   return secret;
 }
@@ -105,7 +105,7 @@ export function realtimeConfig(env: Env = process.env): RealtimeConfig {
   if (kind !== "memory" && kind !== "postgres" && kind !== "redis") throw new ConfigurationError("REALTIME_BUS", "must be memory, postgres or redis");
   const redisUrl = env.REALTIME_REDIS_URL?.trim() || undefined;
   if (kind === "redis" && !redisUrl) throw new ConfigurationError("REALTIME_REDIS_URL", "is required when REALTIME_BUS=redis");
-  return { kind, redisUrl, prefix: env.REALTIME_PREFIX?.trim() || "yazakia:rt:", streamMaxSeconds: setting("REALTIME_STREAM_MAX_SECONDS", 300, 0, 3600, env) };
+  return { kind, redisUrl, prefix: env.REALTIME_PREFIX?.trim() || "yasakia:rt:", streamMaxSeconds: setting("REALTIME_STREAM_MAX_SECONDS", 300, 0, 3600, env) };
 }
 
 /** The operators' service token (32+ characters) — without it, no admin route answers. */

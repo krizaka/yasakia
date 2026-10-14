@@ -1,4 +1,4 @@
-import { accounts, agentSessions, authCodes, db, profiles } from "@yazakia/db";
+import { accounts, agentSessions, authCodes, db, profiles } from "@yasakia/db";
 import { and, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
 
 import { checkBirthDate } from "./age";
@@ -74,7 +74,7 @@ export async function verifyCode(input: VerifyInput): Promise<VerifyResult> {
     if (age.code === "UNDERAGE") {
       // Under 18: the code is spent — retrying with another date needs a new code (and a new e-mail).
       await db.update(authCodes).set({ consumedAt: new Date() }).where(eq(authCodes.id, pending.id));
-      throw refuse(403, "UNDERAGE", "Yazakia is for adults (18+)");
+      throw refuse(403, "UNDERAGE", "Yasakia is for adults (18+)");
     }
     throw refuse(400, age.code, "This date of birth is not valid");
   }

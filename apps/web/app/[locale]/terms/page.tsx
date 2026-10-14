@@ -16,7 +16,7 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
     <>
       <SiteHeader locale={locale} current="terms" />
       <LegalArticle locale={locale} page="terms" />
-      <SiteFooter locale={locale} source="yazakia-terms" />
+      <SiteFooter locale={locale} source="yasakia-terms" />
     </>
   );
 }

@@ -1,5 +1,5 @@
 Your sign-in code: {code}
 
-Type it in the Yazakia app. It works once, for {minutes} minutes. Nobody at Yazakia will ever ask you for it.
+Type it in the Yasakia app. It works once, for {minutes} minutes. Nobody at Yasakia will ever ask you for it.
 
 If you did not ask for a code, ignore this message: nothing happens without it.

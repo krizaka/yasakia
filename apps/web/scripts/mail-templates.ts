@@ -15,7 +15,7 @@ for (const id of Object.keys(MAIL_TEMPLATES) as MailTemplateId[]) {
   const vars = JSON.parse(fs.readFileSync(path.join(dir, id, "preview.json"), "utf8"));
   for (const locale of MAIL_LOCALES) {
     try {
-      const mail = renderMailTemplate(id, vars, { locale, appUrl: "https://yazakia.com", dir });
+      const mail = renderMailTemplate(id, vars, { locale, appUrl: "https://yasakia.com", dir });
       fs.writeFileSync(path.join(out, `${id}.${locale}.html`), mail.html);
       fs.writeFileSync(path.join(out, `${id}.${locale}.txt`), `Subject: ${mail.subject}\n\n${mail.text}`);
       console.log(`✓ ${id} (${locale}) — ${mail.subject}`);

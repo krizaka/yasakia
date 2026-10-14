@@ -1,4 +1,4 @@
-import { checkKey, verifyLocalMediaToken } from "@yazakia/media";
+import { checkKey, verifyLocalMediaToken } from "@yasakia/media";
 import sharp from "sharp";
 
 import { mediaConfig } from "@/lib/env";
