@@ -6,6 +6,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
 import { getDictionary, type Locale, LOCALES } from "@/lib/i18n";
+import { indexable } from "@/lib/indexing";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     applicationName: t.meta.siteName,
     authors: [{ name: "Krizaka", url: "https://krizaka.com" }],
     alternates: { languages: { en: "/en", fr: "/fr" } },
+    ...(indexable() ? {} : { robots: { index: false, follow: false, noarchive: true } }),
   };
 }
 

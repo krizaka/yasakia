@@ -18,6 +18,7 @@
     "footer": "Yasakia est un produit open source de <b>Krizaka</b>, conçu au Québec.",
     "sourceCode": "Code source",
     "contact": "Nous écrire",
+    "devNotice": "Environnement de développement — accès sur invitation",
     "updated": "Mis à jour le {date} · version {version}",
     "onThisPage": "Sur cette page"
   },

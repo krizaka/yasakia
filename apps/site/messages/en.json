@@ -19,7 +19,8 @@
     "sourceCode": "Source code",
     "contact": "Talk to us",
     "menu": "Menu",
-    "footerLabel": "Footer"
+    "footerLabel": "Footer",
+    "devNotice": "Development environment — access by invitation"
   },
   "status": {
     "label": "Under development",

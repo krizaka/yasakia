@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 
 import { getDictionary, type Locale } from "./i18n";
+import { indexable } from "./indexing";
 import { KRIZAKA_URL, type PageId, pagePath, REPO_URL, SITE_URL } from "./site";
 
 /** The Krizaka Organization, defined by www.krizaka.com: every JSON-LD node of the family points back to it. */
@@ -26,6 +27,7 @@ export function pageMetadata(locale: Locale, page: PageId): Metadata {
   const title = page === "home" ? t.meta.siteName : `${page === "how-it-works" ? t.how.title : t.demo.title} — ${t.meta.siteName}`;
   const description = t.meta.description;
   return {
+    ...(indexable() ? {} : { robots: { index: false, follow: false, noarchive: true } }),
     metadataBase: new URL(SITE_URL),
     title: { absolute: title },
     description,

@@ -37,6 +37,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | :--- | :---: | :---: | :--- | :--- |
 | `NEXT_PUBLIC_APP_URL` *(build)* | ✓ |  | `http://localhost:3000` | Public origin of the API: signed upload URLs and local media URLs are built on it. |
 | `APP_ADMIN_HOST` | — |  |  | The host of the administration console (admin.yasakia.com): the same deployment answers it through host-based ingress; there only the administration exists, elsewhere it does not (404). Unset: both at one address (local development). |
+| `APP_SEARCH_INDEXING` | — |  | `on` | `off` on every dev / preview deployment: noindex on every response, robots.txt `Disallow: /` with no sitemap, the development line in the footer. Read at build (landing, legal pages) and at request time (the proxy). Production flips it by configuration. |
 | `NEXT_PUBLIC_APP_BASE_PATH` *(build)* | — |  |  | The path the app is served under (dev.yasakia.com serves it at `/app`, next to the static site at `/`). Empty: the root. |
 | `NEXT_PUBLIC_APP_ENV` *(build)* | — |  | `local` | Where the build runs, for the build information. |
 | `APP_ACCOUNT_PURGE_INTERVAL_SECONDS` | — |  | `60` | How often accounts past their deletion delay are purged. |

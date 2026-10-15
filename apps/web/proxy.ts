@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { allowedOnAdminHost, hostKind, isAdminPath, isLandingPath } from "@/lib/host";
+import { indexable } from "@/lib/indexing";
 
 /**
  * Four address spaces in one app. The public landing owns `/`, `/fr`, `/how-it-works`, `/demo` (static pages copied into
@@ -28,9 +29,25 @@ function remember(request: NextRequest, locale: string) {
   return response;
 }
 
+/** Said on every response of a deployment closed to search engines: the console host always, every host when APP_SEARCH_INDEXING=off. */
+export const NOINDEX_HEADER = "noindex, nofollow, noarchive";
+export const CLOSED_ROBOTS = "User-agent: *\nDisallow: /\n";
+
 export function proxy(request: NextRequest) {
+  const response = route(request);
+  // A route that answers nothing (`undefined`: let it through) still carries the header.
+  const out = response ?? NextResponse.next();
+  if (hostKind(request.headers) === "admin" || !indexable()) out.headers.set("x-robots-tag", NOINDEX_HEADER);
+  return out;
+}
+
+function route(request: NextRequest): NextResponse | undefined {
   const { pathname } = request.nextUrl;
   const kind = hostKind(request.headers);
+  // Closed deployment: robots.txt disallows everything and advertises no sitemap; the sitemap does not exist.
+  if (pathname === "/robots.txt" && (kind === "admin" || !indexable())) return new NextResponse(CLOSED_ROBOTS, { headers: { "Content-Type": "text/plain" } });
+  if (pathname === "/sitemap.xml" && (kind === "admin" || !indexable())) return notFound();
+  if (pathname === "/robots.txt" || pathname === "/sitemap.xml") return;
   if (kind === "app" && isAdminPath(pathname)) return notFound();
   if (kind === "admin") {
     if (pathname === "/" || pathname === "/app" || /^\/app\/(en|fr)\/?$/.test(pathname)) {
@@ -53,5 +70,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  matcher: ["/api/:path*", "/robots.txt", "/sitemap.xml", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };
