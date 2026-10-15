@@ -362,6 +362,12 @@
       "summary": "Lists accounts for the console — searched by address or name, filtered by status and role, sorted and paged on the server."
     },
     {
+      "method": "DELETE",
+      "path": "/api/admin/users/{id}",
+      "access": "public",
+      "summary": "Law 25 erasure of an account, asked of an operator; the e-mail typed confirms."
+    },
+    {
       "method": "GET",
       "path": "/api/admin/users/{id}",
       "access": "public",
@@ -372,6 +378,18 @@
       "path": "/api/admin/users/{id}/restore",
       "access": "public",
       "summary": "Lifts an account's suspension: it is ACTIVE again and can sign in; the restoration is logged."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/users/{id}/role",
+      "access": "public",
+      "summary": "Grants or withdraws the administrator role."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/users/{id}/sessions",
+      "access": "public",
+      "summary": "Ends every session of an account, on the web and in the app, leaving it active."
     },
     {
       "method": "POST",

@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (45)
+## Endpoints (48)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -24,8 +24,11 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `PATCH` | `/api/admin/report-queue/{id}` | public | Moves a report along (REVIEWED · ACTIONED · DISMISSED, or back to OPEN); the decision is logged with who made it. |
 | `GET` | `/api/admin/reports` | operator · service token + IP allow-list | The reports for operators — urgent reasons (UNDERAGE, THREAT) first, details decrypted; service token and IP allow-list. |
 | `GET` | `/api/admin/users` | public | Lists accounts for the console — searched by address or name, filtered by status and role, sorted and paged on the server. |
+| `DELETE` | `/api/admin/users/{id}` | public | Law 25 erasure of an account, asked of an operator; the e-mail typed confirms. |
 | `GET` | `/api/admin/users/{id}` | public | One account for the console: state, role, counts and the audit lines about it — never a date of birth, a message or a photo. |
 | `POST` | `/api/admin/users/{id}/restore` | public | Lifts an account's suspension: it is ACTIVE again and can sign in; the restoration is logged. |
+| `POST` | `/api/admin/users/{id}/role` | public | Grants or withdraws the administrator role. |
+| `POST` | `/api/admin/users/{id}/sessions` | public | Ends every session of an account, on the web and in the app, leaving it active. |
 | `POST` | `/api/admin/users/{id}/suspend` | public | Suspends an account: it cannot sign in and every session of the app and the browser ends at once; the reason is logged. |
 | `POST` | `/api/auth/logout` | bearer · account | Signs out: forgets this phone's push token, and with `everywhere` invalidates every session token of the account at once (the app also deletes its own token from secure storage). |
 | `POST` | `/api/auth/password` | public | Signs a person in to the web console with their e-mail and password: the answer sets an HttpOnly session cookie. |
