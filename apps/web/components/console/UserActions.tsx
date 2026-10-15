@@ -70,7 +70,7 @@ export function UserActions({ id, status, role }: { id: string; status: "ACTIVE"
           <Dialog.Title>{say("admin.user.suspendTitle")}</Dialog.Title>
           <Dialog.Description>{say("admin.user.suspendDescription")}</Dialog.Description>
         </Dialog.Header>
-        <form.Form aria-label={say("admin.user.suspendTitle")} className="flex flex-col gap-4">
+        <form.Form method="post" aria-label={say("admin.user.suspendTitle")} className="flex flex-col gap-4">
           <Dialog.Body className="flex flex-col gap-4">
             <form.TextField name="reason" label={say("admin.user.suspendReason")} hint={say("admin.user.suspendReasonHint")} maxLength={200} />
             {problem ? <Alert tone="danger">{problem}</Alert> : null}

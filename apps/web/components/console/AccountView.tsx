@@ -166,7 +166,7 @@ export function AccountView({ account }: { account: AccountDto }) {
   return (
     <SettingsLayout className="w-full" title={say("account.title")} description={say("account.description")} nav={nav} navLabel={say("account.navLabel")} linkAs={Link}>
       <SettingsSection id="profile" title={say("account.profile.title")} description={say("account.profile.description")}>
-        <profile.Form aria-label={say("account.profile.title")} className="flex flex-col gap-4">
+        <profile.Form method="post" aria-label={say("account.profile.title")} className="flex flex-col gap-4">
           <DescriptionList layout="inline" items={[{ term: say("account.profile.email"), details: account.email, hint: say("account.profile.emailHint") }]} />
           <profile.TextField name="displayName" label={say("account.profile.displayName")} maxLength={40} autoComplete="given-name" />
           <profile.Select
@@ -214,7 +214,7 @@ export function AccountView({ account }: { account: AccountDto }) {
 
       <SettingsSection id="security" title={say("account.security.title")} description={say("account.security.description")}>
         {account.hasPassword ? (
-          <password.Form aria-label={say("account.security.title")} className="flex flex-col gap-4">
+          <password.Form method="post" aria-label={say("account.security.title")} className="flex flex-col gap-4">
             <password.TextField name="current" label={say("account.security.current")} type="password" autoComplete="current-password" />
             <password.TextField name="next" label={say("account.security.next")} type="password" autoComplete="new-password" hint={say("account.security.hint")} />
             <password.TextField name="confirm" label={say("account.security.confirm")} type="password" autoComplete="new-password" />
