@@ -60,7 +60,7 @@ describe("search engines and AI assistants (the family contract, scripts/check-s
     expect(auditRobots(text, { host: SITE_URL })).toEqual([]);
   });
 
-  it("llms.txt follows llmstxt.org and links the family", () => {
+  it("llms.txt follows llmstxt.org and names the publisher", () => {
     expect(auditLlms(llmsText(), { host: SITE_URL })).toEqual([]);
   });
 
@@ -81,13 +81,12 @@ function robotsText(r: ReturnType<typeof robots>): string {
   return `${groups.join("\n\n")}\n\nSitemap: ${r.sitemap}\n`;
 }
 
-describe("the family navigation (@krizaka/ui 3.10)", () => {
-  it("the bar and the footer are the family's: current = yasakia, the family last on the phone, a DEV badge", () => {
+describe("the navigation of an independent product (@krizaka/ui)", () => {
+  it("the bar has no family switcher; the footer is the product's: family={false}, a DEV badge, « A Krizaka product »", () => {
     const src = readFileSync(new URL("../components/SiteChrome.tsx", import.meta.url), "utf8");
-    expect(src).toContain('<NavBar.Family current="yasakia"');
-    expect(src).toContain("{family}\n          </NavBar.Mobile>");
+    expect(src).not.toContain("NavBar.Family");
     expect(src).toContain('<NavBar.Badge env="dev"');
-    expect(src).toContain('<FamilyFooter current="yasakia"');
+    expect(src).toMatch(/<FamilyFooter current="yasakia" family=\{false\}/);
     expect(src).not.toMatch(/KRIZAKA_URL/);
   });
 });
