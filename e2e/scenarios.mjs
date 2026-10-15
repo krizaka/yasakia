@@ -610,6 +610,7 @@ let adaPhoto;
   // The console's pages.
   const page = (p, cookie, ip) => web(p, { cookie, ip });
   check("pages: the sign-in page is served (200) and not indexed", (await page("/app/en/sign-in")).status === 200 && (await page("/app/en/sign-in")).text.includes("noindex"));
+  check("pages: a form submitted without JavaScript never puts a password in the address (method=post)", (await page("/app/en/sign-in")).text.includes('method="post"'));
   check("pages: the home without a session goes to sign-in", (await page("/app/en")).status === 307 && (await page("/app/en")).headers.get("location")?.endsWith("/app/en/sign-in"));
   check("pages: the home, the account render for a person", (await page("/app/en", user.cookie)).status === 200 && (await page("/app/fr/account", user.cookie)).status === 200);
   check("pages: the administration console is a 404 for a person", (await page("/app/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/app/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
