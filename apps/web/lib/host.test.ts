@@ -47,7 +47,11 @@ describe("proxy", async () => {
   });
   it("never redirects the API to a language", () => {
     expect(call("https://dev.yasakia.com/api/admin/reports", "dev.yasakia.com")?.status).toBe(404);
-    expect(call("https://admin.yasakia.com/api/admin/reports", "admin.yasakia.com")).toBeUndefined();
+    // Passed through (not redirected, not hidden) — carrying the console host's noindex.
+    const passed = call("https://admin.yasakia.com/api/admin/reports", "admin.yasakia.com");
+    expect(passed?.headers.get("x-middleware-next")).toBe("1");
+    expect(passed?.headers.get("location")).toBeNull();
+    expect(passed?.headers.get("x-robots-tag")).toContain("noindex");
   });
   it("is a 404 on the admin host for the person's pages, and opens the console's overview from the root", () => {
     expect(call("https://admin.yasakia.com/app/en/account", "admin.yasakia.com")?.status).toBe(404);

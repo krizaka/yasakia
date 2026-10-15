@@ -19,7 +19,8 @@
     "sourceCode": "Code source",
     "contact": "Nous écrire",
     "menu": "Menu",
-    "footerLabel": "Pied de page"
+    "footerLabel": "Pied de page",
+    "devNotice": "Environnement de développement — accès sur invitation"
   },
   "status": {
     "label": "En développement",

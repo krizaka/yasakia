@@ -1,5 +1,6 @@
 /* Search engines and AI assistants (the Krizaka family contract, scripts/check-seo-family.mjs): canonical, hreflang, social
    cards and the JSON-LD of the site. Structure only; the words are messages. */
+import { indexable } from "./indexing";
 import type { Metadata } from "next";
 
 import { getDictionary, type Locale } from "./i18n";
@@ -26,6 +27,7 @@ export function pageMetadata(locale: Locale, page: PageId): Metadata {
   const title = page === "home" ? t.meta.siteName : `${page === "how-it-works" ? t.how.title : t.demo.title} — ${t.meta.siteName}`;
   const description = t.meta.description;
   return {
+    ...(indexable() ? {} : { robots: { index: false, follow: false, noarchive: true } }),
     metadataBase: new URL(SITE_URL),
     title: { absolute: title },
     description,

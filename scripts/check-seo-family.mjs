@@ -33,7 +33,7 @@ const strip = (u) => u.replace(/\/$/, "");
  * @returns {string[]} */
 export function auditRobots(text, { host, index = true, sitemap = true }) {
   const problems = [];
-  if (sitemap && !text.includes(`Sitemap: ${host}/sitemap.xml`)) problems.push(`robots.txt: no "Sitemap: ${host}/sitemap.xml" line`);
+  if (sitemap && index && !text.includes(`Sitemap: ${host}/sitemap.xml`)) problems.push(`robots.txt: no "Sitemap: ${host}/sitemap.xml" line`);
   const groups = text.split(/\n\s*\n/);
   const group = (bot) => groups.find((g) => new RegExp(`^user-agent:\\s*${bot}\\s*$`, "im").test(g));
   if (index) {
@@ -43,7 +43,11 @@ export function auditRobots(text, { host, index = true, sitemap = true }) {
       if (!g) problems.push(`robots.txt: ${bot} has no group (AI crawlers are welcome on public sites)`);
       else if (!/^allow:\s*\/\s*$/im.test(g)) problems.push(`robots.txt: ${bot} is not allowed`);
     }
-  } else if (!/user-agent:\s*\*[\s\S]*?disallow:\s*\/\s*(\n|$)/i.test(text)) problems.push("robots.txt: a site that is not indexed must Disallow: / for *");
+  } else {
+    if (!/user-agent:\s*\*[\s\S]*?disallow:\s*\/\s*(\n|$)/i.test(text)) problems.push("robots.txt: a site that is not indexed must Disallow: / for *");
+    // A site that is not indexed advertises nothing: no sitemap line (dev, preview, consoles).
+    if (/^sitemap:/im.test(text)) problems.push("robots.txt: a site that is not indexed must not advertise a sitemap");
+  }
   return problems;
 }
 
@@ -201,7 +205,7 @@ async function main() {
   }
   if (!args.includes("--no-llms")) report("/llms.txt", auditLlms(await (await get("/llms.txt")).text(), { host }));
   let paths = ["/"];
-  if (!args.includes("--no-sitemap")) {
+  if (index && !args.includes("--no-sitemap")) {
     const xml = await (await get("/sitemap.xml")).text();
     report("/sitemap.xml", auditSitemap(xml, { host }));
     paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname).slice(0, limit);

@@ -3,6 +3,7 @@ import { Page } from "@krizaka/ui/page";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
+import { indexable } from "@/lib/indexing";
 import { type Locale, otherLocale, translator } from "@/lib/i18n";
 import { contactHref, LEGAL_PAGES, LEGAL_PATHS, type LegalPage, PRODUCT_URL, REPO_URL } from "@/lib/site";
 
@@ -62,6 +63,13 @@ export function SiteFooter({ locale, source }: { locale: Locale; source: string 
           </a>
         </div>
       </Page>
+      {indexable() ? null : (
+        <Page>
+          <p className="pb-6 text-center text-xs text-fg-muted" data-testid="dev-environment-notice">
+            {t("chrome.devNotice")}
+          </p>
+        </Page>
+      )}
     </footer>
   );
 }
