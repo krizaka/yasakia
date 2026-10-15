@@ -3,14 +3,12 @@
 #                       the legal pages (/en/privacy…), the person's space (/app/{en|fr}/…) and the API (/api/*)
 #   admin.yasakia.com   the administration console (same service, APP_ADMIN_HOST: only the administration exists there)
 #   doctl apps update <APP_ID> --spec deploy/digitalocean/web.app.yaml   # SECRET values are entered once, never printed
-# History: the app was created for the static landing (`yasakia-site`, hence its name — an app cannot be renamed); converting
-# it in place keeps dev.yasakia.com up and the app count unchanged (the account is capped at 10). A deployment of an app that
-# holds a STATIC SITE stalls (DatabaseTrustedSourcesNotReady) once the app is a trusted source of the shared cluster, which is
-# why the landing is served by the service rather than as a static component. The shared cluster is not a `databases:`
-# component: its private connection string and CA are SECRETs, and the app is added to the cluster's trusted sources
-# (`doctl databases firewalls append <cluster> --rule app:<app-id>`). Cost: one basic-xxs service ($5/month); the `migrate`
-# PRE_DEPLOY job is billed only while it runs.
-name: yasakia-site
+# History: the first app (`yasakia-site`) was a static-site app; an app created without a service never joined the private
+# trusted-source networking (every deployment stalled on DatabaseTrustedSourcesNotReady, even converted in place), so it was
+# deleted and this app (`yasakia-dev`) was created as a service. The shared cluster is not a `databases:` component: its private
+# connection string and CA are SECRETs, and the app is a trusted source (`doctl databases firewalls append <cluster> --rule app:<app-id>`).
+# Cost: one basic-xxs service ($5/month); the `migrate` PRE_DEPLOY job is billed only while it runs.
+name: yasakia-dev
 region: tor
 domains:
   - domain: dev.yasakia.com

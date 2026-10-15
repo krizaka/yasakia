@@ -180,11 +180,10 @@ Dockerfile does the same. The version in its footer is `package.json`'s plus the
 
 One App Platform app, `deploy/digitalocean/web.app.yaml`, one `basic-xxs` service (**$5/month**) behind two hosts: `dev.yasakia.com`
 (the landing at `/`, the legal pages, the person's space under `/app`, the API) and `admin.yasakia.com` (the console, `APP_ADMIN_HOST`,
-$0 more). The app is the one created for the static landing (`yasakia-site`: an app cannot be renamed), converted in place.
+$0 more). The app is `yasakia-dev`, created as a service.
 
-- **Why no static-site component**: observed — any deployment of an app that has a static site stalls on
-  `DatabaseTrustedSourcesNotReady` once the app is a trusted source of the shared cluster (even a static-only rollback). A
-  service-only app deploys. So the landing is plain files in the service's `public/`.
+- **Why no static-site component**: an app created for a static site never joined the trusted-source networking (every deployment
+  stalled on `DatabaseTrustedSourcesNotReady`); an app created as a service deploys. So the landing is plain files in the service's `public/`.
 - **Cost**: the service; the `migrate` PRE_DEPLOY job is billed only while it runs; the database is `yasakia_db` and the role
   `yasakia_user` on the shared dev cluster `krizaka-dev-pg` (no second cluster).
 - **Secrets** (type SECRET, entered once, never printed): `AUTH_SESSION_SECRET`, `DATABASE_ENCRYPTION_KEY`, `DATABASE_URL` and
