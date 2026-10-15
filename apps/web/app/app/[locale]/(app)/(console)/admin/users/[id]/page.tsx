@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AccountActions } from "@/components/console/AccountActions";
 import { UserActions } from "@/components/console/UserActions";
 import { userDetail } from "@/lib/admin-users";
 import { auditFor } from "@/lib/audit";
@@ -25,7 +26,8 @@ const TONE = { ACTIVE: "success", PAUSED: "neutral", SUSPENDED: "danger" } as co
 export default async function UserPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale: raw, id } = await params;
   const locale = asLocale(raw);
-  if (!(await pageAdmin()) || !isUuid(id)) notFound();
+  const admin = await pageAdmin();
+  if (!admin || !isUuid(id)) notFound();
   const user = await userDetail(id);
   if (!user) notFound();
   const t = translator(locale);
@@ -74,6 +76,7 @@ export default async function UserPage({ params }: { params: Promise<{ locale: s
           <Stat label={d.user.reports} value={user.counts.openReportsAgainst} />
           <Stat label={d.user.sessions} value={user.counts.liveSessions} />
         </div>
+        <AccountActions id={user.id} email={user.email} role={user.role} self={admin.account.id === user.id} />
         <section aria-labelledby="activity" className="flex flex-col gap-3">
           <h2 id="activity" className="font-display text-lg font-bold text-fg">
             {d.user.activityTitle}

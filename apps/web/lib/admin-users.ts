@@ -5,6 +5,7 @@ import { audit } from "./audit";
 import { type AdminActor } from "./console-access";
 import { refuse } from "./http";
 import { hasPassword } from "./password-auth";
+import { revokeWebSessions } from "./web-session";
 
 /**
  * The administration console's view of people: a searchable, filterable, sortable, paged list (the DataTable's server
@@ -145,4 +146,41 @@ export async function restoreUser(targetId: string, actor: AdminActor, headers: 
     throw exists ? refuse(409, "NOT_SUSPENDED", "This account is not suspended") : refuse(404, "NOT_FOUND", "Not found");
   }
   await audit({ action: "admin.restore", actorId: actor.id, actorLabel: actor.label, targetId, headers });
+}
+
+/** What an operator may do to whom — pure, so the routes and the tests share it. Returns the refusal code, or null. */
+export function adminActionRefusal(action: "revoke" | "role" | "delete", actorId: string | null, target: { id: string; role: "USER" | "ADMIN" }, admins: number, nextRole?: "USER" | "ADMIN"): "SELF" | "TARGET_IS_ADMIN" | "LAST_ADMIN" | null {
+  if (actorId === target.id) return "SELF";
+  if (action === "role" && target.role === "ADMIN" && nextRole === "USER" && admins <= 1) return "LAST_ADMIN";
+  if (action === "delete" && target.role === "ADMIN") return "TARGET_IS_ADMIN";
+  return null;
+}
+
+async function target(targetId: string): Promise<{ id: string; role: "USER" | "ADMIN"; email: string }> {
+  const [row] = await db.select({ id: accounts.id, role: accounts.role, email: accounts.email }).from(accounts).where(eq(accounts.id, targetId)).limit(1);
+  if (!row) throw refuse(404, "NOT_FOUND", "Not found");
+  return row;
+}
+
+const countAdmins = async () => (await db.select({ n: count() }).from(accounts).where(and(eq(accounts.role, "ADMIN"), eq(accounts.status, "ACTIVE"))))[0].n;
+
+/** Ends every session of an account — the browser's and the app's — without suspending it (a lost phone, a doubt). */
+export async function revokeUserSessions(targetId: string, actor: AdminActor, headers: Headers): Promise<{ revoked: number }> {
+  const who = await target(targetId);
+  const refusal = adminActionRefusal("revoke", actor.id, who, 0);
+  if (refusal) throw refuse(409, refusal, "You cannot do this to your own account");
+  await db.update(accounts).set({ sessionVersion: sql`${accounts.sessionVersion} + 1`, updatedAt: new Date() }).where(eq(accounts.id, targetId));
+  const revoked = await revokeWebSessions(targetId);
+  await audit({ action: "admin.sessions_revoked", actorId: actor.id, actorLabel: actor.label, targetId, detail: { revoked }, headers });
+  return { revoked };
+}
+
+/** Grants or withdraws the administrator role. Never on yourself; the last administrator keeps it. */
+export async function setUserRole(targetId: string, role: "USER" | "ADMIN", actor: AdminActor, headers: Headers): Promise<void> {
+  const who = await target(targetId);
+  if (who.role === role) return;
+  const refusal = adminActionRefusal("role", actor.id, who, await countAdmins(), role);
+  if (refusal) throw refuse(409, refusal, refusal === "LAST_ADMIN" ? "The last administrator keeps the role" : "You cannot do this to your own account");
+  await db.update(accounts).set({ role, updatedAt: new Date() }).where(eq(accounts.id, targetId));
+  await audit({ action: "admin.role", actorId: actor.id, actorLabel: actor.label, targetId, detail: { from: who.role, to: role }, headers });
 }

@@ -5,6 +5,7 @@ import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { audit } from "./audit";
 import { type AdminActor } from "./console-access";
 import { refuse } from "./http";
+import { connectionBudget, queues } from "./operations";
 import { realtimeConnected } from "./realtime";
 import { detailsContext, URGENT_REASONS } from "./reports";
 
@@ -103,7 +104,11 @@ const STARTED = Date.now();
 
 export async function healthReport() {
   const database = await checkDbHealth();
+  // Both need the database: when it does not answer, the page still says so rather than failing.
+  const [connections, waiting] = database ? await Promise.all([connectionBudget().catch(() => null), queues().catch(() => null)]) : [null, null];
   return {
+    connections,
+    queues: waiting,
     status: database ? "ok" : "degraded",
     database,
     realtime: realtimeConnected() ? "connected" : "idle",

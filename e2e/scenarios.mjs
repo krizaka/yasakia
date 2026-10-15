@@ -576,6 +576,22 @@ let adaPhoto;
   check("admin: restoring an active account is refused (NOT_SUSPENDED)", (await web(`/api/admin/users/${someone.id}/restore`, { method: "POST", cookie: adminIn.cookie, ip: ADMIN_IP_HEADER })).json.code === "NOT_SUSPENDED");
   const audit = await web(`/api/admin/audit?size=50&action=admin.suspend,admin.restore&search=${encodeURIComponent("qa+admin")}`, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
   check("audit: the suspension and the restoration are logged with who did it and why", audit.json.rows?.some((r) => r.action === "admin.suspend" && r.targetId === someone.id && r.detail?.reason?.includes("e2e")) && audit.json.rows.some((r) => r.action === "admin.restore" && r.targetId === someone.id), audit.json);
+  // Account actions: end the sessions, change the role, erase (Law 25).
+  {
+    const asAdmin = (path, init = {}) => web(path, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, ...init });
+    const target = await signUp("erasable");
+    check("admin: ending the sessions of an account works and the app token dies at once", (await asAdmin(`/api/admin/users/${target.id}/sessions`, { method: "POST" })).status === 200 && [401, 403].includes((await call("/api/me", { token: target.token })).status));
+    check("admin: you cannot end your own sessions (SELF)", (await asAdmin(`/api/admin/users/${adminIn.json.account.id}/sessions`, { method: "POST" })).json.code === "SELF");
+    check("admin: a role outside the list is refused", (await asAdmin(`/api/admin/users/${target.id}/role`, { method: "POST", body: { role: "OWNER" } })).status === 400);
+    check("admin: you cannot change your own role (SELF)", (await asAdmin(`/api/admin/users/${adminIn.json.account.id}/role`, { method: "POST", body: { role: "USER" } })).json.code === "SELF");
+    check("admin: the administrator role is granted and withdrawn", (await asAdmin(`/api/admin/users/${target.id}/role`, { method: "POST", body: { role: "ADMIN" } })).status === 200 && (await sql("select role from accounts where id = $1", [target.id]))[0].role === "ADMIN" && (await asAdmin(`/api/admin/users/${target.id}/role`, { method: "POST", body: { role: "USER" } })).status === 200 && (await sql("select role from accounts where id = $1", [target.id]))[0].role === "USER");
+    check("admin: erasing with the wrong e-mail is refused (CONFIRM_MISMATCH)", (await asAdmin(`/api/admin/users/${target.id}`, { method: "DELETE", body: { confirmEmail: "someone@else.test" } })).json.code === "CONFIRM_MISMATCH");
+    check("admin: you cannot erase your own account (SELF)", (await asAdmin(`/api/admin/users/${adminIn.json.account.id}`, { method: "DELETE", body: { confirmEmail: QA_ADMIN.email } })).json.code === "SELF");
+    const email = (await sql("select email from accounts where id = $1", [target.id]))[0].email;
+    check("admin: erasing with the e-mail typed deletes the account and what it owns", (await asAdmin(`/api/admin/users/${target.id}`, { method: "DELETE", body: { confirmEmail: email } })).status === 200 && (await sql("select 1 from accounts where id = $1", [target.id])).length === 0);
+    const acted = await asAdmin(`/api/admin/audit?size=50&action=admin.sessions_revoked,admin.role,admin.delete&search=${encodeURIComponent("qa+admin")}`);
+    check("audit: the three actions are logged with who did them", ["admin.sessions_revoked", "admin.role", "admin.delete"].every((a) => acted.json.rows?.some((r) => r.action === a && r.targetId === target.id)), acted.json.rows?.map((r) => r.action).join(","));
+  }
   const refusedLog = await web("/api/admin/audit?action=auth.sign_in_refused&size=5", { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER });
   check("audit: refused sign-ins are logged too", refusedLog.json.rows?.length > 0);
   check("audit: the operator token reads the same API (no account)", (await call("/api/admin/users?size=1", { token: ADMIN_TOKEN, ip: ADMIN_IP })).status === 200);
@@ -600,6 +616,7 @@ let adaPhoto;
     const ov = await asAdmin("/api/admin/overview");
     check("overview: counts of accounts, reports, introductions and batches", ov.status === 200 && typeof ov.json.reports.open === "number" && typeof ov.json.intros.OPEN === "number" && ov.json.accounts.active > 0);
     const hl = await asAdmin("/api/admin/health");
+    check("health: the pool and the connections are shown against their budget, with the queues", hl.json.connections?.pool?.max >= 1 && hl.json.connections.limit > 0 && typeof hl.json.queues?.openReports === "number");
     check("health: the database answers and the version is told", hl.status === 200 && hl.json.database === true && typeof hl.json.version === "string" && hl.json.signupOpen === true);
     check("health, overview, intros: refused to a person (403)", (await web("/api/admin/health", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403 && (await web("/api/admin/overview", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403);
     for (const p of ["/app/en/admin", "/app/en/admin/reports", "/app/fr/admin/intros", "/app/en/admin/health"]) {
