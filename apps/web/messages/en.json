@@ -283,7 +283,9 @@
       "load": "We could not load this. Try again.",
       "retry": "Try again",
       "network": "No connection. Check your network and try again.",
-      "CODE_INVALID": "This code is not valid any more. Ask for a new one."
+      "CODE_INVALID": "This code is not valid any more. Ask for a new one.",
+      "LAST_ADMIN": "The last administrator keeps the role.",
+      "CONFIRM_MISMATCH": "The e-mail typed does not match the account."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -537,7 +539,20 @@
         "activityLabel": "Audit lines about this account",
         "activityEmpty": "Nothing recorded yet.",
         "viewAudit": "Open the audit log",
-        "notFound": "This account does not exist."
+        "notFound": "This account does not exist.",
+        "revokeSessions": "End all sessions",
+        "revokeConfirm": "Sure? End every session",
+        "sessionsRevoked": "Sessions ended: {count}.",
+        "makeAdmin": "Make administrator",
+        "makeAdminConfirm": "Sure? Make administrator",
+        "makeUser": "Withdraw administrator role",
+        "makeUserConfirm": "Sure? Withdraw the role",
+        "accountActions": "Account actions",
+        "selfNote": "This is your own account: it cannot be changed from here.",
+        "eraseTitle": "Erase this account",
+        "eraseLead": "Law 25 erasure: the account and everything that is theirs are deleted now, their photos within 30 days at most; they get a confirmation e-mail. The audit log keeps the fact, not the person. Their export, if they want one, is theirs to download from their own account.",
+        "eraseConfirm": "Type the account's e-mail to confirm",
+        "eraseSubmit": "Erase the account"
       },
       "audit": {
         "title": "Audit log",
@@ -561,7 +576,10 @@
           "auth.password_changed": "Password changed",
           "account.deleted": "Account deleted",
           "admin.suspend": "Account suspended",
-          "admin.restore": "Account restored"
+          "admin.restore": "Account restored",
+          "admin.sessions_revoked": "Sessions ended",
+          "admin.role": "Role changed",
+          "admin.delete": "Account erased by an operator"
         }
       },
       "table": {
@@ -682,7 +700,18 @@
         "up": "Answering",
         "down": "Not answering",
         "minutes": "{count} min",
-        "hours": "{count} h"
+        "hours": "{count} h",
+        "poolTitle": "Database budget",
+        "pool": "This instance's pool: {busy} busy of {max} ({open} open)",
+        "connections": "Connections on the database: {open} of {limit}",
+        "waiting": "{count} waiting. A waiting request means the pool is the bottleneck.",
+        "queuesTitle": "What is waiting",
+        "openReports": "Open reports",
+        "urgentReports": "Urgent reports",
+        "photosPending": "Photos awaiting moderation",
+        "purgesPending": "Erasures with media still to delete",
+        "purgesFailing": "Erasures whose purge failed",
+        "refusedSignIns": "Refused sign-ins, last 24 h"
       }
     },
     "reset": {

@@ -283,7 +283,9 @@
       "load": "Impossible de charger ceci. Réessaie.",
       "retry": "Réessayer",
       "network": "Pas de connexion. Vérifie ton réseau et réessaie.",
-      "CODE_INVALID": "Ce code n’est plus valide. Demande-en un nouveau."
+      "CODE_INVALID": "Ce code n’est plus valide. Demande-en un nouveau.",
+      "LAST_ADMIN": "Le dernier administrateur garde son rôle.",
+      "CONFIRM_MISMATCH": "Le courriel saisi ne correspond pas au compte."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -537,7 +539,20 @@
         "activityLabel": "Lignes du journal à propos de ce compte",
         "activityEmpty": "Rien d’enregistré pour l’instant.",
         "viewAudit": "Ouvrir le journal d’audit",
-        "notFound": "Ce compte n’existe pas."
+        "notFound": "Ce compte n’existe pas.",
+        "revokeSessions": "Terminer toutes les sessions",
+        "revokeConfirm": "Sûr ? Terminer toutes les sessions",
+        "sessionsRevoked": "Sessions terminées : {count}.",
+        "makeAdmin": "Nommer administrateur",
+        "makeAdminConfirm": "Sûr ? Nommer administrateur",
+        "makeUser": "Retirer le rôle d'administrateur",
+        "makeUserConfirm": "Sûr ? Retirer le rôle",
+        "accountActions": "Actions sur le compte",
+        "selfNote": "C'est votre propre compte : il ne peut pas être modifié d'ici.",
+        "eraseTitle": "Effacer ce compte",
+        "eraseLead": "Effacement Loi 25 : le compte et tout ce qui lui appartient sont supprimés maintenant, ses photos sous 30 jours au plus ; la personne reçoit un courriel de confirmation. Le journal d'audit garde le fait, pas la personne. Son export, si elle le souhaite, lui appartient : elle le télécharge depuis son propre compte.",
+        "eraseConfirm": "Saisissez le courriel du compte pour confirmer",
+        "eraseSubmit": "Effacer le compte"
       },
       "audit": {
         "title": "Journal d’audit",
@@ -561,7 +576,10 @@
           "auth.password_changed": "Mot de passe changé",
           "account.deleted": "Compte supprimé",
           "admin.suspend": "Compte suspendu",
-          "admin.restore": "Compte rétabli"
+          "admin.restore": "Compte rétabli",
+          "admin.sessions_revoked": "Sessions terminées",
+          "admin.role": "Rôle modifié",
+          "admin.delete": "Compte effacé par un opérateur"
         }
       },
       "table": {
@@ -682,7 +700,18 @@
         "up": "Répond",
         "down": "Ne répond pas",
         "minutes": "{count} min",
-        "hours": "{count} h"
+        "hours": "{count} h",
+        "poolTitle": "Budget de la base de données",
+        "pool": "Réserve de cette instance : {busy} occupées sur {max} ({open} ouvertes)",
+        "connections": "Connexions sur la base : {open} sur {limit}",
+        "waiting": "{count} en attente. Une requête en attente signifie que la réserve est le goulot.",
+        "queuesTitle": "Ce qui attend",
+        "openReports": "Signalements ouverts",
+        "urgentReports": "Signalements urgents",
+        "photosPending": "Photos en attente de modération",
+        "purgesPending": "Effacements dont les médias restent à supprimer",
+        "purgesFailing": "Effacements dont la purge a échoué",
+        "refusedSignIns": "Connexions refusées, 24 h"
       }
     },
     "reset": {
