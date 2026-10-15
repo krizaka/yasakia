@@ -45,7 +45,7 @@ export function DashboardView({ initial }: { initial: DashboardDto }) {
     useLiveInvalidation(live, { [type]: [keys.me()] }, { channel: type });
   }
   const d = query.data;
-  const home = `/${locale}`;
+  const home = `/app/${locale}`;
   const batchOpen = d.batch !== null;
   return (
     <DashboardLayout

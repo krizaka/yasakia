@@ -36,7 +36,7 @@ export default async function UserPage({ params }: { params: Promise<{ locale: s
   const actions = d.audit.actions as Record<string, string>;
   return (
     <DetailLayout
-      back={<Link href={`/${locale}/admin/users`}>{d.user.back}</Link>}
+      back={<Link href={`/app/${locale}/admin/users`}>{d.user.back}</Link>}
       eyebrow={d.user.eyebrow}
       title={user.email}
       status={
@@ -94,7 +94,7 @@ export default async function UserPage({ params }: { params: Promise<{ locale: s
           ) : (
             <p className="text-sm text-fg-secondary">{d.user.activityEmpty}</p>
           )}
-          <Link className="w-fit text-sm font-semibold text-fg-accent" href={`/${locale}/admin/audit`}>
+          <Link className="w-fit text-sm font-semibold text-fg-accent" href={`/app/${locale}/admin/audit`}>
             {d.user.viewAudit}
           </Link>
         </section>

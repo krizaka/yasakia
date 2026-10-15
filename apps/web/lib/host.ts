@@ -17,14 +17,15 @@ export function hostKind(headers: Headers, env: Record<string, string | undefine
   return host === admin ? "admin" : "app";
 }
 
-const LOCALE = /^\/(en|fr)(?=\/|$)/;
+/** The console lives under `/app/{en|fr}/…` (the landing page owns `/`, `/fr`, `/how-it-works`, `/demo`). */
+export const isAdminPath = (pathname: string) => /^\/app\/(?:en|fr)\/admin(?:\/|$)/.test(pathname) || pathname === "/api/admin" || pathname.startsWith("/api/admin/");
 
-/** Paths are read without the app's base path (Next strips it). */
-export const isAdminPath = (pathname: string) => /^\/(?:(?:en|fr)\/)?admin(?:\/|$)/.test(pathname) || pathname === "/api/admin" || pathname.startsWith("/api/admin/");
-
-/** What the admin host serves: the sign-in page, the admin pages, the sign-in/out and admin APIs, the health check. */
+/** What the admin host serves: the administration, the sign-in, the sign-in/out and admin APIs, the health check. */
 export function allowedOnAdminHost(pathname: string): boolean {
   if (isAdminPath(pathname)) return true;
   if (pathname === "/api/healthz" || pathname.startsWith("/api/auth/") || pathname === "/api/events") return true;
-  return LOCALE.test(pathname) && /^\/(en|fr)\/sign-in\/?$/.test(pathname);
+  return /^\/app\/(en|fr)\/sign-in\/?$/.test(pathname);
 }
+
+/** The pages of the public landing (English at the root, French under /fr), with or without a trailing slash. */
+export const isLandingPath = (pathname: string) => /^\/(?:fr\/)?(?:(?:how-it-works|demo)\/?)?$/.test(pathname) || pathname === "/fr";

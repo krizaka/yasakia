@@ -224,26 +224,28 @@ yasakia/                           npm workspaces — Apache-2.0
 
 ### 6.1 The public dev site — `apps/site` (dev.yasakia.com)
 
-- A **static export** (`output: "export"`, no server, no database, no secret) on a DigitalOcean App Platform **static
-  site** (free), project `yasakia`, spec `deploy/digitalocean/web.app.yaml` (the same app that serves `/app`, §6.2). Three pages — landing, how it works, demo —
-  English at the root, French under `/fr`. Built from the same bricks (`@krizaka/ui` `LandingPage`, `HowItWorksPage`,
-  `PageHero`), strings in `apps/site/messages/{en,fr}.json`, the same lint rules and ratchet.
-- **It never offers what does not exist**: no sign-up, login, download, store button or waiting list (nothing to sign up
-  to: sign-up is closed by `AUTH_SIGNUP_ENABLED=false`, and the app under `/app` is for the people who test it), no
-  invented profile or figure. Media come from the CDN only (`apps/site/lib/media.ts`, hashed).
-- The footer shows « A Krizaka product » (→ krizaka.com) and the build's version, `APP_VERSION` = `package.json`
-  version + short commit (`next.config.mjs`; DigitalOcean passes the commit as `APP_COMMIT_SHA`).
-- `npm run build:site` builds it (CI too); `npm run dev:site` serves it on :3002.
+- A **static export** (`output: "export"`, built with `assetPrefix: "/site-assets"`) — three pages: landing, how it works, demo —, English
+  at the root, French under `/fr`. It is **served by the web service** (one DigitalOcean deployment, §6.2): `scripts/sync-site.mjs`
+  copies `apps/site/out` into the git-ignored `apps/web/public` (pages and root files at their paths, chunks under `/site-assets`)
+  and `apps/web/next.config.mjs` maps each address to its file (`LANDING_PAGES`, trailing slash kept: `skipTrailingSlashRedirect`).
+  URLs, canonical, sitemap, robots, llms.txt and JSON-LD are unchanged. Built from the same bricks (`@krizaka/ui` `LandingPage`,
+  `HowItWorksPage`, `PageHero`), strings in `apps/site/messages/{en,fr}.json`, the same lint rules and ratchet.
+- **It never offers what does not exist**: no sign-up, no download, store button or waiting list (sign-up is closed by
+  `AUTH_SIGNUP_ENABLED=false`; the people who test sign in under `/app`), no invented profile or figure. Media come from the CDN only
+  (`apps/site/lib/media.ts`, hashed; the web app's CSP allows that one host).
+- The footer shows « A Krizaka product » (→ krizaka.com) and the build's version, `APP_VERSION` = `package.json` version + short
+  commit (`APP_COMMIT_SHA`, passed at build).
+- `npm run build` builds the site, syncs it and builds the web app; `npm run dev:site` serves the site alone on :3002.
 
----
-
-### 6.2 The signed-in console — `apps/web` (app.yasakia.com · admin.yasakia.com)
+### 6.2 The signed-in console — `apps/web` (dev.yasakia.com/app · admin.yasakia.com)
 
 - **What it is**: the person's space and the administration console, one Next.js app, **two hosts**: `app.yasakia.com` (the
   person) and `admin.yasakia.com` (the administration — `APP_ADMIN_HOST`, `lib/host.ts`, `proxy.ts`: on the admin host only the
   administration exists, on any other host it is a 404, so the console costs nothing more). Its own DigitalOcean app
-  (`deploy/digitalocean/web.app.yaml`, project `yasakia`): a deployment of an app that holds a static site stalls once the app is
-  a trusted source of the shared cluster, so it is not a component of the static site's app. Pages (`app/[locale]/(app)`):
+  (`deploy/digitalocean/web.app.yaml`, project `yasakia`), which also serves the public landing (§6.1): an app that holds a *static
+  site* component stalls on deploy once it is a trusted source of the shared cluster, so the landing is files served by the service.
+  URLs: the landing at `/`, `/fr`, `/how-it-works`, `/demo`; the legal pages at `/{en|fr}/{privacy|terms|delete-account}`; the
+  console under **`/app/{en|fr}/…`** (`app/app/[locale]/(app)`): 
   `sign-in`, the home (`/`), `account`, and the administration — `admin` (overview), `admin/users` (+ detail), `admin/reports`
   (moderation), `admin/intros`, `admin/audit`, `admin/health` (health + version) — under AppShell, a DEV badge, never indexed.
   Built **only** from our bricks:

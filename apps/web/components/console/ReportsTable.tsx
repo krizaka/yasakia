@@ -73,7 +73,7 @@ export function ReportsTable() {
   const when = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
   const who = (id: string | null) =>
     id ? (
-      <Link className="font-mono text-xs text-fg-accent underline-offset-4 hover:underline" href={`/${locale}/admin/users/${id}`}>
+      <Link className="font-mono text-xs text-fg-accent underline-offset-4 hover:underline" href={`/app/${locale}/admin/users/${id}`}>
         {id.slice(0, 8)}
       </Link>
     ) : (

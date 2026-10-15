@@ -55,7 +55,7 @@ export function AuditTable() {
         id: "target",
         header: say("admin.audit.target"),
         value: (r) => r.targetId ?? "",
-        cell: (r) => (r.targetId ? <Link className="font-mono text-xs text-fg-accent underline-offset-4 hover:underline" href={`/${locale}/admin/users/${r.targetId}`}>{r.targetId.slice(0, 8)}</Link> : "—"),
+        cell: (r) => (r.targetId ? <Link className="font-mono text-xs text-fg-accent underline-offset-4 hover:underline" href={`/app/${locale}/admin/users/${r.targetId}`}>{r.targetId.slice(0, 8)}</Link> : "—"),
       },
       { id: "detail", header: say("admin.audit.detail"), value: (r) => (r.detail ? Object.values(r.detail).join(" · ") : ""), cell: (r) => (r.detail ? Object.values(r.detail).join(" · ") : "—") },
       { id: "ip", header: say("admin.audit.ip"), value: (r) => r.ip ?? "", cell: (r) => <span className="font-mono text-xs">{r.ip ?? "—"}</span> },

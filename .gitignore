@@ -46,3 +46,6 @@ apps/web/next-env.d.ts
 .next-e2e-closed/
 .next-closed/
 .vitest/
+
+# The landing's static export, copied by scripts/sync-site.mjs
+apps/web/public/

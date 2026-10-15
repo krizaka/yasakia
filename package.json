@@ -10,7 +10,7 @@
   "scripts": {
     "setup": "node scripts/setup.mjs",
     "dev": "npm run dev --workspace=apps/web",
-    "build": "npm run build -w apps/web",
+    "build": "npm run build:site && node scripts/sync-site.mjs && npm run build -w apps/web",
     "start": "npm run start -w apps/web",
     "lint": "npm run lint --workspaces --if-present && npm run check:i18n && npm run ratchet",
     "check:i18n": "krizaka-i18n check apps/web/messages && krizaka-i18n check apps/web/messages/errors && krizaka-i18n scan apps/web/app apps/web/components --allow Yasakia,YASAKIA,Krizaka,KRIZAKA,Bunny --skip /app/api/ && krizaka-i18n check apps/site/messages && krizaka-i18n scan apps/site/app apps/site/components --allow Yasakia,YASAKIA,Krizaka,KRIZAKA,Bunny",

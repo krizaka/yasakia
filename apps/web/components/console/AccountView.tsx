@@ -82,7 +82,7 @@ export function AccountView({ account }: { account: AccountDto }) {
   const remove = useMutation({
     mutationFn: () => krizakaFetch("/api/me", { method: "DELETE" }),
     onSuccess: () => {
-      router.replace(`/${locale}/sign-in`);
+      router.replace(`/app/${locale}/sign-in`);
       router.refresh();
     },
     onError: (e) => fail("delete", e),
@@ -94,7 +94,7 @@ export function AccountView({ account }: { account: AccountDto }) {
     onSubmit: async (values) => {
       try {
         await saveProfile.mutateAsync(values);
-        if (values.locale !== locale) router.replace(`/${values.locale}/account`);
+        if (values.locale !== locale) router.replace(`/app/${values.locale}/account`);
         else {
           say2("profile", "success", say("account.profile.saved"));
           router.refresh();

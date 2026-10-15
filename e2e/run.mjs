@@ -62,6 +62,10 @@ if (process.env.APP_URL) {
   run("npm", ["run", "db:qa-accounts", "--silent"], { env });
   ok("migrated and seeded");
 
+  step("The public landing (apps/site export → apps/web/public)");
+  run("npm", ["run", "build:site", "--silent"]);
+  run("node", ["scripts/sync-site.mjs"]);
+
   step("API on :3100 (next dev, its own build folder)");
   const port = 3100;
   const server = spawn("npx", ["next", "dev", "--port", String(port)], {
