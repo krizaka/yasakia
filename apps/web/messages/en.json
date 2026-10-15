@@ -569,6 +569,7 @@
         "loading": "Loading",
         "empty": "Nothing to show",
         "details": "Details",
+        "showMore": "Show more about {name}",
         "filters": "Filter the table",
         "clear": "Clear filters",
         "removeFilter": "Remove {label}",

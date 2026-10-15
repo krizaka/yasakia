@@ -11,6 +11,7 @@ export function tableLabels(say: Say): DataTableLabels {
     loading: k("loading"),
     empty: k("empty"),
     details: k("details"),
+    showMore: (name) => k("showMore", { name }),
     expandRow: (name) => name,
     group: (value, count) => `${value} (${count})`,
     resize: (header) => header,
