@@ -56,7 +56,31 @@
     "closingTitle": "Construit à ciel ouvert",
     "closingLead": "Yasakia est open source, sur les mêmes fondations qu'Orochia et Orazaka. Lisez le code, ou dites-nous ce que vous attendez d'une appli de rencontre.",
     "closingSource": "Code source",
-    "closingContact": "Parler de Yasakia avec nous"
+    "closingContact": "Parler de Yasakia avec nous",
+    "works": {
+      "label": "Ce qui fonctionne aujourd’hui",
+      "lead": "Pas encore publié, mais ces parties tournent déjà dans le code, testées dans le code.",
+      "items": {
+        "location": {
+          "title": "Ta position, à environ 1 km près",
+          "text": "La position d’un téléphone est arrondie à une grille d’environ 1 km avant d’être enregistrée. La position exacte n’arrive jamais en base."
+        },
+        "radius": {
+          "title": "Des rencontres dans le rayon que tu choisis",
+          "text": "Tu choisis la distance acceptée, en kilomètres. Le filtre utilise earthdistance de PostgreSQL sur la position enregistrée."
+        },
+        "signin": {
+          "title": "Connexion par code par courriel ou mot de passe",
+          "text": "Un code à 6 chiffres arrive par courriel, ou connecte-toi avec un mot de passe. Un mot de passe oublié se réinitialise par code, et les autres sessions prennent fin."
+        },
+        "batches": {
+          "title": "Des lots de trois à cinq personnes",
+          "text": "La logique des lots est en construction ; elle n’est pas encore publiée."
+        }
+      },
+      "working": "Fonctionne",
+      "development": "En construction"
+    }
   },
   "how": {
     "title": "Comment ça marche",

@@ -56,7 +56,31 @@
     "closingTitle": "Built in the open",
     "closingLead": "Yasakia is open source, on the same foundations as Orochia and Orazaka. Read the code, or tell us what you expect from a dating app.",
     "closingSource": "Source code",
-    "closingContact": "Talk to us about Yasakia"
+    "closingContact": "Talk to us about Yasakia",
+    "works": {
+      "label": "What works today",
+      "lead": "Not released yet, but these parts already run in the code, tested in the code.",
+      "items": {
+        "location": {
+          "title": "Your location, about 1 km",
+          "text": "A phone's position is rounded to a grid of about 1 km before it is stored. The exact one never reaches the database."
+        },
+        "radius": {
+          "title": "Matching inside the radius you choose",
+          "text": "You set the distance you accept, in kilometres. Matching uses PostgreSQL's earthdistance on the stored position."
+        },
+        "signin": {
+          "title": "Sign in by e-mail code or password",
+          "text": "A 6-digit code arrives by e-mail, or sign in with a password. A forgotten password is reset by code, and every other session ends."
+        },
+        "batches": {
+          "title": "Batches of three to five people",
+          "text": "The batch logic is being built; it is not released yet."
+        }
+      },
+      "working": "Working today",
+      "development": "In development"
+    }
   },
   "how": {
     "title": "How it works",
