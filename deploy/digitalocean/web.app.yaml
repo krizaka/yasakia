@@ -1,0 +1,59 @@
+# Yasakia's web app — app.yasakia.com (the person's space) and admin.yasakia.com (the administration console): ONE App
+# Platform app, host-based (APP_ADMIN_HOST), so the console costs nothing more. Project "yasakia".
+#   doctl apps create --spec deploy/digitalocean/web.app.yaml      # SECRET values are entered once, never printed
+# Why its own app (and not a component of the static site's `yasakia-site`): a deployment of an app that has a static site
+# STALLS (DatabaseTrustedSourcesNotReady) as soon as the app is a trusted source of the shared cluster — proven on a
+# static-only rollback. A service-only app deploys fine (as yomizaka-dev, orazaka-dev do). The shared cluster is NOT a
+# `databases:` component: its private connection string and CA are SECRETs, and the app is added to the cluster's trusted
+# sources (`doctl databases firewalls append <cluster> --rule app:<app-id>`) once created.
+# Needs a free App Platform slot (the account is capped at 10 apps). Cost: one basic-xxs service ($5/month); the
+# `migrate` PRE_DEPLOY job is billed while it runs.
+name: yasakia-web
+region: tor
+domains:
+  - domain: app.yasakia.com
+    type: PRIMARY
+  - domain: admin.yasakia.com
+    type: ALIAS
+services:
+  - name: web
+    github: { repo: krizaka/yasakia, branch: main, deploy_on_push: true }
+    dockerfile_path: deploy/docker/Dockerfile
+    source_dir: /
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    health_check: { http_path: /api/healthz, initial_delay_seconds: 20, period_seconds: 10, timeout_seconds: 5, failure_threshold: 3 }
+    routes:
+      - path: /
+    envs:
+      - { key: NODE_ENV, value: production }
+      - { key: NEXT_PUBLIC_APP_URL, scope: RUN_AND_BUILD_TIME, value: "https://app.yasakia.com" }
+      - { key: NEXT_PUBLIC_APP_ENV, scope: RUN_AND_BUILD_TIME, value: dev }
+      - { key: APP_COMMIT_SHA, scope: BUILD_TIME, value: "${_self.COMMIT_HASH}" }
+      - { key: APP_ADMIN_HOST, scope: RUN_TIME, value: admin.yasakia.com }
+      - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_CA_CERT, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_MAX_CONNECTIONS, scope: RUN_TIME, value: "4" }
+      - { key: AUTH_SESSION_SECRET, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_ENCRYPTION_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: AUTH_SIGNUP_ENABLED, scope: RUN_TIME, value: "false" }
+      - { key: AUTH_ALLOWED_IPS, scope: RUN_TIME, value: "142.122.41.109" }
+      - { key: MEDIA_STORAGE_PROVIDER, scope: RUN_TIME, value: none }
+      - { key: MAIL_PROVIDER, scope: RUN_TIME, value: none }
+      - { key: REALTIME_BUS, scope: RUN_TIME, value: postgres }
+      - { key: ABUSE_RATE_LIMIT_STORE, scope: RUN_TIME, value: postgres }
+      - { key: ABUSE_CLIENT_IP_HEADER, scope: RUN_TIME, value: do-connecting-ip }
+jobs:
+  - name: migrate
+    kind: PRE_DEPLOY
+    github: { repo: krizaka/yasakia, branch: main }
+    dockerfile_path: deploy/docker/Dockerfile
+    source_dir: /
+    run_command: node migrate.cjs
+    instance_size_slug: basic-xxs
+    envs:
+      - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, type: SECRET }
+      - { key: DATABASE_CA_CERT, scope: RUN_TIME, type: SECRET }

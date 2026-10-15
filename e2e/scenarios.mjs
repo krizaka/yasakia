@@ -580,6 +580,33 @@ let adaPhoto;
   check("audit: refused sign-ins are logged too", refusedLog.json.rows?.length > 0);
   check("audit: the operator token reads the same API (no account)", (await call("/api/admin/users?size=1", { token: ADMIN_TOKEN, ip: ADMIN_IP })).status === 200);
 
+  // Moderation, introductions, overview and health.
+  {
+    const asAdmin = (path, init = {}) => web(path, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, ...init });
+    check("moderation: a person is refused the queue (403)", (await web("/api/admin/report-queue", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403);
+    const queue = await asAdmin("/api/admin/report-queue?status=OPEN&size=50");
+    check("moderation: the queue lists open reports, urgent reasons first", queue.status === 200 && queue.json.rows.length > 0 && ["UNDERAGE", "THREAT"].includes(queue.json.rows[0].reason) && queue.json.rows[0].urgent === true, queue.json.rows?.map((r) => r.reason));
+    check("moderation: the list carries no free text, the details open one at a time", queue.json.rows.every((r) => !("details" in r) && !("detailsSealed" in r)));
+    const scam = queue.json.rows.find((r) => r.reason === "SCAM");
+    const opened = await asAdmin(`/api/admin/report-queue/${scam.id}`);
+    check("moderation: one report's words open for an administrator", opened.status === 200 && typeof opened.json.details === "string" && opened.json.details.length > 0);
+    check("moderation: a status outside the list is refused", (await asAdmin(`/api/admin/report-queue/${scam.id}`, { method: "PATCH", body: { status: "BANNED" } })).status === 400);
+    const moved = await asAdmin(`/api/admin/report-queue/${scam.id}`, { method: "PATCH", body: { status: "ACTIONED" } });
+    check("moderation: a report is moved to ACTIONED", moved.status === 200 && (await sql("select status, reviewed_at from reports where id = $1", [scam.id]))[0].status === "ACTIONED");
+    check("moderation: ...and the decision is in the audit log", (await asAdmin("/api/admin/audit?action=admin.report&size=10")).json.rows?.some((r) => r.detail?.status === "ACTIONED"));
+    check("moderation: a malformed id is a 404", (await asAdmin("/api/admin/report-queue/not-a-uuid")).status === 404);
+    const intro = await asAdmin("/api/admin/intros?state=OPEN&size=5");
+    check("introductions: the overview is paged, filtered by state, with message counts and no person", intro.status === 200 && intro.json.total >= 1 && intro.json.rows.every((r) => typeof r.messages === "number" && !("accountA" in r) && !("account_a" in r) && !("body" in r)), intro.json);
+    const ov = await asAdmin("/api/admin/overview");
+    check("overview: counts of accounts, reports, introductions and batches", ov.status === 200 && typeof ov.json.reports.open === "number" && typeof ov.json.intros.OPEN === "number" && ov.json.accounts.active > 0);
+    const hl = await asAdmin("/api/admin/health");
+    check("health: the database answers and the version is told", hl.status === 200 && hl.json.database === true && typeof hl.json.version === "string" && hl.json.signupOpen === true);
+    check("health, overview, intros: refused to a person (403)", (await web("/api/admin/health", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403 && (await web("/api/admin/overview", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403);
+    for (const p of ["/en/admin", "/en/admin/reports", "/fr/admin/intros", "/en/admin/health"]) {
+      check(`pages: ${p} renders for an administrator and is a 404 for a person`, (await web(p, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER })).status === 200 && (await web(p, { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 404);
+    }
+  }
+
   // The console's pages.
   const page = (p, cookie, ip) => web(p, { cookie, ip });
   check("pages: the sign-in page is served (200) and not indexed", (await page("/en/sign-in")).status === 200 && (await page("/en/sign-in")).text.includes("noindex"));

@@ -1,9 +1,10 @@
 "use client";
 
-import { ClockIcon, HomeIcon, LogoutIcon, SettingsIcon, UsersIcon } from "@krizaka/icons";
+import { ClockIcon, FlagIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
+import { Badge } from "@krizaka/ui/badge";
 import { Button } from "@krizaka/ui/button";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
@@ -18,7 +19,7 @@ const VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "";
  * phone, a header with the page's title), the person's destinations, and — only for an administrator on an allowed
  * address — the administration group. The page's own title is the header's h1.
  */
-export function ConsoleShell({ locale, email, admin, children }: { locale: "en" | "fr"; email: string; admin: boolean; children: React.ReactNode }) {
+export function ConsoleShell({ locale, email, admin, adminOnly = false, children }: { locale: "en" | "fr"; email: string; admin: boolean; adminOnly?: boolean; children: React.ReactNode }) {
   const { say } = useSay();
   const router = useRouter();
   const path = usePathname() ?? "";
@@ -37,9 +38,17 @@ export function ConsoleShell({ locale, email, admin, children }: { locale: "en" 
     ? "shell.audit"
     : path.startsWith(`${home}/admin/users`)
       ? "shell.users"
-      : path.startsWith(`${home}/account`)
-        ? "shell.account"
-        : "shell.dashboard";
+      : path.startsWith(`${home}/admin/reports`)
+        ? "shell.reports"
+        : path.startsWith(`${home}/admin/intros`)
+          ? "shell.intros"
+          : path.startsWith(`${home}/admin/health`)
+            ? "shell.health"
+            : path.startsWith(`${home}/admin`)
+              ? "shell.overview"
+              : path.startsWith(`${home}/account`)
+                ? "shell.account"
+                : "shell.dashboard";
   const item = (to: string, label: string, icon: React.ReactNode, exact = false) => (
     <AppShell.Item asChild label={label} icon={icon} current={current(to, exact)}>
       <Link href={to}>{label}</Link>
@@ -51,7 +60,7 @@ export function ConsoleShell({ locale, email, admin, children }: { locale: "en" 
         label={say("shell.sidebarLabel")}
         brand={
           <Link href={home} className="inline-flex items-center gap-2">
-            <YasakiaLogo size={24} animated={false} /> Yasakia
+            <YasakiaLogo size={24} animated={false} /> {adminOnly ? say("shell.adminBrand") : "Yasakia"}
           </Link>
         }
         closeLabel={say("shell.closeMenu")}
@@ -65,14 +74,22 @@ export function ConsoleShell({ locale, email, admin, children }: { locale: "en" 
           </div>
         }
       >
-        <AppShell.Group>{say("shell.groupYou")}</AppShell.Group>
-        {item(home, say("shell.dashboard"), <HomeIcon />, true)}
-        {item(`${home}/account`, say("shell.account"), <SettingsIcon />)}
+        {adminOnly ? null : (
+          <>
+            <AppShell.Group>{say("shell.groupYou")}</AppShell.Group>
+            {item(home, say("shell.dashboard"), <HomeIcon />, true)}
+            {item(`${home}/account`, say("shell.account"), <SettingsIcon />)}
+          </>
+        )}
         {admin ? (
           <>
             <AppShell.Group>{say("shell.groupAdmin")}</AppShell.Group>
+            {item(`${home}/admin`, say("shell.overview"), <ShieldIcon />, true)}
             {item(`${home}/admin/users`, say("shell.users"), <UsersIcon />)}
+            {item(`${home}/admin/reports`, say("shell.reports"), <FlagIcon />)}
+            {item(`${home}/admin/intros`, say("shell.intros"), <IntroIcon />)}
             {item(`${home}/admin/audit`, say("shell.audit"), <ClockIcon />)}
+            {item(`${home}/admin/health`, say("shell.health"), <ServerIcon />)}
           </>
         ) : null}
       </AppShell.Sidebar>
@@ -82,6 +99,11 @@ export function ConsoleShell({ locale, email, admin, children }: { locale: "en" 
           menuLabel={say("shell.openMenu")}
           actions={
             <>
+              {adminOnly ? (
+                <Badge tone="warning" size="sm">
+                  {say("shell.devBadge", { version: VERSION })}
+                </Badge>
+              ) : null}
               <Link href={`/${other}${rest}`} hrefLang={other} lang={other} className="rounded-md px-2 py-1 text-sm text-fg-secondary hover:text-fg">
                 <span className="sr-only">{say("shell.language")} · </span>
                 {say("shell.otherLanguage")}
