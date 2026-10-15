@@ -1,9 +1,9 @@
 /* Search engines and AI assistants (the Krizaka family contract, scripts/check-seo-family.mjs): canonical, hreflang, social
    cards and the JSON-LD of the site. Structure only; the words are messages. */
-import { indexable } from "./indexing";
 import type { Metadata } from "next";
 
 import { getDictionary, type Locale } from "./i18n";
+import { indexable } from "./indexing";
 import { KRIZAKA_URL, type PageId, pagePath, REPO_URL, SITE_URL } from "./site";
 
 /** The Krizaka Organization, defined by www.krizaka.com: every JSON-LD node of the family points back to it. */

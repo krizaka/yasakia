@@ -3,8 +3,8 @@ import { Page } from "@krizaka/ui/page";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
-import { indexable } from "@/lib/indexing";
 import { type Locale, otherLocale, translator } from "@/lib/i18n";
+import { indexable } from "@/lib/indexing";
 import { contactHref, LEGAL_PAGES, LEGAL_PATHS, type LegalPage, PRODUCT_URL, REPO_URL } from "@/lib/site";
 
 import { Rich } from "./Rich";

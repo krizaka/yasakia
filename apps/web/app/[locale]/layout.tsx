@@ -5,8 +5,8 @@ import { ThemeProvider, ThemeScript } from "@krizaka/ui/theme";
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
-import { indexable } from "@/lib/indexing";
 import { getDictionary, type Locale, LOCALES } from "@/lib/i18n";
+import { indexable } from "@/lib/indexing";
 
 export const viewport: Viewport = {
   width: "device-width",

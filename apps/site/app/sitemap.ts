@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
-import { indexable } from "../lib/indexing";
 import { LOCALES } from "../lib/i18n";
+import { indexable } from "../lib/indexing";
 import { pagePath, PAGES, SITE_URL } from "../lib/site";
 
 export const dynamic = "force-static";
