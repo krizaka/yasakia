@@ -13,7 +13,7 @@ This repository is Yasakia's **API** (Next.js route handlers), its **packages** 
 three **web pages** (privacy, terms, account deletion). The app for iOS and Android is
 [`krizaka/yasakia-mobile`](https://github.com/krizaka/yasakia-mobile). Yasakia is the third open-source product of
 [Krizaka](https://krizaka.com), built on the same foundations as Orochia and on the shared `@krizaka/*` bricks; its AI
-will run on [Orazaka](https://krizaka.com/products/orazaka).
+will run on Orazaka.
 
 ## Start
 
@@ -51,3 +51,7 @@ The rules every change keeps: [AGENTS.md](AGENTS.md). Contributing: [CONTRIBUTIN
 ## License
 
 [Apache-2.0](LICENSE) © Krizaka
+
+---
+
+<sub>A Krizaka product · [krizaka.com](https://www.krizaka.com) · Apache-2.0</sub>
