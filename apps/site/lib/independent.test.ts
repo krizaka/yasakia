@@ -15,7 +15,8 @@ function* walk(dir: string): Generator<string> {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) {
-      if (name === "node_modules") continue;
+      // The bundled client chunks (_next/) ship @krizaka/ui's site registry; what a visitor is given — the pages — is checked.
+      if (name === "node_modules" || name === "_next") continue;
       yield* walk(path);
     } else if (!/\.test\.[tj]sx?$/.test(name) && /\.(tsx?|jsx?|mjs|json|md|mdx|txt|html|css)$/.test(name)) yield path;
   }
