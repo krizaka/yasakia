@@ -1,17 +1,19 @@
-# Yasakia's web app — app.yasakia.com (the person's space) and admin.yasakia.com (the administration console): ONE App
-# Platform app, host-based (APP_ADMIN_HOST), so the console costs nothing more. Project "yasakia".
-#   doctl apps create --spec deploy/digitalocean/web.app.yaml      # SECRET values are entered once, never printed
-# Why its own app (and not a component of the static site's `yasakia-site`): a deployment of an app that has a static site
-# STALLS (DatabaseTrustedSourcesNotReady) as soon as the app is a trusted source of the shared cluster — proven on a
-# static-only rollback. A service-only app deploys fine (as yomizaka-dev, orazaka-dev do). The shared cluster is NOT a
-# `databases:` component: its private connection string and CA are SECRETs, and the app is added to the cluster's trusted
-# sources (`doctl databases firewalls append <cluster> --rule app:<app-id>`) once created.
-# Needs a free App Platform slot (the account is capped at 10 apps). Cost: one basic-xxs service ($5/month); the
-# `migrate` PRE_DEPLOY job is billed while it runs.
-name: yasakia-web
+# Yasakia on DigitalOcean — ONE App Platform app (project "yasakia"), one Next.js service:
+#   dev.yasakia.com     the public landing (apps/site's static export, copied into apps/web/public and served by the service),
+#                       the legal pages (/en/privacy…), the person's space (/app/{en|fr}/…) and the API (/api/*)
+#   admin.yasakia.com   the administration console (same service, APP_ADMIN_HOST: only the administration exists there)
+#   doctl apps update <APP_ID> --spec deploy/digitalocean/web.app.yaml   # SECRET values are entered once, never printed
+# History: the app was created for the static landing (`yasakia-site`, hence its name — an app cannot be renamed); converting
+# it in place keeps dev.yasakia.com up and the app count unchanged (the account is capped at 10). A deployment of an app that
+# holds a STATIC SITE stalls (DatabaseTrustedSourcesNotReady) once the app is a trusted source of the shared cluster, which is
+# why the landing is served by the service rather than as a static component. The shared cluster is not a `databases:`
+# component: its private connection string and CA are SECRETs, and the app is added to the cluster's trusted sources
+# (`doctl databases firewalls append <cluster> --rule app:<app-id>`). Cost: one basic-xxs service ($5/month); the `migrate`
+# PRE_DEPLOY job is billed only while it runs.
+name: yasakia-site
 region: tor
 domains:
-  - domain: app.yasakia.com
+  - domain: dev.yasakia.com
     type: PRIMARY
   - domain: admin.yasakia.com
     type: ALIAS
@@ -28,7 +30,7 @@ services:
       - path: /
     envs:
       - { key: NODE_ENV, value: production }
-      - { key: NEXT_PUBLIC_APP_URL, scope: RUN_AND_BUILD_TIME, value: "https://app.yasakia.com" }
+      - { key: NEXT_PUBLIC_APP_URL, scope: RUN_AND_BUILD_TIME, value: "https://dev.yasakia.com" }
       - { key: NEXT_PUBLIC_APP_ENV, scope: RUN_AND_BUILD_TIME, value: dev }
       - { key: APP_COMMIT_SHA, scope: BUILD_TIME, value: "${_self.COMMIT_HASH}" }
       - { key: APP_ADMIN_HOST, scope: RUN_TIME, value: admin.yasakia.com }

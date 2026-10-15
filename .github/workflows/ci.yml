@@ -36,11 +36,10 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
-      - name: Static site build (dev.yasakia.com)
-        run: npm run build:site
+      # `npm run build` above built the landing (apps/site, a static export) and copied it into apps/web/public (served by the web service).
       - name: SEO family contract (robots, AI crawlers, sitemap, llms.txt, canonical, JSON-LD back to Krizaka)
         run: |
-          python3 -m http.server 3000 --directory apps/site/out >/dev/null 2>&1 &
+          python3 -m http.server 3000 --directory apps/web/public >/dev/null 2>&1 &
           sleep 2
           node scripts/check-seo-family.mjs --base http://localhost:3000 --host https://dev.yasakia.com --types WebSite,SoftwareApplication
 
@@ -126,6 +125,8 @@ jobs:
           REALTIME_IT: "1"
           REALTIME_REDIS_URL: redis://localhost:6379
       - run: npm run db:seed
+      - name: The public landing (the web service serves it from apps/web/public)
+        run: npm run build:site && node scripts/sync-site.mjs
       - name: Console test accounts (passwords drawn for this run, never printed)
         run: |
           echo "QA_USER_PASSWORD=$(openssl rand -base64 18 | tr -d '/+=')" >> "$GITHUB_ENV"

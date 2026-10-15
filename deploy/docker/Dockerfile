@@ -9,6 +9,7 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/site/package.json ./apps/site/
 COPY packages/db/package.json ./packages/db/
 COPY packages/media/package.json ./packages/media/
 COPY packages/config/package.json ./packages/config/
@@ -31,7 +32,9 @@ ARG APP_COMMIT_SHA
 ENV NEXT_PUBLIC_APP_BASE_PATH=$NEXT_PUBLIC_APP_BASE_PATH \
     NEXT_PUBLIC_APP_ENV=$NEXT_PUBLIC_APP_ENV \
     APP_COMMIT_SHA=$APP_COMMIT_SHA
-RUN npm run build --workspace=@yasakia/web
+# The public landing (apps/site, a static export) is built first and copied into apps/web/public: one service serves the landing,
+# the legal pages, the console and the API (scripts/sync-site.mjs).
+RUN npm run build:site && node scripts/sync-site.mjs && npm run build --workspace=@yasakia/web
 # Self-contained migrator (drizzle-orm + pg bundled): `node migrate.cjs`
 RUN npm run build:migrator --workspace=@yasakia/db
 
@@ -49,6 +52,8 @@ RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+# The landing (static files) and its assets.
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 # E-mail templates are read from disk at run time (data, not code).
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/mail-templates ./apps/web/mail-templates
 # Database migrations: `node migrate.cjs` applies ./drizzle (0000 creates the extensions) to DATABASE_DIRECT_URL or DATABASE_URL.

@@ -15,7 +15,7 @@ export function ConsoleProviders({ locale, messages, children }: { locale: Local
   useState(() => configureKrizakaFetch({ baseUrl: BASE_PATH }));
   return (
     <I18nProvider locale={locale} messages={messages}>
-      <KrizakaQueryProvider onUnauthorized={() => router.replace(`/${locale}/sign-in`)}>{children}</KrizakaQueryProvider>
+      <KrizakaQueryProvider onUnauthorized={() => router.replace(`/app/${locale}/sign-in`)}>{children}</KrizakaQueryProvider>
     </I18nProvider>
   );
 }

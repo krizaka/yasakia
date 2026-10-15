@@ -170,28 +170,29 @@ durable lives on the bus.
 
 The test suites need none of these: CI and `npm run test:e2e` run on the local storage and the mail outbox.
 
-## The public dev site (static)
+## The public dev site
 
-`dev.yasakia.com` is a DigitalOcean App Platform app: a **static site** at `/` built from `apps/site` and the web app at `/app` (next section) — `deploy/digitalocean/web.app.yaml`
-(`npm ci && npm run build -w apps/site`, output `apps/site/out`). No service, no database, no secret; the only build
-variable is `APP_COMMIT_SHA` (`${_self.COMMIT_HASH}`), which the footer shows with `package.json`'s version. The app lives in
-the DigitalOcean project `yasakia`; the DNS is a CNAME `dev` → the app's default domain.
+`dev.yasakia.com` is the landing built from `apps/site` (a static export) and **served by the web service** — see the next section.
+`npm run build` builds it (`npm run build:site`), copies it into `apps/web/public` (`scripts/sync-site.mjs`) and builds the web app; the
+Dockerfile does the same. The version in its footer is `package.json`'s plus the short commit (`APP_COMMIT_SHA`).
 
-## Dev deployment of the web app (app.yasakia.com · admin.yasakia.com)
+## Dev deployment (dev.yasakia.com · admin.yasakia.com)
 
-One App Platform app, `deploy/digitalocean/web.app.yaml`, two hosts (the console is `APP_ADMIN_HOST`, same deployment, $0 more).
-It is **not** a component of `yasakia-site` (the static site): a deployment of an app with a static site stalls on
-`DatabaseTrustedSourcesNotReady` as soon as the app is a trusted source of the shared cluster (observed, even for a static-only
-rollback); a service-only app deploys. The account is capped at **10 apps**, so creating it needs a free slot.
+One App Platform app, `deploy/digitalocean/web.app.yaml`, one `basic-xxs` service (**$5/month**) behind two hosts: `dev.yasakia.com`
+(the landing at `/`, the legal pages, the person's space under `/app`, the API) and `admin.yasakia.com` (the console, `APP_ADMIN_HOST`,
+$0 more). The app is the one created for the static landing (`yasakia-site`: an app cannot be renamed), converted in place.
 
-- **Cost**: one `basic-xxs` service (**$5/month**); the `migrate` PRE_DEPLOY job is billed only while it runs; the database is
-  `yasakia_db` and the role `yasakia_user` on the shared dev cluster `krizaka-dev-pg` (no second cluster).
+- **Why no static-site component**: observed — any deployment of an app that has a static site stalls on
+  `DatabaseTrustedSourcesNotReady` once the app is a trusted source of the shared cluster (even a static-only rollback). A
+  service-only app deploys. So the landing is plain files in the service's `public/`.
+- **Cost**: the service; the `migrate` PRE_DEPLOY job is billed only while it runs; the database is `yasakia_db` and the role
+  `yasakia_user` on the shared dev cluster `krizaka-dev-pg` (no second cluster).
 - **Secrets** (type SECRET, entered once, never printed): `AUTH_SESSION_SECRET`, `DATABASE_ENCRYPTION_KEY`, `DATABASE_URL` and
   `DATABASE_DIRECT_URL` (the role's **private** connection string, `private-<host>`, `sslmode=require`), `DATABASE_CA_CERT`
-  (`doctl databases get-ca`). The cluster is not a `databases:` component; add the app to its trusted sources after creation:
+  (`doctl databases get-ca`). The cluster is not a `databases:` component; add the app to its trusted sources:
   `doctl databases firewalls append <cluster> --rule app:<app-id>`.
 - **Closed**: `AUTH_SIGNUP_ENABLED=false`, `AUTH_ALLOWED_IPS` = the one address that may open the console, `MAIL_PROVIDER=none` and
   `MEDIA_STORAGE_PROVIDER=none` (allowed only with `NEXT_PUBLIC_APP_ENV=dev`).
-- **DNS** (Porkbun): CNAME `app` and `admin` → the app's default ingress host.
+- **DNS** (Porkbun): CNAME `dev` and `admin` → the app's default ingress host.
 - **Accounts**: only `npm run db:qa-accounts` with `DATABASE_URL` and `QA_USER_PASSWORD` / `QA_ADMIN_PASSWORD` in the environment.
 - The extensions `vector`, `cube` and `earthdistance` are created once by the database owner before the first release.

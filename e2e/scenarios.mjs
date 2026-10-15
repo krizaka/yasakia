@@ -602,19 +602,19 @@ let adaPhoto;
     const hl = await asAdmin("/api/admin/health");
     check("health: the database answers and the version is told", hl.status === 200 && hl.json.database === true && typeof hl.json.version === "string" && hl.json.signupOpen === true);
     check("health, overview, intros: refused to a person (403)", (await web("/api/admin/health", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403 && (await web("/api/admin/overview", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403);
-    for (const p of ["/en/admin", "/en/admin/reports", "/fr/admin/intros", "/en/admin/health"]) {
+    for (const p of ["/app/en/admin", "/app/en/admin/reports", "/app/fr/admin/intros", "/app/en/admin/health"]) {
       check(`pages: ${p} renders for an administrator and is a 404 for a person`, (await web(p, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER })).status === 200 && (await web(p, { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 404);
     }
   }
 
   // The console's pages.
   const page = (p, cookie, ip) => web(p, { cookie, ip });
-  check("pages: the sign-in page is served (200) and not indexed", (await page("/en/sign-in")).status === 200 && (await page("/en/sign-in")).text.includes("noindex"));
-  check("pages: the home without a session goes to sign-in", (await page("/en")).status === 307 && (await page("/en")).headers.get("location")?.endsWith("/en/sign-in"));
-  check("pages: the home, the account render for a person", (await page("/en", user.cookie)).status === 200 && (await page("/fr/account", user.cookie)).status === 200);
-  check("pages: the administration console is a 404 for a person", (await page("/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
-  check("pages: ...and for an administrator on a wrong address", (await page("/en/admin/users", adminIn.cookie, "198.51.100.200")).status === 404);
-  check("pages: ...and renders for an administrator on the allowed address", (await page("/en/admin/users", adminIn.cookie, ADMIN_IP_HEADER)).status === 200 && (await page(`/fr/admin/users/${someone.id}`, adminIn.cookie, ADMIN_IP_HEADER)).status === 200);
+  check("pages: the sign-in page is served (200) and not indexed", (await page("/app/en/sign-in")).status === 200 && (await page("/app/en/sign-in")).text.includes("noindex"));
+  check("pages: the home without a session goes to sign-in", (await page("/app/en")).status === 307 && (await page("/app/en")).headers.get("location")?.endsWith("/app/en/sign-in"));
+  check("pages: the home, the account render for a person", (await page("/app/en", user.cookie)).status === 200 && (await page("/app/fr/account", user.cookie)).status === 200);
+  check("pages: the administration console is a 404 for a person", (await page("/app/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/app/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
+  check("pages: ...and for an administrator on a wrong address", (await page("/app/en/admin/users", adminIn.cookie, "198.51.100.200")).status === 404);
+  check("pages: ...and renders for an administrator on the allowed address", (await page("/app/en/admin/users", adminIn.cookie, ADMIN_IP_HEADER)).status === 200 && (await page(`/app/fr/admin/users/${someone.id}`, adminIn.cookie, ADMIN_IP_HEADER)).status === 200);
 
   // Delete my account, from the web.
   const doomed = await signUp("doomed");
@@ -639,6 +639,11 @@ let adaPhoto;
   const bare = await fetch(`${B}/privacy`, { redirect: "manual", headers: { "Accept-Language": "fr-CA,fr;q=0.9" } });
   check("/privacy goes to the reader's language", bare.status === 307 && bare.headers.get("location")?.endsWith("/fr/privacy"));
   check("any other address is a 404", (await fetch(`${B}/en/batches`)).status === 404);
+  for (const [p, lang] of [["/", "en"], ["/fr/", "fr"], ["/how-it-works", "en"], ["/fr/demo", "fr"]]) {
+    const r = await fetch(B + p);
+    check(`the public landing ${p} is served by the same app, in ${lang}`, r.status === 200 && (await r.text()).includes(`lang="${lang}"`));
+  }
+  check("the landing keeps its robots.txt, sitemap.xml and llms.txt", (await fetch(`${B}/robots.txt`)).status === 200 && (await fetch(`${B}/sitemap.xml`)).status === 200 && (await fetch(`${B}/llms.txt`)).status === 200);
 }
 
 // ── No raw media URL, no storage key, no score in any answer ───────────────────────────────────────

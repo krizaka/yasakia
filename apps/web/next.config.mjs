@@ -19,11 +19,15 @@ const production = process.env.NODE_ENV === "production";
  * but this origin — no third-party script, frame or font. Next renders inline bootstrap scripts without a nonce, so
  * scripts keep 'unsafe-inline'. Development adds what the dev server needs.
  */
+// The landing's demo recordings and images come from the CDN (hashed files), nothing else outside this origin.
+const CDN = "https://krizaka-assets.b-cdn.net";
+
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${production ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  `img-src 'self' data: blob: ${CDN}`,
+  `media-src 'self' blob: ${CDN}`,
   "font-src 'self' data:",
   `connect-src 'self'${production ? "" : " ws: http://localhost:* http://127.0.0.1:*"}`,
   "frame-src 'none'",
@@ -45,6 +49,17 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "off" },
 ];
 
+/**
+ * The public landing — English at `/`, French under `/fr`, plus `/how-it-works` and `/demo` — is a static export copied into
+ * public/ (scripts/sync-site.mjs). A page address is mapped to its file; with and without a trailing slash, the export's canonical
+ * URLs keep theirs (skipTrailingSlashRedirect).
+ */
+const LANDING_PAGES = ["", "how-it-works", "demo", "fr", "fr/how-it-works", "fr/demo"];
+const landingRewrites = LANDING_PAGES.flatMap((page) => {
+  const file = `/${page ? `${page}/` : ""}index.html`;
+  return page ? [{ source: `/${page}`, destination: file }, { source: `/${page}/`, destination: file }] : [{ source: "/", destination: file }];
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
@@ -62,8 +77,16 @@ const nextConfig = {
   // (@krizaka/realtime/redis — it connects only with REALTIME_BUS=redis).
   serverExternalPackages: ["sharp", "pg", "ioredis"],
   // The mail templates are read from disk at run time; the image copies them next to the server (deploy/docker/Dockerfile).
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return { beforeFiles: landingRewrites, afterFiles: [], fallback: [] };
+  },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // The administration host is never indexed (the landing, on the other host, is).
+      { source: "/:path*", has: [{ type: "host", value: "admin\\..*" }], headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+    ];
   },
 };
 

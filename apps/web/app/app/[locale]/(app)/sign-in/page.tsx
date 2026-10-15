@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 /** Sign-in on the product's auth template: the brand panel beside a calm form. Sign-up is closed — the page says so. */
 export default async function SignInPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = asLocale((await params).locale);
-  if (await pageSession()) redirect(`/${locale}`);
+  if (await pageSession()) redirect(`/app/${locale}`);
   const t = getDictionary(locale).console.signIn;
   return (
     <AuthLayout
@@ -55,7 +55,7 @@ export default async function SignInPage({ params }: { params: Promise<{ locale:
         </>
       }
     >
-      <SignInForm next={`/${locale}`} />
+      <SignInForm next={`/app/${locale}`} />
     </AuthLayout>
   );
 }

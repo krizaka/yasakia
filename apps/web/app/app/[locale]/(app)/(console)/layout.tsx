@@ -19,7 +19,7 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 export default async function ConsoleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
   const locale = asLocale((await params).locale);
   const session = await pageSession();
-  if (!session) redirect(`/${locale}/sign-in`);
+  if (!session) redirect(`/app/${locale}/sign-in`);
   const adminOnly = hostKind(await headers()) === "admin";
   const admin = (await pageAdmin()) !== null;
   if (adminOnly && !admin) notFound();

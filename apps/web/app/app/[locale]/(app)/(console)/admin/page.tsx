@@ -42,7 +42,7 @@ export default async function AdminOverview({ params }: { params: Promise<{ loca
       </Widget>
       <Widget level={3} title={t.moderation} description={t.moderationLine} span={2}>
         {o.reports.open ? (
-          <Link className="font-semibold text-fg-accent" href={`/${locale}/admin/reports`}>
+          <Link className="font-semibold text-fg-accent" href={`/app/${locale}/admin/reports`}>
             {t.open}
           </Link>
         ) : (

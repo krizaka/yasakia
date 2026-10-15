@@ -58,7 +58,7 @@ export function UsersTable() {
         filter: "text",
         card: "title",
         cell: (u) => (
-          <Link href={`/${locale}/admin/users/${u.id}`} className="font-medium text-fg-accent underline-offset-4 hover:underline" aria-label={say("admin.users.open", { email: u.email })}>
+          <Link href={`/app/${locale}/admin/users/${u.id}`} className="font-medium text-fg-accent underline-offset-4 hover:underline" aria-label={say("admin.users.open", { email: u.email })}>
             {u.email}
           </Link>
         ),

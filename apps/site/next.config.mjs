@@ -15,8 +15,11 @@ function shortSha() {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // A static site: no server, no API, no database — what DigitalOcean serves for free.
+  // A static export, built here and served by the web service (one deployment, host-routed).
   output: "export",
+  // The export is served by the web service (apps/web/public/site, scripts/sync-site.mjs): its chunks live under /site-assets
+  // so they never meet the web app's own /_next.
+  assetPrefix: "/site-assets",
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,

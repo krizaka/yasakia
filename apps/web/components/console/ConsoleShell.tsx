@@ -23,13 +23,13 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
   const { say } = useSay();
   const router = useRouter();
   const path = usePathname() ?? "";
-  const home = `/${locale}`;
+  const home = `/app/${locale}`;
   const other = locale === "en" ? "fr" : "en";
-  const rest = path.slice(`/${locale}`.length);
+  const rest = path.slice(home.length);
   const signOut = useMutation({
     mutationFn: () => krizakaFetch("/api/auth/sign-out", { method: "POST" }),
     onSettled: () => {
-      router.replace(`/${locale}/sign-in`);
+      router.replace(`/app/${locale}/sign-in`);
       router.refresh();
     },
   });
@@ -104,7 +104,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
                   {say("shell.devBadge", { version: VERSION })}
                 </Badge>
               ) : null}
-              <Link href={`/${other}${rest}`} hrefLang={other} lang={other} className="rounded-md px-2 py-1 text-sm text-fg-secondary hover:text-fg">
+              <Link href={`/app/${other}${rest}`} hrefLang={other} lang={other} className="rounded-md px-2 py-1 text-sm text-fg-secondary hover:text-fg">
                 <span className="sr-only">{say("shell.language")} · </span>
                 {say("shell.otherLanguage")}
               </Link>
