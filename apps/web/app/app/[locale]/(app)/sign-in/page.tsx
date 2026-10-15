@@ -55,7 +55,12 @@ export default async function SignInPage({ params }: { params: Promise<{ locale:
         </>
       }
     >
-      <SignInForm next={`/app/${locale}`} />
+      <>
+        <SignInForm next={`/app/${locale}`} />
+        <Link className="mt-4 inline-block text-sm underline" href={`/app/${locale}/forgot-password`}>
+          {t.forgot}
+        </Link>
+      </>
     </AuthLayout>
   );
 }

@@ -52,6 +52,24 @@ export const authCodes = pgTable(
   (t) => [index("auth_codes_email_idx").on(t.email, t.createdAt), index("auth_codes_expires_idx").on(t.expiresAt)],
 );
 
+/**
+ * A password reset code, sent by e-mail: 6 digits, kept only as a keyed hash, valid 10 minutes, 5 attempts, used once.
+ * Its own table, not auth_codes: a reset never signs anyone in by itself.
+ */
+export const passwordResetCodes = pgTable(
+  "password_reset_codes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: varchar("email", { length: 254 }).notNull(),
+    codeHash: varchar("code_hash", { length: 64 }).notNull(),
+    attempts: integer("attempts").default(0).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("password_reset_codes_email_idx").on(t.email, t.createdAt)],
+);
+
 /** The account's phones (Expo push tokens). A token moves to the account signed in on the phone. */
 export const pushTokens = pgTable(
   "push_tokens",

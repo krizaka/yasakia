@@ -2,6 +2,7 @@
 
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { Alert } from "@krizaka/ui/alert";
+import { Avatar } from "@krizaka/ui/avatar";
 import { Button } from "@krizaka/ui/button";
 import { ConfirmButton } from "@krizaka/ui/confirm-button";
 import { DataTable, type DataTableColumn } from "@krizaka/ui/data-table";
@@ -166,6 +167,9 @@ export function AccountView({ account }: { account: AccountDto }) {
   return (
     <SettingsLayout className="w-full" title={say("account.title")} description={say("account.description")} nav={nav} navLabel={say("account.navLabel")} linkAs={Link}>
       <SettingsSection id="profile" title={say("account.profile.title")} description={say("account.profile.description")}>
+        <div className="mb-4 flex items-center gap-4">
+          <Avatar size="lg" alt={say("account.avatar")} defaultAvatar={{ brand: "yasakia", seed: account.email, kind: "person" }} />
+        </div>
         <profile.Form method="post" aria-label={say("account.profile.title")} className="flex flex-col gap-4">
           <DescriptionList layout="inline" items={[{ term: say("account.profile.email"), details: account.email, hint: say("account.profile.emailHint") }]} />
           <profile.TextField name="displayName" label={say("account.profile.displayName")} maxLength={40} autoComplete="given-name" />

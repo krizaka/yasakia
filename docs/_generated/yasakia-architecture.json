@@ -69,6 +69,7 @@
         "intro_messages",
         "intros",
         "pairs_seen",
+        "password_reset_codes",
         "profile_photos",
         "profiles",
         "push_tokens",
@@ -260,6 +261,11 @@
       ]
     },
     {
+      "name": "password_reset_codes",
+      "columns": 7,
+      "references": []
+    },
+    {
       "name": "profile_photos",
       "columns": 14,
       "references": [
@@ -384,6 +390,18 @@
       "path": "/api/auth/password",
       "access": "public",
       "summary": "Signs a person in to the web console with their e-mail and password: the answer sets an HttpOnly session cookie."
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/password/forgot",
+      "access": "public",
+      "summary": "\"Forgot password\": a reset code by e-mail, the same answer whether an account exists or not."
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/password/reset",
+      "access": "public",
+      "summary": "The code and the new password."
     },
     {
       "method": "POST",

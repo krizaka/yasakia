@@ -192,7 +192,10 @@
       "account": "Account",
       "users": "People",
       "user": "Person",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "forgot": "Forgot password",
+      "reset": "Choose a new password",
+      "signUp": "Create an account"
     },
     "form": {
       "errors": {
@@ -254,7 +257,8 @@
       "legalAnd": "and the",
       "privacy": "privacy policy",
       "back": "Yasakia on krizaka.com",
-      "asideFooter": "© Krizaka · Montréal"
+      "asideFooter": "© Krizaka · Montréal",
+      "forgot": "Forgot your password?"
     },
     "errors": {
       "INVALID_CREDENTIALS": "Wrong e-mail or password.",
@@ -278,7 +282,8 @@
       "generic": "Something went wrong. Try again.",
       "load": "We could not load this. Try again.",
       "retry": "Try again",
-      "network": "No connection. Check your network and try again."
+      "network": "No connection. Check your network and try again.",
+      "CODE_INVALID": "This code is not valid any more. Ask for a new one."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -464,7 +469,8 @@
         "confirm": "Sure? Delete it for good",
         "deleted": "Your account is deleted.",
         "deleting": "Deleting…"
-      }
+      },
+      "avatar": "Profile picture"
     },
     "admin": {
       "users": {
@@ -678,6 +684,25 @@
         "minutes": "{count} min",
         "hours": "{count} h"
       }
+    },
+    "reset": {
+      "title": "Forgot your password?",
+      "description": "Enter your e-mail. If an account exists for it, we send a 6-digit code that lets you choose a new password.",
+      "email": "E-mail",
+      "sendCode": "Send me a code",
+      "sent": "If an account exists for this address, a code is on its way. It is valid 10 minutes.",
+      "code": "6-digit code",
+      "password": "New password",
+      "passwordHint": "At least 12 characters. Every web session of this account ends when you save.",
+      "submit": "Save the new password",
+      "done": "Your password is changed. Sign in with it now.",
+      "back": "Back to sign-in",
+      "changeEmail": "Use another e-mail",
+      "signUpTitle": "Create an account",
+      "signUpDescription": "Accounts are opened by our team while Yasakia is in development.",
+      "closedTitle": "Sign-up is closed.",
+      "closed": "Yasakia is in development; accounts are created by our team.",
+      "contact": "Talk to us"
     }
   }
 }

@@ -1,0 +1,5 @@
+Your password reset code: {code}
+
+Type it in the Yasakia app to choose a new password. It works once, for {minutes} minutes. Nobody at Yasakia will ever ask you for it.
+
+If you did not ask to reset your password, ignore this message: your password does not change without this code.

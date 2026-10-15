@@ -26,6 +26,7 @@ Then [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md): sign up the way the app
 
 ## What is inside
 
+- **Accounts** — sign-in with a code by e-mail or a password, "forgot password" with a 6-digit code by e-mail (the same answer for every address), a password change that ends the other web sessions, a profile with Krizaka's default picture; registration is closed by configuration (`AUTH_SIGNUP_ENABLED`).
 - **Native sessions** by e-mail code — no password; 18+ checked by the server; stateless tokens re-checked against the
   account on every request.
 - **Private photos**: a signed upload, re-encoding that strips every metadata block (GPS included), blurhash, then a
