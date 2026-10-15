@@ -105,7 +105,9 @@ const STARTED = Date.now();
 export async function healthReport() {
   const database = await checkDbHealth();
   // Both need the database: when it does not answer, the page still says so rather than failing.
-  const [connections, waiting] = database ? await Promise.all([connectionBudget().catch(() => null), queues().catch(() => null)]) : [null, null];
+  // One after the other: the pool is measured while it is quiet, not while the queues' own reads hold its connections.
+  const connections = database ? await connectionBudget().catch(() => null) : null;
+  const waiting = database ? await queues().catch(() => null) : null;
   return {
     connections,
     queues: waiting,

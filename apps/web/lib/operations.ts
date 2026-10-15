@@ -18,14 +18,17 @@ export interface ConnectionBudget {
 }
 
 export async function connectionBudget(): Promise<ConnectionBudget> {
+  // The pool is read before this function (or its caller) asks the database anything: what it holds then is the
+  // instance's own load, not the reads that measure it.
   const pool = getPool();
+  const snapshot = { max: pool.options.max ?? 10, total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount };
   const [row] = (
     await db.execute<{ open: string; role_limit: number; server_limit: string }>(sql`
       select (select count(*) from pg_stat_activity where datname = current_database()) as open,
              (select rolconnlimit from pg_roles where rolname = current_user) as role_limit,
              current_setting('max_connections') as server_limit`)
   ).rows;
-  return { pool: { max: pool.options.max ?? 10, total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount }, open: Number(row.open), limit: budgetLimit(Number(row.role_limit), Number(row.server_limit)) };
+  return { pool: snapshot, open: Number(row.open), limit: budgetLimit(Number(row.role_limit), Number(row.server_limit)) };
 }
 
 export interface Queues {
