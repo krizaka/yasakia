@@ -309,6 +309,42 @@
     },
     {
       "method": "GET",
+      "path": "/api/admin/health",
+      "access": "public",
+      "summary": "The instance's health for the console: database, realtime bus, version, environment, uptime, whether sign-up is open."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/intros",
+      "access": "public",
+      "summary": "The introductions overview for the console — state, dates, message counts; never who said what — filtered and paged on the server."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/overview",
+      "access": "public",
+      "summary": "The console's overview: accounts by status, the moderation queue, introductions by state, open batches — counts only."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/report-queue",
+      "access": "public",
+      "summary": "The moderation queue for the console — urgent reasons (UNDERAGE, THREAT) first while open — filtered by status and paged on the server; details open one report at a time."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/report-queue/{id}",
+      "access": "public",
+      "summary": "One report with its details opened — operators only."
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/report-queue/{id}",
+      "access": "public",
+      "summary": "Moves a report along (REVIEWED · ACTIONED · DISMISSED, or back to OPEN); the decision is logged with who made it."
+    },
+    {
+      "method": "GET",
       "path": "/api/admin/reports",
       "access": "operator · service token + IP allow-list",
       "summary": "The reports for operators — urgent reasons (UNDERAGE, THREAT) first, details decrypted; service token and IP allow-list."

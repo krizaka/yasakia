@@ -225,7 +225,7 @@ yasakia/                           npm workspaces — Apache-2.0
 ### 6.1 The public dev site — `apps/site` (dev.yasakia.com)
 
 - A **static export** (`output: "export"`, no server, no database, no secret) on a DigitalOcean App Platform **static
-  site** (free), project `yasakia`, spec `deploy/digitalocean/dev.app.yaml` (the same app that serves `/app`, §6.2). Three pages — landing, how it works, demo —
+  site** (free), project `yasakia`, spec `deploy/digitalocean/web.app.yaml` (the same app that serves `/app`, §6.2). Three pages — landing, how it works, demo —
   English at the root, French under `/fr`. Built from the same bricks (`@krizaka/ui` `LandingPage`, `HowItWorksPage`,
   `PageHero`), strings in `apps/site/messages/{en,fr}.json`, the same lint rules and ratchet.
 - **It never offers what does not exist**: no sign-up, login, download, store button or waiting list (nothing to sign up
@@ -237,12 +237,16 @@ yasakia/                           npm workspaces — Apache-2.0
 
 ---
 
-### 6.2 The signed-in console — `apps/web` (dev.yasakia.com/app)
+### 6.2 The signed-in console — `apps/web` (app.yasakia.com · admin.yasakia.com)
 
-- **What it is**: the person's space and the administration console, on the product's own address: `/app` of
-  dev.yasakia.com (one DigitalOcean app, two components — the static site at `/`, this Next.js app at `/app` through
-  `NEXT_PUBLIC_APP_BASE_PATH=/app`; `deploy/digitalocean/dev.app.yaml`). Pages (`app/[locale]/(app)`): `sign-in`, the home
-  (`/`), `account`, `admin/users`, `admin/users/[id]`, `admin/audit`. Never indexed. Built **only** from our bricks:
+- **What it is**: the person's space and the administration console, one Next.js app, **two hosts**: `app.yasakia.com` (the
+  person) and `admin.yasakia.com` (the administration — `APP_ADMIN_HOST`, `lib/host.ts`, `proxy.ts`: on the admin host only the
+  administration exists, on any other host it is a 404, so the console costs nothing more). Its own DigitalOcean app
+  (`deploy/digitalocean/web.app.yaml`, project `yasakia`): a deployment of an app that holds a static site stalls once the app is
+  a trusted source of the shared cluster, so it is not a component of the static site's app. Pages (`app/[locale]/(app)`):
+  `sign-in`, the home (`/`), `account`, and the administration — `admin` (overview), `admin/users` (+ detail), `admin/reports`
+  (moderation), `admin/intros`, `admin/audit`, `admin/health` (health + version) — under AppShell, a DEV badge, never indexed.
+  Built **only** from our bricks:
   `@krizaka/ui` (`AuthLayout`, `AppShell` — the console template —, `DashboardLayout`, `SettingsLayout`, `DetailLayout`,
   `DataTable` in server mode, `form`, `Dialog`, `ConfirmButton`, `Timeline`), `@krizaka/query` (server state, the live
   stream), `@krizaka/i18n` (the client receives only its `console` slice), the brand `yasakia`.

@@ -43,6 +43,7 @@ const v = (name: string, context: EnvContext, need: EnvNeed, schema: z.ZodTypeAn
 
 export const ENV_VARS: readonly EnvVar[] = [
   v("NEXT_PUBLIC_APP_URL", "APP", "required", url, "Public origin of the API: signed upload URLs and local media URLs are built on it.", { build: true, default: "http://localhost:3000" }),
+  v("APP_ADMIN_HOST", "APP", "optional", text, "The host of the administration console (admin.yasakia.com): the same deployment answers it through host-based ingress; there only the administration exists, elsewhere it does not (404). Unset: both at one address (local development)."),
   v("NEXT_PUBLIC_APP_BASE_PATH", "APP", "optional", z.string().regex(/^\/[a-z0-9-]+$/, "must be a single path segment such as /app"), "The path the app is served under (dev.yasakia.com serves it at `/app`, next to the static site at `/`). Empty: the root.", { build: true }),
   v("NEXT_PUBLIC_APP_ENV", "APP", "optional", z.enum(["local", "dev", "staging", "production"]), "Where the build runs, for the build information.", { build: true, default: "local" }),
   v("APP_ACCOUNT_PURGE_INTERVAL_SECONDS", "APP", "optional", int(1, 3600), "How often accounts past their deletion delay are purged.", { default: "60" }),
