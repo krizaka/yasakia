@@ -22,6 +22,13 @@
       "when": 1792012291243,
       "tag": "0002_console_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792077463205,
+      "tag": "0003_password_reset_codes",
+      "breakpoints": true
     }
   ]
 }

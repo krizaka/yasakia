@@ -192,7 +192,10 @@
       "account": "Compte",
       "users": "Personnes",
       "user": "Personne",
-      "audit": "Journal d’audit"
+      "audit": "Journal d’audit",
+      "forgot": "Mot de passe oublié",
+      "reset": "Choisir un nouveau mot de passe",
+      "signUp": "Créer un compte"
     },
     "form": {
       "errors": {
@@ -254,7 +257,8 @@
       "legalAnd": "et la",
       "privacy": "politique de confidentialité",
       "back": "Yasakia sur krizaka.com",
-      "asideFooter": "© Krizaka · Montréal"
+      "asideFooter": "© Krizaka · Montréal",
+      "forgot": "Mot de passe oublié ?"
     },
     "errors": {
       "INVALID_CREDENTIALS": "Courriel ou mot de passe incorrect.",
@@ -278,7 +282,8 @@
       "generic": "Quelque chose s’est mal passé. Réessaie.",
       "load": "Impossible de charger ceci. Réessaie.",
       "retry": "Réessayer",
-      "network": "Pas de connexion. Vérifie ton réseau et réessaie."
+      "network": "Pas de connexion. Vérifie ton réseau et réessaie.",
+      "CODE_INVALID": "Ce code n’est plus valide. Demande-en un nouveau."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -464,7 +469,8 @@
         "confirm": "Sûr·e ? Supprimer pour de bon",
         "deleted": "Ton compte est supprimé.",
         "deleting": "Suppression…"
-      }
+      },
+      "avatar": "Photo de profil"
     },
     "admin": {
       "users": {
@@ -678,6 +684,25 @@
         "minutes": "{count} min",
         "hours": "{count} h"
       }
+    },
+    "reset": {
+      "title": "Mot de passe oublié ?",
+      "description": "Entre ton courriel. Si un compte existe pour lui, nous envoyons un code à 6 chiffres pour choisir un nouveau mot de passe.",
+      "email": "Courriel",
+      "sendCode": "M’envoyer un code",
+      "sent": "Si un compte existe pour cette adresse, un code est en route. Il est valide 10 minutes.",
+      "code": "Code à 6 chiffres",
+      "password": "Nouveau mot de passe",
+      "passwordHint": "Au moins 12 caractères. Toutes les sessions web de ce compte prennent fin à l’enregistrement.",
+      "submit": "Enregistrer le nouveau mot de passe",
+      "done": "Ton mot de passe est changé. Connecte-toi avec lui.",
+      "back": "Retour à la connexion",
+      "changeEmail": "Utiliser un autre courriel",
+      "signUpTitle": "Créer un compte",
+      "signUpDescription": "Les comptes sont ouverts par notre équipe pendant le développement de Yasakia.",
+      "closedTitle": "L’inscription est fermée.",
+      "closed": "Yasakia est en développement ; les comptes sont créés par notre équipe.",
+      "contact": "Nous joindre"
     }
   }
 }

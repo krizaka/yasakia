@@ -1,0 +1,5 @@
+Ton code de réinitialisation : {code}
+
+Entre-le dans l’app Yasakia pour choisir un nouveau mot de passe. Il fonctionne une seule fois, pendant {minutes} minutes. Personne chez Yasakia ne te le demandera jamais.
+
+Si tu n’as pas demandé à réinitialiser ton mot de passe, ignore ce message : ton mot de passe ne change pas sans ce code.

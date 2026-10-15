@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 24 tables · 17 enums · 3 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 25 tables · 17 enums · 4 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -309,6 +309,20 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Checks:** `pairs_seen_not_self` (`account_id <> seen_account_id`)
 
+### `password_reset_codes`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `email` | varchar(254) | no |  |  |
+| `code_hash` | varchar(64) | no |  |  |
+| `attempts` | integer | no | `0` |  |
+| `expires_at` | timestamp with time zone | no |  |  |
+| `consumed_at` | timestamp with time zone | yes |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `password_reset_codes_email_idx` (email, created_at)
+
 ### `profile_photos`
 
 | Column | Type | Null | Default | Notes |
@@ -433,3 +447,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0000_extensions.sql`
 - `0001_initial_schema.sql`
 - `0002_console_accounts.sql`
+- `0003_password_reset_codes.sql`

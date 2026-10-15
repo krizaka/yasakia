@@ -15,6 +15,7 @@ type VarKind = "text" | "flag";
 /** Every template and its variables — a call that misses or misspells one does not compile. */
 export const MAIL_TEMPLATES = {
   "sign-in-code": { code: "text", minutes: "text" },
+  "password-reset-code": { code: "text", minutes: "text" },
   "account-deleted": { purgeDays: "text" },
 } as const satisfies Record<string, Record<string, VarKind>>;
 
