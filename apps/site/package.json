@@ -2,7 +2,7 @@
   "name": "@yasakia/site",
   "version": "0.1.0",
   "private": true,
-  "description": "Yasakia's public dev site (dev.yasakia.com): landing, how it works, demo \u2014 a static export, no backend, no sign-up.",
+  "description": "Yasakia's public dev site (dev.yasakia.com): landing, how it works, demo — a static export, no backend, no sign-up.",
   "scripts": {
     "dev": "next dev --port 3002",
     "build": "next build",
@@ -11,9 +11,9 @@
   "dependencies": {
     "@krizaka/i18n": "^0.1.0",
     "@krizaka/icons": "^0.3.0",
-    "@krizaka/tailwind": "^3.14.0",
-    "@krizaka/tokens": "^3.14.0",
-    "@krizaka/ui": "^3.14.0",
+    "@krizaka/tailwind": "^3.18.0",
+    "@krizaka/tokens": "^3.18.0",
+    "@krizaka/ui": "^3.18.0",
     "next": "^16.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

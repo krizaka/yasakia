@@ -569,6 +569,7 @@
         "loading": "Chargement",
         "empty": "Rien à montrer",
         "details": "Détails",
+        "showMore": "Afficher plus sur {name}",
         "filters": "Filtrer le tableau",
         "clear": "Effacer les filtres",
         "removeFilter": "Retirer {label}",
