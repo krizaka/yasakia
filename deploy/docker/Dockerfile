@@ -13,7 +13,7 @@ COPY apps/site/package.json ./apps/site/
 COPY packages/db/package.json ./packages/db/
 COPY packages/media/package.json ./packages/media/
 COPY packages/config/package.json ./packages/config/
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund --ignore-scripts
 
 # 2. Build
 FROM base AS builder
