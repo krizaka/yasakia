@@ -2,7 +2,7 @@
   "name": "yasakia-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "Yasakia \u2014 the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
+  "description": "Yasakia — the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -12,7 +12,7 @@
     "dev": "npm run dev --workspace=apps/web",
     "build": "npm run build:site && node scripts/sync-site.mjs && npm run build -w apps/web",
     "start": "npm run start -w apps/web",
-    "lint": "npm run lint --workspaces --if-present && npm run check:i18n && npm run ratchet",
+    "lint": "npm run lint --workspaces --if-present && npm run check:i18n && npm run ratchet && ast-grep test --skip-snapshot-tests && node scripts/sg-ratchet.mjs",
     "check:i18n": "krizaka-i18n check apps/web/messages && krizaka-i18n check apps/web/messages/errors && krizaka-i18n scan apps/web/app apps/web/components --allow Yasakia,YASAKIA,Krizaka,KRIZAKA,Bunny --skip /app/api/ && krizaka-i18n check apps/site/messages && krizaka-i18n scan apps/site/app apps/site/components --allow Yasakia,YASAKIA,Krizaka,KRIZAKA,Bunny",
     "ratchet": "krizaka-ratchet",
     "ratchet:update": "krizaka-ratchet --update",
@@ -37,7 +37,11 @@
     "workspace": "node scripts/workspace.mjs",
     "mail:templates:preview": "tsx apps/web/scripts/mail-templates.ts",
     "build:site": "npm run build -w apps/site",
-    "dev:site": "npm run dev -w apps/site"
+    "dev:site": "npm run dev -w apps/site",
+    "lint:sg": "node scripts/sg-ratchet.mjs",
+    "lint:sg:test": "ast-grep test --skip-snapshot-tests",
+    "sg:ratchet:update": "node scripts/sg-ratchet.mjs --update",
+    "sg:fix": "node scripts/sg-fix.mjs"
   },
   "keywords": [
     "dating-app",
@@ -51,6 +55,7 @@
   "author": "Krizaka Core Team",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@ast-grep/cli": "0.51.0",
     "@krizaka/i18n": "^0.1.0",
     "pg": "^8.12.0",
     "sharp": "^0.35.5",
