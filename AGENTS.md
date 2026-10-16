@@ -308,6 +308,34 @@ yasakia/                           npm workspaces — Apache-2.0
 
 ---
 
+## Static rules & codemods (ast-grep)
+
+The org code rules (addendum 2026-10-15) are lint rules, not review comments. [`@ast-grep/cli`](https://ast-grep.github.io)
+is a **pinned devDependency** (no global install, CI reproduces local): `sgconfig.yml` + `rules/*.yml` (one rule per file,
+with a message and, where safe, a `fix:`; written for Tsx and `.ts` is parsed as Tsx too, so each rule covers `.ts` and `.tsx`), `rule-tests/` (valid/invalid cases of each rule).
+
+| Rule | What it refuses |
+| :--- | :--- |
+| `no-hand-ms-*`, `no-get-time-difference`, `no-get-time-arithmetic` | hand-written time arithmetic (`n * 60 * 1000`, `a.getTime() - b.getTime()`): date-fns, or a duration read from the settings |
+| `no-env-in-domain` | an `env` import in domain code (`packages/*/src`, `src/`): the value arrives as a parameter |
+| `no-db-in-service-or-rules` | a db client / schema import in `*.service.ts`, `*-service.ts`, `*.rules.ts`, `*-rules.ts` |
+| `no-ts-enum` | the TypeScript `enum` keyword (`as const` object + derived type, or a Postgres enum) |
+| `no-enum-string-compare` | `x.status === "OPEN"` (field named status/kind/role/reason/state/direction compared to a string literal) |
+| `no-ambient-clock` | `new Date()` / `Date.now()` in domain code: the clock is injected |
+| `no-types-at-package-root` | `types.ts` at a package root (`<feature>/<feature>.types.ts`) |
+| `no-unjustified-numeric-export` | a numeric (or `…ToMilliseconds(n)`) `export const` in feature code without `// @fixed: <reason>` just above |
+
+- **Run**: `npm run lint` runs everything (it includes `ast-grep test` and the ratchet). `npx ast-grep scan` lists the
+  violations with their message; `npm run lint:sg:test` runs the rule tests.
+- **Ratchet**: `scripts/sg-ratchet.mjs` counts the violations per rule and refuses any increase against
+  `sg-ratchet.json` (same idea as `krizaka-ratchet` / `lint-ratchet.json`: the debt only goes down). Fixed some? Lock the gain with
+  `npm run sg:ratchet:update` (it never raises a count and records a new rule at its current count). A new rule is
+  added with its test in `rule-tests/` and its baseline in the same pull request. The script is identical in every
+  Krizaka TypeScript repository (keep the copies identical; its unit test is `scripts/sg-ratchet.test.mjs`).
+- **Codemods**: `npm run sg:fix` applies the `fix:` of the rules (`ast-grep scan --update-all`) and adds the date-fns import;
+  behaviour is identical — run `npm run lint && npm test` after, and land the result in a small pull request.
+- A rule is never silenced to get a PR green; fix the code, or (a business parameter that is a technical fact) justify it with `// @fixed:`.
+
 ## 10. Definition of done
 
 1. `npm run check` passes and `npm run build` succeeds.
