@@ -13,12 +13,12 @@ import { revokeWebSessions } from "./web-session";
  */
 
 export interface PasswordSignInResult {
-  account: { id: string; email: string; locale: "en" | "fr"; role: "USER" | "ADMIN" };
+  account: { id: string; email: string; locale: "en" | "fr"; role: "USER" | "ADMIN"; sessionVersion: number };
 }
 
 export async function checkPassword(email: string, password: string, headers: Headers): Promise<PasswordSignInResult> {
   const [row] = await db
-    .select({ id: accounts.id, email: accounts.email, status: accounts.status, locale: accounts.locale, role: accounts.role, hash: accountCredentials.passwordHash })
+    .select({ id: accounts.id, email: accounts.email, status: accounts.status, locale: accounts.locale, role: accounts.role, sessionVersion: accounts.sessionVersion, hash: accountCredentials.passwordHash })
     .from(accounts)
     .leftJoin(accountCredentials, eq(accountCredentials.accountId, accounts.id))
     .where(eq(accounts.email, email))
@@ -34,7 +34,7 @@ export async function checkPassword(email: string, password: string, headers: He
   }
   await db.update(accounts).set({ lastSeenAt: new Date() }).where(eq(accounts.id, row.id));
   await audit({ action: "auth.sign_in", actorId: row.id, actorLabel: row.email, targetId: row.id, headers });
-  return { account: { id: row.id, email: row.email, locale: row.locale, role: row.role } };
+  return { account: { id: row.id, email: row.email, locale: row.locale, role: row.role, sessionVersion: row.sessionVersion } };
 }
 
 /** Sets or replaces an account's password (an operator's provisioning, or the person's own change). */

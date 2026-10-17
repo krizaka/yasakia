@@ -32,6 +32,8 @@ jobs:
         run: npm test
       - name: Docs are generated from this code
         run: node scripts/generate-docs.mjs --check
+      - name: Universal links / App Links (krizaka/.github#81) — web routes ↔ claimed paths ↔ routes.json
+        run: node scripts/check-app-links.mjs
       - name: Production build
         run: npm run build
         env:

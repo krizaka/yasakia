@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (61)
+## Endpoints (62)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -36,7 +36,7 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `GET` | `/api/agent` | bearer · account | The person's agent: the conversation, what it understood in their own words, the portrait once written, what it still has to learn. |
 | `POST` | `/api/agent/messages` | bearer · account | Says something to the agent and gets its answer; what the agent understood of it follows (extraction, then the portrait when it knows enough). |
 | `POST` | `/api/auth/logout` | bearer · account | Signs out: forgets this phone's push token, and with `everywhere` invalidates every session token of the account at once (the app also deletes its own token from secure storage). |
-| `POST` | `/api/auth/password` | public | Signs a person in to the web console with their e-mail and password: the answer sets an HttpOnly session cookie. |
+| `POST` | `/api/auth/password` | public | Signs a person in with their e-mail and password: the web console gets an HttpOnly session cookie, the app (`client: "native"`) a bearer token — the e-mail sign-in of krizaka/.github#76 for accounts that have a password. |
 | `POST` | `/api/auth/password/forgot` | public | "Forgot password": a reset code by e-mail, the same answer whether an account exists or not. |
 | `POST` | `/api/auth/password/reset` | public | The code and the new password. |
 | `POST` | `/api/auth/request-code` | public | Sends a 6-digit sign-in code to an e-mail address — the same answer whether an account exists or not. |
@@ -76,6 +76,7 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/push/tokens` | bearer · account | Registers this phone's Expo push token for the account (a phone that changed hands moves to the new account). |
 | `POST` | `/api/reports` | bearer · account | Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it. |
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
+| `GET` | `/api/v1/app-config` | public | `GET /api/v1/app-config?platform=ios|android&version=x.y.z` — public and cacheable (ETag, 304): the minimum and latest versions, the update mode, maintenance, the contract range, texts in the app's language (krizaka/.github#75). |
 
 ## Database tables (26)
 
