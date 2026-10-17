@@ -13,7 +13,7 @@
     "@krizaka/icons": "^0.3.0",
     "@krizaka/tailwind": "^3.23.0",
     "@krizaka/tokens": "^3.23.0",
-    "@krizaka/ui": "^3.23.0",
+    "@krizaka/ui": "^3.25.0",
     "next": "^16.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

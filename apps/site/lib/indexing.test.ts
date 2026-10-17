@@ -42,7 +42,7 @@ describe("APP_SEARCH_INDEXING — the public landing of a dev deployment", () =>
     expect(en.chrome.devNotice).toBe("Development environment — access by invitation");
     expect(fr.chrome.devNotice).toBe("Environnement de développement — accès sur invitation");
     const chrome = readFileSync(new URL("../components/SiteChrome.tsx", import.meta.url), "utf8");
-    expect(chrome).toMatch(/legal=\{indexable\(\) \? undefined : <span data-testid="dev-environment-notice">/);
+    expect(chrome).toMatch(/\{indexable\(\) \? null : <span data-testid="dev-environment-notice">/);
     const views = readFileSync(new URL("../components/views.tsx", import.meta.url), "utf8");
     expect(views).not.toContain("DevEnvironmentNotice");
   });

@@ -184,5 +184,39 @@
         "line": "She types her own message. From here, two people talk."
       }
     }
+  },
+  "changelog": {
+    "metaTitle": "Changelog",
+    "metaDescription": "What changed in Yasakia, week by week: new, fixed, security and breaking, with the pull request behind each line.",
+    "eyebrow": "Changelog",
+    "title": "What shipped",
+    "lead": "What changed in Yasakia, newest week first — read from the merged pull requests, not written for the page.",
+    "runs": "This site runs v{version} on Krizaka UI {ui}.",
+    "runsNoUi": "This site runs v{version}.",
+    "feed": "Subscribe (RSS)",
+    "logLabel": "Weeks",
+    "empty": "The changes could not be read right now.",
+    "emptyLink": "See the pull requests on GitHub",
+    "kinds": {
+      "added": "New",
+      "changed": "Changed",
+      "fixed": "Fixed",
+      "removed": "Removed",
+      "security": "Security",
+      "breaking": "Breaking"
+    },
+    "tags": {
+      "feature": "New",
+      "fix": "Fixed",
+      "security": "Security",
+      "breaking": "Breaking",
+      "change": "Changed"
+    },
+    "pull": "Pull request #{number}",
+    "week": "Week of {date}",
+    "feedTitle": "Yasakia — changelog",
+    "feedDescription": "What shipped in Yasakia, week by week.",
+    "footerVersion": "v{version}",
+    "langTag": "en"
   }
 }
