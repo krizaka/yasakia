@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (62)
+## Endpoints (63)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -19,6 +19,7 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `GET` | `/api/admin/health` | public | The instance's health for the console: database, realtime bus, version, environment, uptime, whether sign-up is open. |
 | `GET` | `/api/admin/intros` | public | The introductions overview for the console — state, dates, message counts; never who said what — filtered and paged on the server. |
 | `GET` | `/api/admin/overview` | public | The console's overview: accounts by status, the moderation queue, introductions by state, open batches — counts only. |
+| `POST` | `/api/admin/qa-reset` | public | Gives one QA account (`qa+…@`) a blank page again — the conversation, the portrait, the batches, the introductions — so the journey can be shown or recorded from its start. |
 | `GET` | `/api/admin/report-queue` | public | The moderation queue for the console — urgent reasons (UNDERAGE, THREAT) first while open — filtered by status and paged on the server; details open one report at a time. |
 | `GET` | `/api/admin/report-queue/{id}` | public | One report with its details opened — operators only. |
 | `PATCH` | `/api/admin/report-queue/{id}` | public | Moves a report along (REVIEWED · ACTIONED · DISMISSED, or back to OPEN); the decision is logged with who made it. |

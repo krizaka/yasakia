@@ -310,7 +310,8 @@
       "DEBRIEF_NOT_DUE": "The debrief comes once everyone in the batch is answered.",
       "INTRO_CLOSED": "This introduction is over — nobody can write in it any more.",
       "INTRO_FROZEN": "This introduction is paused while a report is reviewed.",
-      "ALREADY_CONTINUED": "You already said you want to continue."
+      "ALREADY_CONTINUED": "You already said you want to continue.",
+      "QA_RESET_REFUSED": "This reset is refused: only a QA address, never on production."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -605,7 +606,8 @@
           "admin.sessions_revoked": "Sessions ended",
           "admin.role": "Role changed",
           "admin.delete": "Account erased by an operator",
-          "admin.rules_published": "Rule set published"
+          "admin.rules_published": "Rule set published",
+          "admin.qa_reset": "QA account reset"
         }
       },
       "table": {

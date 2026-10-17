@@ -310,7 +310,8 @@
       "DEBRIEF_NOT_DUE": "Le débrief vient quand tout le lot a sa réponse.",
       "INTRO_CLOSED": "Cette présentation est terminée — plus personne ne peut y écrire.",
       "INTRO_FROZEN": "Cette présentation est en pause pendant l’examen d’un signalement.",
-      "ALREADY_CONTINUED": "Tu as déjà dit que tu veux continuer."
+      "ALREADY_CONTINUED": "Tu as déjà dit que tu veux continuer.",
+      "QA_RESET_REFUSED": "Cette réinitialisation est refusée : seulement une adresse QA, jamais en production."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -605,7 +606,8 @@
           "admin.sessions_revoked": "Sessions terminées",
           "admin.role": "Rôle modifié",
           "admin.delete": "Compte effacé par un opérateur",
-          "admin.rules_published": "Jeu de règles publié"
+          "admin.rules_published": "Jeu de règles publié",
+          "admin.qa_reset": "Compte QA réinitialisé"
         }
       },
       "table": {

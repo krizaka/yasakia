@@ -338,6 +338,12 @@
       "summary": "The console's overview: accounts by status, the moderation queue, introductions by state, open batches — counts only."
     },
     {
+      "method": "POST",
+      "path": "/api/admin/qa-reset",
+      "access": "public",
+      "summary": "Gives one QA account (`qa+…@`) a blank page again — the conversation, the portrait, the batches, the introductions — so the journey can be shown or recorded from its start."
+    },
+    {
       "method": "GET",
       "path": "/api/admin/report-queue",
       "access": "public",
