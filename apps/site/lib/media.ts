@@ -6,10 +6,9 @@
  */
 const CDN = "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour";
 
-/** The two recordings of the journey and the hashes of their files. */
+/** The recording of the whole loop (`npm run dev:journey -- --through loop`, 2026-10-17) and the hashes of its files. */
 export const CLIPS = {
-  talk: { webm: "8830c624d5", mp4: "4b648cf8ea", jpg: "a73c38309c" },
-  batch: { webm: "7861c4cb41", mp4: "561bd30f2e", jpg: "ba0817c377" },
+  loop: { webm: "c8320ba441", mp4: "31a8872f96", jpg: "8ad54182ce" },
 } as const;
 
 export type ClipId = keyof typeof CLIPS;

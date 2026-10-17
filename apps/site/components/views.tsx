@@ -149,10 +149,10 @@ export function HowView({ locale }: { locale: Locale }) {
   );
 }
 
-/** The demo: the real journey, recorded on the development site — two clips, captioned in the page. Media come from the CDN only. */
+/** The demo: the real journey, recorded on the development site — one run, captioned in the page. Media come from the CDN only. */
 export function DemoView({ locale }: { locale: Locale }) {
   const t = translator(locale);
-  const clips = ["talk", "batch"] as const;
+  const media = clip("loop");
   return (
     <>
       <SiteHeader locale={locale} current="demo" />
@@ -160,23 +160,18 @@ export function DemoView({ locale }: { locale: Locale }) {
         <PageHero eyebrow={t("demo.eyebrow")} title={t("demo.title")} lead={t("demo.lead")} backdrop="grid">
           <Status locale={locale} />
         </PageHero>
-        {clips.map((id, i) => {
-          const media = clip(id);
-          return (
-            <Section key={id} title={t(`demo.${id}Title`)} lead={t(`demo.${id}Lead`)} divider={i > 0} spacing="sm">
-              <Page size="wide">
-                <CaptionedVideo
-                  webm={media.webm}
-                  mp4={media.mp4}
-                  poster={media.poster}
-                  label={t(`demo.${id}Label`)}
-                  transcriptLabel={t("demo.transcript")}
-                  cues={id === "talk" ? CUES.talk.map((c) => ({ at: c.at, text: t(`demo.talk.cues.${c.id}`) })) : CUES.batch.map((c) => ({ at: c.at, text: t(`demo.batch.cues.${c.id}`) }))}
-                />
-              </Page>
-            </Section>
-          );
-        })}
+        <Section title={t("demo.journeyTitle")} lead={t("demo.journeyLead")} spacing="sm">
+          <Page size="wide">
+            <CaptionedVideo
+              webm={media.webm}
+              mp4={media.mp4}
+              poster={media.poster}
+              label={t("demo.journeyLabel")}
+              transcriptLabel={t("demo.transcript")}
+              cues={CUES.loop.map((c) => ({ at: c.at, text: t(`demo.journey.cues.${c.id}`) }))}
+            />
+          </Page>
+        </Section>
         <Section title={t("demo.noteTitle")} lead={t("demo.note")} spacing="sm" />
         <Section spacing="sm">
           <CtaPanel title={t("demo.nextTitle")} body={t("demo.nextText")}>

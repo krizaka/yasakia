@@ -9,8 +9,8 @@ export const WHAT_WORKS = [
   { id: "location", status: "working" },
   { id: "radius", status: "working" },
   { id: "signin", status: "working" },
-  { id: "debrief", status: "development" },
-  { id: "intros", status: "development" },
+  { id: "debrief", status: "working" },
+  { id: "intros", status: "working" },
 ] as const;
 
 export type WorksStatus = (typeof WHAT_WORKS)[number]["status"];
