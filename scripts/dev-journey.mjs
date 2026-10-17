@@ -2,11 +2,12 @@
 /**
  * `npm run dev:journey` — walks the core journey in a real browser, as the QA person, on a real deployment (dev.yasakia.com)
  * or a local server wired to the real engine: sign in, talk to the agent until it has written the portrait (and, with
- * `--through batch`, open the first batch). It records a video of the run, takes the key screens, and writes
+ * `--through batch`, open the first batch; with `--through loop`, answer it — tell me more, yes, pass —, write the first line
+ * in the introduction that opens, and send the debrief). It records a video of the run, takes the key screens, and writes
  * `evidence.json` — the engine run ids (the lines in Orazaka's logs) that prove the run was real.
  *
  *   AUTH_QA_USER_EMAIL=… AUTH_QA_USER_PASSWORD=… node scripts/dev-journey.mjs --base https://dev.yasakia.com --out <dir>
- *       [--locale fr|en] [--theme dark|light] [--viewport 1280x720|390x844] [--through talk|batch] [--no-video] [--shots]
+ *       [--locale fr|en] [--theme dark|light] [--viewport 1280x720|390x844] [--through talk|batch|loop] [--no-video] [--shots]
  *
  * The password is read from the environment and never printed. The person is the QA account, whose agent starts from a
  * blank page (`npm run db:qa-reset`, run by whoever owns the database, before a recording).
@@ -129,7 +130,7 @@ await page.waitForTimeout(2500);
 await shot(page, "05-portrait");
 
 let batch = null;
-if (through === "batch") {
+if (through === "batch" || through === "loop") {
   step("open the first batch");
   await page.goto(`${base}/app/${locale}/batch`);
   await shot(page, "06-batch-ready");
@@ -150,6 +151,69 @@ if (through === "batch") {
     await shot(page, "08-batch-reasons");
     evidence.batchPeople = await page.locator("h2, h3").allTextContents();
   }
+}
+
+/** The words of the buttons, as the page says them (messages/*.json). */
+const UI = {
+  fr: { more: "Dis-m’en plus", yes: "Intéressé·e", pass: "Je passe", toIntros: "Tes présentations", send: "Envoyer", debrief: "Envoyer le débrief", chips: ["En partie", "Les valeurs", "Plus près de chez moi"], note: "Plus près du Plateau, si possible." },
+  en: { more: "Tell me more", yes: "Interested", pass: "Pass", toIntros: "Your introductions", send: "Send", debrief: "Send the debrief", chips: ["Partly", "Values", "Closer to me"], note: "Closer to the Plateau, if possible." },
+}[locale];
+
+if (through === "loop" && batch?.status === 201) {
+  const decisions = [];
+  page.on("response", async (res) => {
+    if (/\/api\/batches\/[^/]+\/items\/[^/]+\/decision$/.test(res.url()) && res.ok()) decisions.push(await res.json().catch(() => ({})));
+  });
+  step("answer the batch");
+  await page.mouse.wheel(0, -2000);
+  await page.getByRole("button", { name: UI.more }).first().click();
+  await page.waitForTimeout(2500);
+  await shot(page, "09-tell-me-more");
+  const yes = page.waitForResponse((r) => r.url().endsWith("/decision") && r.request().method() === "POST", { timeout: 120_000 });
+  await page.getByRole("button", { name: UI.yes }).first().click();
+  const said = await (await yes).json();
+  evidence.introId = said.introId ?? null;
+  step(`said yes: intro ${said.introId ? "opened" : "not opened"}`);
+  await page.waitForTimeout(2500);
+  while ((await page.getByRole("button", { name: UI.pass }).count()) > 0) {
+    const passed = page.waitForResponse((r) => r.url().endsWith("/decision") && r.request().method() === "POST");
+    await page.getByRole("button", { name: UI.pass }).first().click();
+    await passed;
+    await page.waitForTimeout(900);
+  }
+  step("everyone answered");
+  await page.mouse.wheel(0, -2000);
+  await page.getByRole("button", { name: UI.debrief }).waitFor({ timeout: 30_000 });
+  await page.waitForTimeout(1500);
+  await shot(page, "10-debrief");
+  for (const chip of UI.chips) await page.getByRole("radio", { name: chip, exact: true }).click();
+  await page.locator("textarea").first().pressSequentially(UI.note, { delay: 20 });
+  const debriefed = page.waitForResponse((r) => r.url().endsWith("/debrief") && r.request().method() === "POST");
+  await page.getByRole("button", { name: UI.debrief }).click();
+  evidence.debriefStatus = (await debriefed).status();
+  step(`debrief sent: HTTP ${evidence.debriefStatus}`);
+  await page.waitForTimeout(2500);
+  if (evidence.introId) {
+    step("open the introduction");
+    await page.goto(`${base}/app/${locale}/intros/${evidence.introId}`);
+    const box = page.locator("textarea");
+    await box.waitFor();
+    await page.waitForTimeout(2500);
+    await shot(page, "11-intro");
+    // The line her agent whispered (only she sees it): she sends it as it is — the page shows it above the conversation.
+    const detail = await page.evaluate(async (id) => (await (await fetch(`/api/intros/${id}`, { credentials: "same-origin" })).json()).intro, evidence.introId);
+    evidence.openerShown = Boolean(detail?.opener);
+    const line = detail?.opener ?? UI.note;
+    await box.click();
+    await box.pressSequentially(line.slice(0, 160), { delay: 22 });
+    const sent = page.waitForResponse((r) => r.url().endsWith("/messages") && r.request().method() === "POST");
+    await box.press("Enter");
+    evidence.introMessageStatus = (await sent).status();
+    step(`first line sent: HTTP ${evidence.introMessageStatus}`);
+    await page.waitForTimeout(3000);
+    await shot(page, "12-intro-message");
+  }
+  evidence.decisions = decisions.length + 1;
 }
 
 const agent = await page.evaluate(async () => (await (await fetch("/api/agent", { credentials: "same-origin" })).json()).agent);
