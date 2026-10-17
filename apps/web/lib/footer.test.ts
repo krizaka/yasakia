@@ -1,7 +1,10 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
+import { SiteFooter } from "@/components/SiteChrome";
 
 // One footer, one contentinfo: @krizaka/ui's SiteFooter in product mode, rendered once per legal page after its content.
 const ROOT = join(__dirname, "..");
@@ -30,5 +33,14 @@ describe("the web pages render exactly one footer", () => {
       .filter((f) => /\.tsx$/.test(f) && !/SiteChrome\.tsx$/.test(f))
       .filter((f) => /<footer\b|<FamilyFooter\b/.test(read(f)));
     expect(offenders).toEqual([]);
+  });
+
+  it("renders one footer landmark, signed « A Krizaka product », with no family navigation", () => {
+    for (const locale of ["en", "fr"] as const) {
+      const html = renderToStaticMarkup(SiteFooter({ locale, source: "test" }));
+      expect(html.match(/<footer\b/g)).toHaveLength(1);
+      expect(html).toContain('href="https://www.krizaka.com"');
+      expect(html).not.toMatch(/Krizaka family|Famille Krizaka/);
+    }
   });
 });

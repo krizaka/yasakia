@@ -1,6 +1,6 @@
 import { YasakiaLogo } from "@krizaka/ui";
 import { Page } from "@krizaka/ui/page";
-import { SiteFooter as FamilyFooter } from "@krizaka/ui/site-footer";
+import { SiteFooter as FamilyFooter, SiteFooterColumn, SiteFooterLink } from "@krizaka/ui/site-footer";
 import { familyLabels } from "@krizaka/ui/sites";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
@@ -64,15 +64,15 @@ export function SiteFooter({ locale, source }: { locale: Locale; source: string 
       data-testid="app-version"
       legal={indexable() ? undefined : <span data-testid="dev-environment-notice">{t("chrome.devNotice")}</span>}
     >
-      <FamilyFooter.Column title="Yasakia">
+      <SiteFooterColumn title="Yasakia">
         {LEGAL_PAGES.map((page) => (
-          <FamilyFooter.Link key={page} asChild>
+          <SiteFooterLink key={page} asChild>
             <Link href={`/${locale}/${LEGAL_PATHS[page]}`}>{t(`chrome.nav.${page}`)}</Link>
-          </FamilyFooter.Link>
+          </SiteFooterLink>
         ))}
-        <FamilyFooter.Link href={REPO_URL}>{t("chrome.sourceCode")}</FamilyFooter.Link>
-        <FamilyFooter.Link href={contactHref(source)}>{t("chrome.contact")}</FamilyFooter.Link>
-      </FamilyFooter.Column>
+        <SiteFooterLink href={REPO_URL}>{t("chrome.sourceCode")}</SiteFooterLink>
+        <SiteFooterLink href={contactHref(source)}>{t("chrome.contact")}</SiteFooterLink>
+      </SiteFooterColumn>
     </FamilyFooter>
   );
 }
