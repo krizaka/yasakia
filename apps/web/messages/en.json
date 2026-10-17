@@ -13,7 +13,6 @@
       "deleteAccount": "Delete your account"
     },
     "languageLabel": "Language",
-    "otherLanguage": "Français",
     "themeToggle": "Switch between light and dark",
     "footerLabel": "Site footer",
     "sourceCode": "Source code",
@@ -244,7 +243,6 @@
       "signOut": "Sign out",
       "signingOut": "Signing out…",
       "language": "Language",
-      "otherLanguage": "Français",
       "theme": "Switch between light and dark",
       "devBuild": "Development build {version}",
       "devNote": "In development — not open to the public.",

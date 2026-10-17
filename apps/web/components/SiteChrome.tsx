@@ -1,11 +1,12 @@
 import { YasakiaLogo } from "@krizaka/ui";
+import { languagesFor,LanguageSwitch } from "@krizaka/ui/language-switch";
 import { Page } from "@krizaka/ui/page";
 import { SiteFooter as FamilyFooter, SiteFooterColumn, SiteFooterLink } from "@krizaka/ui/site-footer";
 import { familyLabels } from "@krizaka/ui/sites";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
-import { type Locale, otherLocale, translator } from "@/lib/i18n";
+import { type Locale, translator } from "@/lib/i18n";
 import { indexable } from "@/lib/indexing";
 import { contactHref, LEGAL_PAGES, LEGAL_PATHS, type LegalPage, PRODUCT_URL, REPO_URL } from "@/lib/site";
 
@@ -18,8 +19,7 @@ const navLink =
  */
 export function SiteHeader({ locale, current }: { locale: Locale; current?: LegalPage }) {
   const t = translator(locale);
-  const other = otherLocale(locale);
-  const otherPath = `/${other}${current ? `/${LEGAL_PATHS[current]}` : ""}`;
+  const here = `/${locale}${current ? `/${LEGAL_PATHS[current]}` : ""}`;
   return (
     <header className="border-b border-border-default bg-surface-0/80 backdrop-blur-md">
       <Page className="flex min-h-16 flex-wrap items-center gap-x-4 gap-y-2 py-3">
@@ -35,10 +35,7 @@ export function SiteHeader({ locale, current }: { locale: Locale; current?: Lega
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Link href={otherPath} hrefLang={other} lang={other} className={navLink}>
-            <span className="sr-only">{t("chrome.languageLabel")} · </span>
-            {t("chrome.otherLanguage")}
-          </Link>
+          <LanguageSwitch label={t("chrome.languageLabel")} current={locale} languages={languagesFor(here)} linkAs={Link} />
           <ThemeToggle label={t("chrome.themeToggle")} variant="ghost" />
         </div>
       </Page>

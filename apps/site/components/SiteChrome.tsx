@@ -3,13 +3,14 @@
 import { HomeIcon, InfoIcon, PlayIcon } from "@krizaka/icons";
 import { YasakiaLogo } from "@krizaka/ui";
 import { Button } from "@krizaka/ui/button";
+import { languagesFor } from "@krizaka/ui/language-switch";
 import { NavBar } from "@krizaka/ui/nav-bar";
 import { SiteFooter as FamilyFooter } from "@krizaka/ui/site-footer";
 import { familyLabels } from "@krizaka/ui/sites";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
-import { format, getDictionary, type Locale, otherLocale, translator } from "@/lib/i18n";
+import { format, getDictionary, type Locale, translator } from "@/lib/i18n";
 import { indexable } from "@/lib/indexing";
 import { groupOf, NAV_GROUPS, signInHref } from "@/lib/nav";
 import { APP_UI_VERSION, APP_VERSION, changelogPath, contactHref, type PageId, pagePath, PAGES, REPO_URL } from "@/lib/site";
@@ -21,9 +22,9 @@ const ICONS = { home: <HomeIcon />, "how-it-works": <InfoIcon />, demo: <PlayIco
 
 /** The bar: the animated mark, the DEV badge · the sections of this site · the repository, the theme, the language and
     the one action. No family switcher: a deployed product is independent. Below md, one panel. */
-export function SiteHeader({ locale, current, switchHref }: { locale: Locale; current: PageId; switchHref?: string }) {
+export function SiteHeader({ locale, current, path }: { locale: Locale; current: PageId; path?: string }) {
   const t = translator(locale);
-  const other = otherLocale(locale);
+  const languages = languagesFor(path ?? pagePath(locale, current));
   return (
     <div className="pointer-events-none fixed inset-x-0 top-3 z-50 px-3">
       <NavBar.Root label={t("chrome.navLabel")} className="pointer-events-auto mx-auto max-w-(--kz-page-max,72rem)">
@@ -50,12 +51,9 @@ export function SiteHeader({ locale, current, switchHref }: { locale: Locale; cu
           <span className="hidden md:inline-flex">
             <ThemeToggle label={t("chrome.themeToggle")} variant="ghost" />
           </span>
-          <Button asChild variant="outline" size="sm" className="hidden h-7 w-auto px-2 font-mono text-[11px] font-semibold tracking-wide md:inline-flex">
-            <Link href={switchHref ?? pagePath(other, current)} hrefLang={other} lang={other}>
-              <span className="sr-only">{t("chrome.languageLabel")} · </span>
-              {t("chrome.otherLanguage")}
-            </Link>
-          </Button>
+          <span className="hidden md:inline-flex">
+            <NavBar.Language label={t("chrome.languageLabel")} current={locale} languages={languages} linkAs={Link} />
+          </span>
           <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
             <a href={signInHref(locale)}>{t("chrome.signIn")}</a>
           </Button>
@@ -77,14 +75,10 @@ export function SiteHeader({ locale, current, switchHref }: { locale: Locale; cu
             <NavBar.MobileLink asChild>
               <a href={signInHref(locale)}>{t("chrome.signIn")}</a>
             </NavBar.MobileLink>
-            <NavBar.MobileLink asChild>
-              <Link href={switchHref ?? pagePath(other, current)} hrefLang={other} lang={other}>
-                {t("chrome.otherLanguage")}
-              </Link>
-            </NavBar.MobileLink>
-            <div className="flex items-center gap-2 px-3 py-1">
+            <NavBar.MobilePreferences label={t("chrome.preferences")}>
               <ThemeToggle label={t("chrome.themeToggle")} variant="ghost" />
-            </div>
+              <NavBar.Language label={t("chrome.languageLabel")} current={locale} languages={languages} linkAs={Link} />
+            </NavBar.MobilePreferences>
             <Button asChild variant="primary" size="md" shape="cut" className="mt-2 font-bold">
               <a href={contactHref("dev-yasakia-bar")}>{t("chrome.contact")}</a>
             </Button>

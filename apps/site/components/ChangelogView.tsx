@@ -1,7 +1,7 @@
 import { ChangelogBody } from "@/components/ChangelogBody";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CHANGELOG_REPO, loadReleases } from "@/lib/changelog";
-import { getDictionary, type Locale, otherLocale } from "@/lib/i18n";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import { APP_UI_VERSION, APP_VERSION, changelogPath, pagePath } from "@/lib/site";
 
 /** `/changelog/` and `/fr/changelog/` (changelog template): the weeks of merged work, read from GitHub at build. */
@@ -9,7 +9,7 @@ export async function ChangelogView({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   return (
     <>
-      <SiteHeader locale={locale} current="home" switchHref={changelogPath(otherLocale(locale))} />
+      <SiteHeader locale={locale} current="home" path={changelogPath(locale)} />
       <main id="main" className="pt-20">
         <ChangelogBody
           c={t.changelog}
