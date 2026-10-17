@@ -14,7 +14,6 @@
       "product": "Produit"
     },
     "languageLabel": "Langue",
-    "otherLanguage": "English",
     "themeToggle": "Basculer entre clair et sombre",
     "product": "Un produit Krizaka",
     "sourceCode": "Code source",
@@ -36,7 +35,8 @@
         "text": "Le vrai parcours, enregistré sur le site de développement."
       }
     },
-    "signIn": "Se connecter (sur invitation)"
+    "signIn": "Se connecter (sur invitation)",
+    "preferences": "Préférences"
   },
   "status": {
     "label": "En développement",

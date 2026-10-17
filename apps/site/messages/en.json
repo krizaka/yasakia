@@ -14,7 +14,6 @@
       "product": "Product"
     },
     "languageLabel": "Language",
-    "otherLanguage": "Français",
     "themeToggle": "Switch between light and dark",
     "product": "A Krizaka product",
     "sourceCode": "Source code",
@@ -36,7 +35,8 @@
         "text": "The real journey, recorded on the development site."
       }
     },
-    "signIn": "Sign in (by invitation)"
+    "signIn": "Sign in (by invitation)",
+    "preferences": "Preferences"
   },
   "status": {
     "label": "Under development",

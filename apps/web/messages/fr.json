@@ -13,7 +13,6 @@
       "deleteAccount": "Supprimer ton compte"
     },
     "languageLabel": "Langue",
-    "otherLanguage": "English",
     "themeToggle": "Passer du thème clair au sombre",
     "footerLabel": "Pied de page",
     "sourceCode": "Code source",
@@ -244,7 +243,6 @@
       "signOut": "Se déconnecter",
       "signingOut": "Déconnexion…",
       "language": "Langue",
-      "otherLanguage": "English",
       "theme": "Passer du thème clair au sombre",
       "devBuild": "Version de développement {version}",
       "devNote": "En développement — fermé au public.",
