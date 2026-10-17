@@ -47,7 +47,7 @@ services:
       # ≤ 70 % of the database's usable slots — docs/DEPLOYMENT.md, "Database connections".
       - key: DATABASE_MAX_CONNECTIONS
         scope: RUN_TIME
-        value: "5"
+        value: "2"
       - key: AUTH_SESSION_SECRET
         scope: RUN_TIME
         type: SECRET

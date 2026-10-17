@@ -37,7 +37,7 @@ services:
       - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }
       - { key: DATABASE_DIRECT_URL, scope: RUN_TIME, type: SECRET }
       - { key: DATABASE_CA_CERT, scope: RUN_TIME, type: SECRET }
-      - { key: DATABASE_MAX_CONNECTIONS, scope: RUN_TIME, value: "4" }
+      - { key: DATABASE_MAX_CONNECTIONS, scope: RUN_TIME, value: "2" }
       - { key: AUTH_SESSION_SECRET, scope: RUN_TIME, type: SECRET }
       - { key: DATABASE_ENCRYPTION_KEY, scope: RUN_TIME, type: SECRET }
       - { key: AUTH_SIGNUP_ENABLED, scope: RUN_TIME, value: "false" }
