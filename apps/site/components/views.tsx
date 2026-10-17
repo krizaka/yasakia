@@ -1,7 +1,5 @@
-import { YasakiaLogo } from "@krizaka/ui";
 import { CtaPanel } from "@krizaka/ui/cta-panel";
 import { HowItWorksPage } from "@krizaka/ui/how-it-works-page";
-import { LandingPage } from "@krizaka/ui/landing-page";
 import { Page, Section } from "@krizaka/ui/page";
 import { PageHero } from "@krizaka/ui/page-hero";
 import Link from "next/link";
@@ -9,12 +7,14 @@ import Link from "next/link";
 import { CUES } from "@/lib/demo";
 import { type Locale, translator } from "@/lib/i18n";
 import { clip } from "@/lib/media";
-import { contactHref, pagePath, REPO_URL } from "@/lib/site";
-import { WHAT_WORKS } from "@/lib/what-works";
+import { pagePath, REPO_URL } from "@/lib/site";
 
 import { ButtonLink } from "./ButtonLink";
 import { CaptionedVideo } from "./CaptionedVideo";
+import { HomeView } from "./home/HomeView";
 import { SiteFooter, SiteHeader } from "./SiteChrome";
+
+export { HomeView };
 
 function Status({ locale }: { locale: Locale }) {
   const t = translator(locale);
@@ -23,73 +23,6 @@ function Status({ locale }: { locale: Locale }) {
       <strong className="shrink-0 font-semibold text-fg-accent">{t("status.label")}</strong>
       <span>{t("status.text")}</span>
     </p>
-  );
-}
-
-/** The landing: the promise beside the animated mark, four rules, the closing call. */
-export function HomeView({ locale }: { locale: Locale }) {
-  const t = translator(locale);
-  const rules = ["talk", "batch", "both", "debrief"] as const;
-  return (
-    <>
-      <SiteHeader locale={locale} current="home" />
-      <main id="main">
-        <LandingPage
-          eyebrow={t("home.eyebrow")}
-          title={t("home.title")}
-          lead={
-            <>
-              {t("home.lead")}
-              <Status locale={locale} />
-            </>
-          }
-          actions={
-            <>
-              <ButtonLink href={pagePath(locale, "how-it-works")} variant="primary" shimmer>
-                {t("home.ctaHow")}
-              </ButtonLink>
-              <ButtonLink href={pagePath(locale, "demo")}>{t("home.ctaDemo")}</ButtonLink>
-            </>
-          }
-          visual={
-            <div className="flex min-h-64 items-center justify-center py-8">
-              <YasakiaLogo size={200} title="Yasakia" />
-            </div>
-          }
-          visualLabel="yasakia.com"
-          featuresHeading={{ title: t("home.principlesTitle"), lead: t("home.principlesLead") }}
-          features={rules.map((id, i) => ({ id, title: t(`home.principles.${id}.title`), text: t(`home.principles.${id}.text`), size: i === 0 ? ("lg" as const) : ("sm" as const) }))}
-          closing={{
-            title: t("home.closingTitle"),
-            body: t("home.closingLead"),
-            actions: (
-              <>
-                <ButtonLink href={REPO_URL} variant="primary">
-                  {t("home.closingSource")}
-                </ButtonLink>
-                <ButtonLink href={contactHref("dev-yasakia-home")}>{t("home.closingContact")}</ButtonLink>
-              </>
-            ),
-          }}
-        />
-        <Section id="works" title={t("home.works.label")} lead={t("home.works.lead")} divider>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {WHAT_WORKS.map((w) => (
-              <li key={w.id} className="rounded-xl border border-border-default bg-surface-1 p-4">
-                <p className="flex items-center justify-between gap-2 font-semibold text-fg">
-                  {t(`home.works.items.${w.id}.title`)}
-                  <span className={w.status === "working" ? "shrink-0 text-xs font-semibold text-fg-accent" : "shrink-0 text-xs font-semibold text-fg-muted"}>
-                    {t(w.status === "working" ? "home.works.working" : "home.works.development")}
-                  </span>
-                </p>
-                <p className="mt-1 text-sm text-fg-secondary">{t(`home.works.items.${w.id}.text`)}</p>
-              </li>
-            ))}
-          </ul>
-        </Section>
-      </main>
-      <SiteFooter locale={locale} />
-    </>
   );
 }
 

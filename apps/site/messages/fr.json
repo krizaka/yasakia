@@ -43,32 +43,7 @@
     "text": "Yasakia se construit à ciel ouvert. Il n'y a pas encore d'appli à télécharger ni de compte à créer — ce site dit ce qu'elle sera et montre ce qui tourne déjà."
   },
   "home": {
-    "title": "On se parle d'abord. On se rencontre dans les deux sens.",
-    "eyebrow": "L'appli de rencontre où l'on se parle d'abord",
-    "lead": "Pas de swipe, pas de catalogue, pas de score. Un agent apprend à vous connaître avec vos mots, puis ouvre un petit lot de personnes qui vous conviennent dans les deux sens.",
-    "ctaHow": "Comment ça marche",
     "ctaDemo": "Voir la démo",
-    "ctaSource": "Suivre la construction",
-    "principlesTitle": "Quatre règles, tenues par conception",
-    "principlesLead": "Ce que Yasakia refuse compte autant que ce qu'elle fait.",
-    "principles": {
-      "talk": {
-        "title": "Une conversation, pas un formulaire",
-        "text": "L'agent pose une question à la fois, avec humour, dans votre langue."
-      },
-      "batch": {
-        "title": "Trois à cinq personnes, pas un fil",
-        "text": "Un petit lot, chacune avec « pourquoi vous deux » en mots — jamais un score."
-      },
-      "both": {
-        "title": "Dans les deux sens, ou pas du tout",
-        "text": "Quelqu'un n'apparaît que s'il vous convient et que vous lui convenez."
-      },
-      "debrief": {
-        "title": "Le prochain lot vous attend",
-        "text": "Vous faites le bilan du dernier d'abord : chaque lot vous va mieux que le précédent."
-      }
-    },
     "closingTitle": "Construit à ciel ouvert",
     "closingLead": "Yasakia est open source, sur les mêmes fondations qu'Orochia et Orazaka. Lisez le code, ou dites-nous ce que vous attendez d'une appli de rencontre.",
     "closingSource": "Code source",
@@ -218,5 +193,269 @@
     "feedDescription": "Ce que Yasakia a livré, semaine par semaine.",
     "footerVersion": "v{version}",
     "langTag": "fr-CA"
+  },
+  "landing": {
+    "eyebrow": "L'appli de rencontre où l'on se parle d'abord",
+    "title": "De vraies personnes. On se parle d'abord.",
+    "lead": "Pas de swipe sans fin, pas de score. Un agent apprend à te connaître avec tes mots, puis t'ouvre un petit lot de personnes dont les photos sont vérifiées et qui te conviennent dans les deux sens. Les messages, c'est toi qui les écris.",
+    "ctaTalk": "Parler de Yasakia avec nous",
+    "ctaJourney": "Voir le parcours de Camille",
+    "status": "Yasakia se construit à ciel ouvert : les inscriptions sont fermées et il n'y a pas encore d'appli à installer. Ce site dit ce qu'elle sera et montre ce qui tourne déjà.",
+    "hero": {
+      "visualLabel": "yasakia — ton profil",
+      "visualAlt": "Un téléphone : ton profil de vraies personnes, avec les photos vérifiées et la marque de ce que tu écris.",
+      "profile": "Ton profil",
+      "photos": "Photos",
+      "photosOk": "4 à 6 photos, dont 2 de ton visage",
+      "checkFace": "Ton visage est le sujet",
+      "checkWords": "Rien d'écrit sur une photo",
+      "checkAge": "Personne qui semble avoir moins de 18 ans",
+      "stamp": "Écrit à la main",
+      "stampHint": "Un signal avant chaque message, jamais un verdict.",
+      "mine": "Ce message est de toi. L'agent n'écrit rien à ta place."
+    },
+    "figures": {
+      "batch": "personnes par lot, jamais un fil",
+      "photos": "photos minimum, dont 2 de ton visage",
+      "days": "jours pour se parler"
+    },
+    "features": {
+      "eyebrow": "Ce que Yasakia fait",
+      "title": "Quatre promesses, tenues par conception",
+      "lead": "Ce que Yasakia refuse compte autant que ce qu'elle fait.",
+      "items": {
+        "real": {
+          "title": "De vraies personnes",
+          "text": "Un profil, c'est 4 à 6 photos dont 2 de ton visage, vérifiées avant qu'un lot s'ouvre. Une photo refusée se remplace, elle n'est jamais sanctionnée."
+        },
+        "intros": {
+          "title": "Des présentations, sans swipe",
+          "text": "Quand toi et l'autre personne dites oui, une présentation s'ouvre pour sept jours. Un petit lot de trois à cinq personnes, jamais un catalogue."
+        },
+        "words": {
+          "title": "Tes mots, jamais ceux de l'IA",
+          "text": "L'agent apprend à te connaître en conversation. Il n'écrit aucun message à ta place et ne lit jamais ta conversation avec quelqu'un."
+        },
+        "signal": {
+          "title": "Un signal d'authenticité",
+          "text": "Une petite marque avant chaque message dit s'il semble écrit à la main. Un signal, jamais un chiffre, et il ne bloque rien."
+        }
+      }
+    },
+    "people": {
+      "eyebrow": "De vraies personnes",
+      "title": "Des photos vérifiées avant le premier lot",
+      "lead": "Un lot ne s'ouvre qu'une fois ton jeu de photos vérifié. La vérification peut se tromper, et le texte dit ce qu'elle regarde, et ce qu'elle ne regarde pas.",
+      "checks": {
+        "count": {
+          "title": "4 à 6 photos",
+          "text": "Dont au moins 2 où l'on voit ton visage."
+        },
+        "face": {
+          "title": "Un visage est le sujet",
+          "text": "Rien n'est écrit sur une photo, pas de capture d'écran, personne qui semble avoir moins de 18 ans."
+        },
+        "private": {
+          "title": "Privées par défaut",
+          "text": "Montrées seulement à quelqu'un de ton lot ou de ta présentation, par un lien qui expire en quelques minutes. Les métadonnées, le GPS compris, sont retirées."
+        },
+        "nobody": {
+          "title": "Elle n'identifie personne",
+          "text": "Comparer tes photos entre elles est un traitement biométrique : c'est désactivé, et même activé, seulement avec ton accord distinct et explicite."
+        }
+      },
+      "powered": "Propulsé par Orazaka : la vérification des photos et le signal d'authenticité tournent sur le moteur, et chaque passage garde son identifiant d'exécution."
+    },
+    "journey": {
+      "eyebrow": "Le parcours de Camille",
+      "title": "Une conversation, un lot, un oui des deux côtés",
+      "lead": "Camille est une personne de test, une adulte fictive : son parcours est celui d'un vrai passage sur le site de développement, vu sur un téléphone. Ses phrases sont celles qu'elle a dites.",
+      "phoneLabel": "Le parcours de Camille, étape par étape",
+      "stepOf": "Étape {n} sur {total}",
+      "says": "Camille dit",
+      "note": "Les personnes qu'elle rencontre sont une distribution fictive : personne ici n'existe. Les mots de l'agent sont générés en direct, donc un passage diffère du suivant. L'enregistrement complet est dans la démo.",
+      "demo": "Voir la démo enregistrée",
+      "steps": {
+        "talk": {
+          "title": "Elle parle en premier",
+          "text": "Une question à la fois, dans sa langue. Pas de formulaire.",
+          "says": "Salut ! Moi c'est Camille, je suis une femme et je vis à Montréal."
+        },
+        "portrait": {
+          "title": "Son portrait, en mots",
+          "text": "L'agent écrit qui elle est et qui elle cherche, à partir de ce qu'elle a dit. Elle peut le lire. Jamais une note.",
+          "says": "J'espère rencontrer quelqu'un de curieux, qui lit, qui aime cuisiner et qui sait écouter."
+        },
+        "batch": {
+          "title": "Un petit lot de cinq personnes",
+          "text": "Chacune vient avec pourquoi vous deux, en mots, dans les deux sens. Pas de swipe."
+        },
+        "yes": {
+          "title": "Un oui des deux côtés",
+          "text": "Elle dit oui, il a dit oui aussi : une présentation s'ouvre pour sept jours."
+        },
+        "write": {
+          "title": "Elle écrit son message",
+          "text": "L'agent n'écrit aucune phrase et ne lit jamais la suite. À partir de là, deux personnes se parlent."
+        }
+      }
+    },
+    "notDoing": {
+      "eyebrow": "Ce que Yasakia ne fait pas",
+      "title": "Trois refus, et ce qu'ils te coûtent",
+      "lead": "Chaque refus est une décision, dite avec son prix.",
+      "labels": {
+        "chose": "On a choisi",
+        "refused": "On a refusé",
+        "because": "Parce que",
+        "cost": "Ce que ça te coûte"
+      },
+      "items": {
+        "ghostwriting": {
+          "chose": "Chaque message est écrit par une personne.",
+          "refused": "Une première phrase suggérée, une réponse rédigée par l'agent.",
+          "because": "Tu veux parler à quelqu'un, pas à son assistant.",
+          "cost": "Tu cherches tes mots toi-même, même pour la première phrase."
+        },
+        "swipe": {
+          "chose": "Un lot de trois à cinq personnes, et tu y réponds.",
+          "refused": "Un fil infini à balayer.",
+          "because": "Un fil sans fin fait glisser sans regarder.",
+          "cost": "Moins de profils à parcourir : s'il y en a moins de trois, tu attends."
+        },
+        "score": {
+          "chose": "Pourquoi vous deux, en mots, dans les deux sens.",
+          "refused": "Une note d'affinité, un classement.",
+          "because": "Une note donne l'impression d'une vérité qu'elle n'est pas.",
+          "cost": "Il faut lire quelques phrases au lieu d'un pourcentage."
+        }
+      }
+    },
+    "comparison": {
+      "eyebrow": "En comparaison",
+      "title": "Yasakia, face à une appli à swipe",
+      "lead": "Une comparaison honnête : ce que chacune demande, et ce qu'elle te montre.",
+      "topic": "Question",
+      "columns": {
+        "yasakia": "Yasakia",
+        "swipe": "Une appli à swipe typique",
+        "ghost": "Une appli qui écrit pour toi"
+      },
+      "rows": {
+        "start": {
+          "topic": "Comment on commence",
+          "yasakia": {
+            "key": "Une conversation.",
+            "detail": "Un agent te connaît avec tes mots."
+          },
+          "swipe": {
+            "key": "Un formulaire.",
+            "detail": "Des champs et des photos, puis le fil."
+          },
+          "ghost": {
+            "key": "Un profil rédigé.",
+            "detail": "Un texte généré à ta place."
+          }
+        },
+        "show": {
+          "topic": "Ce qu'on te montre",
+          "yasakia": {
+            "key": "Trois à cinq personnes.",
+            "detail": "Avec pourquoi vous deux, en mots."
+          },
+          "swipe": {
+            "key": "Un fil.",
+            "detail": "Des profils qui s'enchaînent, sans fin."
+          },
+          "ghost": {
+            "key": "Des suggestions.",
+            "detail": "Classées pour toi."
+          }
+        },
+        "photos": {
+          "topic": "Les photos",
+          "yasakia": {
+            "key": "4 à 6, dont 2 de ton visage.",
+            "detail": "Vérifiées avant l'ouverture d'un lot."
+          },
+          "swipe": {
+            "key": "Au choix.",
+            "detail": "Souvent sans vérification."
+          },
+          "ghost": {
+            "key": "Au choix.",
+            "detail": "Ou retouchées, ou générées."
+          }
+        },
+        "writes": {
+          "topic": "Qui écrit les messages",
+          "yasakia": {
+            "key": "Toi, et l'autre personne.",
+            "detail": "L'agent n'écrit rien."
+          },
+          "swipe": {
+            "key": "Les personnes.",
+            "detail": "Le plus souvent."
+          },
+          "ghost": {
+            "key": "Une IA.",
+            "detail": "Des phrases suggérées ou rédigées."
+          }
+        },
+        "signal": {
+          "topic": "Savoir si c'est écrit à la main",
+          "yasakia": {
+            "key": "Un signal avant chaque message.",
+            "detail": "Jamais un verdict, jamais un chiffre."
+          },
+          "swipe": {
+            "key": "Rien.",
+            "detail": "À toi de deviner."
+          },
+          "ghost": {
+            "key": "Rien.",
+            "detail": "C'est le principe."
+          }
+        }
+      }
+    },
+    "promise": {
+      "label": "La promesse de l'inséparable",
+      "text": "Je présente deux personnes. Ensuite, c'est à elles de se parler."
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Ce qu'on nous demande",
+      "items": {
+        "open": {
+          "q": "Je peux me joindre à Yasakia ?",
+          "a": "Pas encore. Yasakia se construit à ciel ouvert : les inscriptions sont fermées et il n'y a pas d'appli à installer. Le code est public, et tu peux nous dire ce que tu attends d'une appli de rencontre."
+        },
+        "photos": {
+          "q": "Pourquoi des photos vérifiées ?",
+          "a": "Pour de vraies personnes : de 4 à 6 photos, dont au moins 2 de ton visage. Un lot ne s'ouvre qu'une fois le jeu vérifié. La vérification peut se tromper : une photo refusée se remplace, elle n'est jamais sanctionnée."
+        },
+        "faces": {
+          "q": "Yasakia compare mes visages ?",
+          "a": "Comparer tes photos entre elles est un traitement biométrique. C'est désactivé tant que ça n'a pas été examiné, et même alors seulement avec ton accord distinct et explicite. Rien n'est conservé."
+        },
+        "writes": {
+          "q": "L'IA écrit mes messages ?",
+          "a": "Non. Chaque message est écrit par une personne : l'agent n'écrit rien à ta place et ne lit jamais ta conversation."
+        },
+        "signal": {
+          "q": "C'est quoi, la marque avant un message ?",
+          "a": "Un signal : écrit à la main, incertain, probablement généré ou trop court pour juger. Jamais un verdict, jamais un chiffre, et il ne bloque aucun message. Ces détecteurs sont peu fiables, surtout sur les textes courts : la façon dont le message a été tapé compte autant que son texte."
+        },
+        "engine": {
+          "q": "Sur quoi tourne l'IA ?",
+          "a": "Sur Orazaka, le moteur de Krizaka : l'agent, la vérification des photos et le signal d'authenticité. Yasakia reste le produit ; le moteur est la fondation."
+        }
+      }
+    },
+    "closing": {
+      "title": "Construit à ciel ouvert",
+      "body": "Yasakia est open source. Lis le code, ou dis-nous ce que tu attends d'une appli de rencontre."
+    }
   }
 }
