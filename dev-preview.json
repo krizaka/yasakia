@@ -79,9 +79,8 @@
       "issue": "https://github.com/krizaka/.github/issues/78"
     },
     "admin.gated": {
-      "evidence": null,
-      "gap": "No test proves the host/IP gate and the 404 on the public host (dev.yasakia.com/admin answers 307).",
-      "issue": "https://github.com/krizaka/yasakia/issues/66"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/apps/web/lib/host.test.ts",
+      "checked": "2026-10-17"
     },
     "admin.noindex": {
       "evidence": "https://admin.yasakia.com/robots.txt",
