@@ -1,11 +1,11 @@
 import { YasakiaLogo } from "@krizaka/ui";
-import { languagesFor,LanguageSwitch } from "@krizaka/ui/language-switch";
 import { Page } from "@krizaka/ui/page";
 import { SiteFooter as FamilyFooter, SiteFooterColumn, SiteFooterLink } from "@krizaka/ui/site-footer";
 import { familyLabels } from "@krizaka/ui/sites";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
+import { LocaleSwitch } from "@/components/LocaleSwitch";
 import { type Locale, translator } from "@/lib/i18n";
 import { indexable } from "@/lib/indexing";
 import { contactHref, LEGAL_PAGES, LEGAL_PATHS, type LegalPage, PRODUCT_URL, REPO_URL } from "@/lib/site";
@@ -35,7 +35,7 @@ export function SiteHeader({ locale, current }: { locale: Locale; current?: Lega
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <LanguageSwitch label={t("chrome.languageLabel")} current={locale} languages={languagesFor(here)} linkAs={Link} />
+          <LocaleSwitch label={t("chrome.languageLabel")} current={locale} path={here} />
           <ThemeToggle label={t("chrome.themeToggle")} variant="ghost" />
         </div>
       </Page>
