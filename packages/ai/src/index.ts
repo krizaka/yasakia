@@ -1,4 +1,4 @@
-export { Extraction, FACET_KEYS, FACETS, type FacetKey, isSensitiveFacet, type Language, Portrait, Reasons, type Turn, TurnRole } from "./agent/agent.types";
+export { BatchReasons, Extraction, FACET_KEYS, FACETS, type FacetKey, isSensitiveFacet, type Language, Portrait, Reasons, type Turn, TurnRole } from "./agent/agent.types";
 export { firstJsonObject, parseModel } from "./agent/parse";
 export { askPrompt, extractPrompt, portraitPrompt, reasonsPrompt, wrapPrompt } from "./agent/prompts";
 export { createOrazakaProvider, type OrazakaOptions, sseData } from "./provider/orazaka";

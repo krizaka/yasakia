@@ -65,16 +65,16 @@ function portrait(prompt) {
 }
 
 function reasons(prompt) {
-  const names = [...prompt.matchAll(/(?:YOU are talking to|The person you may introduce:) (\S+?)[ .]/g)].map((m) => m[1]);
-  const [you = "you", them = "them"] = names;
-  return { forYou: [`${them} shares what you described: the same kind of weekends and the same curiosity.`], forThem: [`${you} looks for what ${them} is: someone curious, with the same rhythm.`] };
+  const you = /YOU are talking to (\S+?)[ .]/.exec(prompt)?.[1] ?? "you";
+  const them = [...prompt.matchAll(/^(\d+)\. (\S+?) — /gm)];
+  return { people: them.map((m) => ({ index: Number(m[1]), forYou: [`${m[2]} shares what you described: the same kind of weekends and the same curiosity.`], forThem: [`${you} looks for what ${m[2]} is: someone curious, with the same rhythm.`] })) };
 }
 
 function answerFor(prompt) {
   if (prompt.includes("You extract structured facts")) return { kind: "extract", text: `\`\`\`json\n${JSON.stringify(extraction(prompt))}\n\`\`\`` };
   if (prompt.includes("You write the portrait of a person")) return { kind: "portrait", text: JSON.stringify(portrait(prompt)) };
   if (prompt.includes("Write the closing message")) return { kind: "wrap", text: "I think I have a good picture of you. Tell me if I got something wrong; now I look for people who fit you, and for whom you fit too." };
-  if (prompt.includes("explain, in words only") || prompt.includes("Explain, in words only")) return { kind: "reasons", text: JSON.stringify(reasons(prompt)) };
+  if (prompt.includes("Explain, in words only")) return { kind: "reasons", text: JSON.stringify(reasons(prompt)) };
   const turn = personLines(prompt).length;
   return { kind: "ask", text: turn ? `Thanks for telling me that (turn ${turn}). What else would you like me to know about you?` : "Hello, I am the Yasakia agent. We talk first, then I open a small batch of people who fit you both ways. What is your name?" };
 }

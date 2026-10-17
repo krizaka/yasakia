@@ -88,17 +88,17 @@ export function portraitPrompt({ language, turns, facets }: { language: Language
   ].join("\n\n");
 }
 
-/** Why two people fit, in words, in both directions. Never a number. */
-export function reasonsPrompt({ language, you, them }: { language: Language; you: { name: string; portrait: string }; them: { name: string; portrait: string } }): string {
+/** Why each person of a batch fits, in words, both ways — one call for the whole batch. Never a number. */
+export function reasonsPrompt({ language, you, them }: { language: Language; you: { name: string; portrait: string }; them: readonly { name: string; portrait: string }[] }): string {
+  const list = them.map((t, i) => `${i + 1}. ${t.name} — ${t.portrait}`).join("\n");
   return [
-    "You are the agent of a dating app that opens small batches of people who fit BOTH ways. Explain, in words only, why these two people may get along. Use only what the portraits say; never invent; never mention a score, a percentage or a rank; never say anything sexual.",
+    "You are the agent of a dating app that opens small batches of people who fit BOTH ways. Explain, in words only, why each person below may get along with the person you talk to. Use only what the portraits say; never invent; never mention a score, a percentage or a rank; never say anything sexual.",
     `YOU are talking to ${you.name}. Their portrait: ${you.portrait}`,
-    `The person you may introduce: ${them.name}. Their portrait: ${them.portrait}`,
+    `The people you may introduce:\n${list}`,
     [
       "Answer with ONE JSON object and nothing else:",
-      '{"forYou": [string, ...], "forThem": [string, ...]}',
-      `"forYou": 1 to 3 short sentences, addressed to ${you.name} ("tu"/"you"), on why ${them.name} may suit them.`,
-      `"forThem": 1 to 3 short sentences on why ${you.name} may suit ${them.name}, written about ${you.name} in the third person (it is what ${them.name} will read).`,
+      '{"people": [{"index": 1, "forYou": [string, ...], "forThem": [string, ...]}, ...]}',
+      `One entry per numbered person, with their number as "index". "forYou": 1 to 2 short sentences addressed to ${you.name} on why that person may suit them. "forThem": 1 to 2 short sentences on why ${you.name} may suit that person, written about ${you.name} in the third person (it is what that person will read).`,
       `Write every sentence in ${LANGUAGE_NAME[language]} only (never mix languages), in plain text: no markdown, no asterisks, no emojis.`,
     ].join("\n"),
   ].join("\n\n");

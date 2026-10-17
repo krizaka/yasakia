@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { AiFailure } from "../provider/provider.types";
-import { Extraction, isSensitiveFacet, Portrait, Reasons, TurnRole } from "./agent.types";
+import { BatchReasons, Extraction, isSensitiveFacet, Portrait, Reasons, TurnRole } from "./agent.types";
 import { firstJsonObject, parseModel } from "./parse";
 import { askPrompt, extractPrompt, portraitPrompt, reasonsPrompt, wrapPrompt } from "./prompts";
 
@@ -52,7 +52,7 @@ describe("prompts", () => {
       extractPrompt({ turns }),
       portraitPrompt({ language: "en", turns, facets: {} }),
       wrapPrompt({ language: "en", turns, portrait: { self: "s", seeking: "t" } }),
-      reasonsPrompt({ language: "en", you: { name: "A", portrait: "x" }, them: { name: "B", portrait: "y" } }),
+      reasonsPrompt({ language: "en", you: { name: "A", portrait: "x" }, them: [{ name: "B", portrait: "y" }] }),
     ];
     for (const p of all) expect(p).not.toMatch(/score (them|from|out of)|rate (them|from)|percent(age)? match/i);
     expect(extractPrompt({ turns })).toMatch(/never infer/i);
@@ -76,5 +76,16 @@ describe("parseModel failures", () => {
       expect(message).not.toContain("someone who listens carefully");
     }
     expect(() => parseModel("no braces here", Portrait)).toThrow(/no JSON object/);
+  });
+});
+
+describe("the batch's reasons, one call", () => {
+  it("numbers every person in the prompt and parses one entry per number", () => {
+    const prompt = reasonsPrompt({ language: "fr", you: { name: "Camille", portrait: "x" }, them: [{ name: "Hugo", portrait: "a" }, { name: "Karim", portrait: "b" }] });
+    expect(prompt).toContain("1. Hugo — a");
+    expect(prompt).toContain("2. Karim — b");
+    const ok = parseModel('{"people":[{"index":1,"forYou":["Il aime les marchés."],"forThem":["Elle aime cuisiner."]},{"index":2,"forYou":["Il cuisine bien."],"forThem":["Elle est curieuse."]}]}', BatchReasons);
+    expect(ok.people.map((p) => p.index)).toEqual([1, 2]);
+    expect(() => parseModel('{"people":[{"index":1,"forYou":[],"forThem":["Elle aime cuisiner."]}]}', BatchReasons)).toThrow();
   });
 });
