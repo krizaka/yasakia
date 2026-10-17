@@ -1,13 +1,13 @@
 import { YasakiaLogo } from "@krizaka/ui";
 import { Page } from "@krizaka/ui/page";
+import { SiteFooter as FamilyFooter } from "@krizaka/ui/site-footer";
+import { familyLabels } from "@krizaka/ui/sites";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
 import { type Locale, otherLocale, translator } from "@/lib/i18n";
 import { indexable } from "@/lib/indexing";
 import { contactHref, LEGAL_PAGES, LEGAL_PATHS, type LegalPage, PRODUCT_URL, REPO_URL } from "@/lib/site";
-
-import { Rich } from "./Rich";
 
 const navLink =
   "rounded-md px-2 py-1 text-sm text-fg-secondary transition-colors hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:text-fg-accent aria-[current=page]:font-semibold";
@@ -46,30 +46,33 @@ export function SiteHeader({ locale, current }: { locale: Locale; current?: Lega
   );
 }
 
+/**
+ * The footer is @krizaka/ui's SiteFooter in product mode (`family={false}`): the three legal pages and the repository, the
+ * publisher line « A Krizaka product » (→ www.krizaka.com), DEV · the version, Montréal. On a deployment kept out of search
+ * engines the invitation line ends the signature row (one footer, no strip under it).
+ */
 export function SiteFooter({ locale, source }: { locale: Locale; source: string }) {
   const t = translator(locale);
   return (
-    <footer className="mt-16 border-t border-border-default">
-      <Page className="flex flex-col gap-3 py-8 text-sm text-fg-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>
-          <Rich text={t("chrome.footer")} />
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <a href={REPO_URL} className="underline-offset-4 hover:text-fg hover:underline">
-            {t("chrome.sourceCode")}
-          </a>
-          <a href={contactHref(source)} className="underline-offset-4 hover:text-fg hover:underline">
-            {t("chrome.contact")}
-          </a>
-        </div>
-      </Page>
-      {indexable() ? null : (
-        <Page>
-          <p className="pb-6 text-center text-xs text-fg-muted" data-testid="dev-environment-notice">
-            {t("chrome.devNotice")}
-          </p>
-        </Page>
-      )}
-    </footer>
+    <FamilyFooter
+      current="yasakia"
+      family={false}
+      labels={familyLabels[locale]}
+      aria-label={t("chrome.footerLabel")}
+      version={process.env.APP_VERSION || undefined}
+      env={indexable() ? undefined : "dev"}
+      data-testid="app-version"
+      legal={indexable() ? undefined : <span data-testid="dev-environment-notice">{t("chrome.devNotice")}</span>}
+    >
+      <FamilyFooter.Column title="Yasakia">
+        {LEGAL_PAGES.map((page) => (
+          <FamilyFooter.Link key={page} asChild>
+            <Link href={`/${locale}/${LEGAL_PATHS[page]}`}>{t(`chrome.nav.${page}`)}</Link>
+          </FamilyFooter.Link>
+        ))}
+        <FamilyFooter.Link href={REPO_URL}>{t("chrome.sourceCode")}</FamilyFooter.Link>
+        <FamilyFooter.Link href={contactHref(source)}>{t("chrome.contact")}</FamilyFooter.Link>
+      </FamilyFooter.Column>
+    </FamilyFooter>
   );
 }
