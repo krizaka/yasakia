@@ -43,6 +43,13 @@
       "when": 1792286230532,
       "tag": "0005_intro_days_rule",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792372630532,
+      "tag": "0006_app_config",
+      "breakpoints": true
     }
   ]
 }

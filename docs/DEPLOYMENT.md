@@ -37,6 +37,8 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | :--- | :---: | :---: | :--- | :--- |
 | `NEXT_PUBLIC_APP_URL` *(build)* | ✓ |  | `http://localhost:3000` | Public origin of the API: signed upload URLs and local media URLs are built on it. |
 | `APP_ADMIN_HOST` | — |  |  | The host of the administration console (admin.yasakia.com): the same deployment answers it through host-based ingress; there only the administration exists, elsewhere it does not (404). Unset: both at one address (local development). |
+| `APP_IOS_TEAM_ID` | — |  |  | The Apple Team ID of yasakia-mobile: `/.well-known/apple-app-site-association` is served only when it is set (universal links, krizaka/.github#81). |
+| `APP_ANDROID_CERT_SHA256` | — |  |  | The SHA-256 signing fingerprints of the Android app (EAS and Play): `/.well-known/assetlinks.json` is served only when they are set (App Links). |
 | `APP_SEARCH_INDEXING` | — |  | `on` | `off` on every dev / preview deployment: noindex on every response, robots.txt `Disallow: /` with no sitemap, the development line in the footer. Read at build (landing, legal pages) and at request time (the proxy). Production flips it by configuration. |
 | `NEXT_PUBLIC_APP_BASE_PATH` *(build)* | — |  |  | The path the app is served under (dev.yasakia.com serves it at `/app`, next to the static site at `/`). Empty: the root. |
 | `NEXT_PUBLIC_APP_ENV` *(build)* | — |  | `local` | Where the build runs, for the build information. |

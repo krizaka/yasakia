@@ -1,0 +1,27 @@
+{
+  "host": "dev.yasakia.com",
+  "iosBundleId": "com.krizaka.yasakia",
+  "androidPackage": "com.krizaka.yasakia",
+  "paths": [
+    "/app/*"
+  ],
+  "shareable": [
+    "/app/*",
+    "/app/*/account",
+    "/app/*/admin",
+    "/app/*/admin/audit",
+    "/app/*/admin/health",
+    "/app/*/admin/intros",
+    "/app/*/admin/reports",
+    "/app/*/admin/rules",
+    "/app/*/admin/users",
+    "/app/*/admin/users/*",
+    "/app/*/batch",
+    "/app/*/forgot-password",
+    "/app/*/intros",
+    "/app/*/intros/*",
+    "/app/*/sign-in",
+    "/app/*/sign-up",
+    "/app/*/talk"
+  ]
+}

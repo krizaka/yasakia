@@ -1,0 +1,13 @@
+{
+  "host": "dev.yasakia.com",
+  "iosBundleId": "com.krizaka.yasakia",
+  "androidPackage": "com.krizaka.yasakia",
+  "paths": ["/app/*"],
+  "web": {
+    "appDir": "apps/web/app",
+    "excluded": ["/[locale]/[...rest]", "/[locale]/delete-account", "/[locale]/privacy", "/[locale]/terms"],
+    "aasaRoute": "apps/web/app/.well-known/apple-app-site-association/route.ts",
+    "assetlinksRoute": "apps/web/app/.well-known/assetlinks.json/route.ts",
+    "routesFile": "routes.json"
+  }
+}

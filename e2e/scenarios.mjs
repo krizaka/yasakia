@@ -112,6 +112,18 @@ async function uploadPhoto(user, bytes, contentType = "image/jpeg") {
   check("the health check answers, database up", r.status === 200 && r.json.database === true, r.json);
 }
 
+// ── The app-version contract and the app links (krizaka/.github#75, #81) ─────────────────────────────────────────
+{
+  const cfg = await call("/api/v1/app-config?platform=ios&version=1.0.0", { headers: { "Accept-Language": "fr" } });
+  check("app-config: public, cacheable, permissive by default (no update forced, no maintenance)", cfg.status === 200 && cfg.json.platform === "ios" && cfg.json.updateMode === "none" && cfg.json.maintenance?.on === false && !!cfg.headers.get("etag"), cfg.json);
+  await sql("update app_config set min_supported_version = '2.0.0', latest_version = '2.0.0', revision = revision + 1 where platform = 'android'");
+  const old = await call("/api/v1/app-config?platform=android&version=1.0.0");
+  check("app-config: an app below the minimum is told to update (force), read from the database", old.json.updateMode === "force" || (await sleep(31000), (await call("/api/v1/app-config?platform=android&version=1.0.1")).json.updateMode === "force"));
+  await sql("update app_config set min_supported_version = '0.0.0', latest_version = '0.0.0', revision = revision + 1 where platform = 'android'");
+  check("app-config: an unknown platform is refused", (await call("/api/v1/app-config?platform=symbian&version=1.0.0")).status >= 400);
+  check("app links: not served until the app's identity is configured (404, never a guess)", (await call("/.well-known/apple-app-site-association")).status === 404 && (await call("/.well-known/assetlinks.json")).status === 404);
+}
+
 // ── Sign-up and sign-in by e-mail code ──────────────────────────────────────────────────────────
 const adaEmail = `ada-${run}@example.test`;
 const adaIp = freshIp();
@@ -514,6 +526,12 @@ let adaPhoto;
   check("password sign-in: the right password sets an HttpOnly, SameSite=Lax session cookie", user.status === 200 && !!user.cookie && /HttpOnly/i.test(user.headers.get("set-cookie")) && /SameSite=Lax/i.test(user.headers.get("set-cookie")), user.json);
   check("the session cookie is opaque: its hash, not itself, is stored", user.cookie && (await sql("select 1 from web_sessions where token_hash = encode(sha256(convert_to($1, 'UTF8')), 'hex')", [user.cookie.split("=")[1]])).length === 1);
   check("a cookie session reads /api/me", (await web("/api/me", { cookie: user.cookie })).json.account?.email === QA_USER.email);
+  // The app signs in with the same password and gets a bearer token, never a cookie (krizaka/.github#76, e-mail sign-in).
+  {
+    const native = await call("/api/auth/password", { method: "POST", body: { ...QA_USER, client: "native" }, ip: freshIp() });
+    check("native password sign-in: a bearer token, no cookie, and it reads /api/me", native.status === 200 && typeof native.json.token === "string" && !native.headers.get("set-cookie") && (await call("/api/me", { token: native.json.token })).json.account?.email === QA_USER.email);
+    check("native password sign-in: a wrong password is the same 401", (await call("/api/auth/password", { method: "POST", body: { email: QA_USER.email, password: "not-the-password-0000", client: "native" }, ip: freshIp() })).status === 401);
+  }
   check("no cookie: /api/me/dashboard is a 401", (await web("/api/me/dashboard")).status === 401);
   const dash = await web("/api/me/dashboard", { cookie: user.cookie });
   check("the dashboard answers counts and dates (agent state, profile completeness, no person, no score)", dash.status === 200 && dash.json.dashboard?.agentState === "ONBOARDING" && dash.json.dashboard?.profile?.total === 5 && dash.json.dashboard?.batch === null);
