@@ -56,6 +56,16 @@
         ]
       },
       {
+        "id": "photo-check",
+        "title": "Comment tes photos sont vérifiées",
+        "paragraphs": [
+          "<b>Yasakia est pour de vraies personnes</b> : tes photos sont donc vérifiées quand tu les ajoutes — 4 à 6 photos, dont au moins 2 où l’on voit ton visage. La vérification est faite par Orazaka, la plateforme d’IA construite par Krizaka, qui tourne sur nos propres serveurs — jamais par un service d’IA tiers.",
+          "<b>Ce qu’elle regarde :</b> combien de visages contient chaque photo et lequel est le sujet ; trois questions par oui ou non posées à un modèle de vision (est-ce une capture d’écran, y a-t-il quelque chose d’écrit dessus, la personne semble-t-elle avoir moins de 18 ans) ; et — <b>seulement avec ton accord distinct et explicite, que tu peux retirer à tout moment</b> — si tes photos de visage pourraient être de personnes différentes (la comparaison dure quelques secondes en mémoire — <b>aucune empreinte de visage n’est conservée, nulle part</b>). But : garder Yasakia pour de vraies personnes.",
+          "<b>Ce qu’elle ne fait pas :</b> elle n’identifie personne, ne reconnaît aucune célébrité et ne garde rien de la comparaison. Nous ne conservons que le résultat — une liste de codes comme « visage détecté » — avec la date de la vérification.",
+          "<b>Elle peut se tromper.</b> Les modèles de visage et d’image font des erreurs (un sosie, une lumière forte, un petit visage). Une photo refusée n’entraîne jamais de sanction : tu en choisis une autre. Les vignettes envoyées pour la vérification (environ 512 pixels, sans métadonnées) sont effacées du stockage de fichiers d’Orazaka dès que la vérification se termine ; la trace de la vérification, qui les contient encore, est purgée sous 30 jours au plus tard."
+        ]
+      },
+      {
         "id": "where",
         "title": "Où c’est conservé",
         "paragraphs": [
@@ -197,7 +207,8 @@
       "reset": "Choisir un nouveau mot de passe",
       "signUp": "Créer un compte",
       "talk": "Parle à ton agent",
-      "batch": "Ton lot"
+      "batch": "Ton lot",
+      "photos": "Photos"
     },
     "form": {
       "errors": {
@@ -247,7 +258,8 @@
       "batch": "Ton lot",
       "rules": "Règles",
       "myIntros": "Présentations",
-      "analytics": "Statistiques"
+      "analytics": "Statistiques",
+      "photos": "Photos"
     },
     "signIn": {
       "title": "Content de te revoir",
@@ -312,7 +324,14 @@
       "INTRO_CLOSED": "Cette présentation est terminée — plus personne ne peut y écrire.",
       "INTRO_FROZEN": "Cette présentation est en pause pendant l’examen d’un signalement.",
       "ALREADY_CONTINUED": "Tu as déjà dit que tu veux continuer.",
-      "QA_RESET_REFUSED": "Cette réinitialisation est refusée : seulement une adresse QA, jamais en production."
+      "QA_RESET_REFUSED": "Cette réinitialisation est refusée : seulement une adresse QA, jamais en production.",
+      "PHOTOS_REQUIRED": "Tes photos doivent d’abord passer la vérification — 4 à 6 photos, dont au moins 2 où l’on voit ton visage.",
+      "NO_PHOTOS": "Ajoute d’abord une photo.",
+      "TOO_MANY_PHOTOS": "Un profil contient six photos au plus.",
+      "INVALID_IMAGE": "Ce fichier n’est pas une photo que nous savons lire. Utilise une photo JPEG, PNG ou WebP.",
+      "UPLOAD_MISSING": "La photo n’est pas arrivée. Essaie de l’ajouter à nouveau.",
+      "UPLOAD_TOO_LARGE": "Cette photo est trop lourde (10 Mo au plus).",
+      "STORAGE_UNAVAILABLE": "Les photos ne peuvent pas être enregistrées pour l’instant. Réessaie dans un moment."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -748,11 +767,13 @@
         "description": "Ce sur quoi tournent la sélection et l’agent : versionné, publié avec une raison, journalisé. Une sélection déjà ouverte garde la version sous laquelle elle a été faite.",
         "domains": {
           "MATCHING": "La sélection",
-          "AGENT": "L’agent"
+          "AGENT": "L’agent",
+          "PHOTOS": "Les photos"
         },
         "domainHints": {
           "MATCHING": "Qui peut être dans une sélection, combien de personnes, et combien de temps elle reste ouverte.",
-          "AGENT": "Combien de temps l’agent parle avant d’écrire un portrait, et ce qu’il doit savoir."
+          "AGENT": "Combien de temps l’agent parle avant d’écrire un portrait, et ce qu’il doit savoir.",
+          "PHOTOS": "Combien de photos contient un profil, et combien doivent montrer le visage de la personne. Orazaka vérifie l’ensemble ; un profil qui n’a pas passé la vérification n’est pas montré et ne peut pas ouvrir de lot."
         },
         "params": {
           "batchMin": "Le moins de personnes par sélection",
@@ -764,7 +785,10 @@
           "historyMessages": "Messages que l’agent relit",
           "messageMaxChars": "Message le plus long (caractères)",
           "requiredFacets": "Facettes toujours requises",
-          "minFacets": "Le moins de facettes pour un portrait"
+          "minFacets": "Le moins de facettes pour un portrait",
+          "minPhotos": "Nombre minimal de photos",
+          "maxPhotos": "Nombre maximal de photos (six emplacements)",
+          "minFacePhotos": "Nombre minimal de photos montrant le visage"
         },
         "activeVersion": "Version {version} active",
         "noActive": "Aucune version active",
@@ -938,7 +962,9 @@
             "different": "Quelqu’un d’un peu différent"
           }
         }
-      }
+      },
+      "photosNeeded": "Avant ton premier lot, tes photos doivent passer la vérification. C’est ce qui garde Yasakia pour de vraies personnes.",
+      "photosLink": "Aller à mes photos"
     },
     "intros": {
       "title": "Présentations",
@@ -965,6 +991,89 @@
         "CONTINUED": "Continuée — vous l’avez dit tous les deux",
         "FADED": "Éteinte — le temps s’est écoulé",
         "CLOSED": "Fermée"
+      }
+    },
+    "photos": {
+      "lead": "Ajoute de {min} à {max} photos, dont au moins {faces} où ton visage est clairement le sujet. Elles restent privées tant qu’elles n’ont pas passé une vérification — ensuite, seules les personnes de tes lots les voient.",
+      "add": "Ajouter des photos",
+      "counts": "{count} photos sur {min} au moins ({max} au plus)",
+      "faceCount": "{count} photos sur {min} où l’on voit ton visage",
+      "grid": {
+        "add": "Ajouter une photo",
+        "main": "Principale",
+        "photo": "Photo {position}",
+        "moveEarlier": "Avancer",
+        "moveLater": "Reculer",
+        "remove": "Retirer",
+        "moved": "Déplacée à la place {position}"
+      },
+      "state": {
+        "EMPTY": "Ajoute ta première photo pour commencer.",
+        "UNCHECKED": "Tes photos vont être vérifiées.",
+        "CHECKING": "Vérification de tes photos…",
+        "PASSED": "Tes photos sont prêtes. Elles peuvent être montrées et ton lot peut s’ouvrir.",
+        "FAILED": "Quelques photos demandent un autre regard avant de continuer.",
+        "UNAVAILABLE": "La vérification n’a pas pu se faire à l’instant. Tes photos sont à l’abri — réessaie dans un moment."
+      },
+      "status": {
+        "PENDING": "En attente de vérification",
+        "CHECKING": "Vérification…",
+        "FACE": "Visage détecté ✓",
+        "GROUP": "Plusieurs visages — ne compte pas comme photo de visage",
+        "NO_FACE": "Pas de visage ici — ça va, mais ça ne compte pas comme photo de visage"
+      },
+      "finding": {
+        "FACE_MISMATCH": "Ce visage ne ressemble pas à celui de tes autres photos. Choisis des photos de toi.",
+        "MINOR_LIKELY": "La personne ici a peut-être moins de 18 ans. Yasakia est réservé aux adultes.",
+        "TEXT_OR_CONTACT": "Quelque chose est écrit sur cette photo (du texte, un numéro, un nom d’utilisateur). Choisis-en une sans.",
+        "SCREENSHOT": "On dirait une capture d’écran ou une photo d’écran. Choisis une vraie photo.",
+        "UNVERIFIED": "La lecture automatique n’a pas répondu pour celle-ci. Ça ne te bloque pas.",
+        "GROUP_PHOTO": "Personne ne ressort dans cette photo."
+      },
+      "blocker": {
+        "TOO_FEW_PHOTOS": "Ajoute des photos jusqu’à en avoir {min}.",
+        "TOO_MANY_PHOTOS": "Retire des photos pour en avoir {max} ou moins.",
+        "TOO_FEW_FACE_PHOTOS": "Au moins {faces} photos doivent montrer ton visage clairement — ajoutes-en une où on te voit.",
+        "FACE_MISMATCH": "Certaines photos ne semblent pas montrer la même personne. Remplace-les.",
+        "MINOR_LIKELY": "Une photo montre peut-être quelqu’un de moins de 18 ans. Remplace-la.",
+        "TEXT_OR_CONTACT": "Retire les photos où du texte ou des coordonnées sont écrits.",
+        "SCREENSHOT": "Remplace les captures d’écran par de vraies photos."
+      },
+      "upload": {
+        "working": "Ajout de ta photo…",
+        "tooLarge": "Cette photo est trop lourde (10 Mo au plus).",
+        "wrongType": "Utilise une photo JPEG, PNG ou WebP.",
+        "failed": "Cette photo n’a pas pu être ajoutée. Essaie-en une autre."
+      },
+      "retry": "Vérifier à nouveau",
+      "continue": "Continuer vers mon lot",
+      "continueHint": "Disponible quand tes photos auront passé la vérification.",
+      "removeFailed": "La photo n’a pas pu être retirée. Réessaie.",
+      "privacy": {
+        "title": "Ce qui est vérifié, et ce qui ne l’est pas",
+        "intro": "Yasakia, c’est pour de vraies personnes. Quand tu ajoutes des photos, Orazaka — la plateforme d’IA de Krizaka, pas un service tiers — les regarde une fois.",
+        "items": {
+          "faces": "<b>Les visages :</b> elle compte les visages de chaque photo et repère lequel est le sujet.",
+          "same": "<b>La même personne — seulement si tu es d’accord :</b> elle peut comparer tes photos de visage entre elles, seulement pour repérer une photo qui est clairement quelqu’un d’autre. La comparaison dure quelques secondes en mémoire ; aucune empreinte de visage n’est gardée, nulle part.",
+          "questions": "<b>Trois questions par oui ou non</b> à un modèle de vision : est-ce une capture d’écran, y a-t-il quelque chose d’écrit dessus (du texte, un numéro, un nom d’utilisateur), la personne semble-t-elle avoir moins de 18 ans ?",
+          "not": "<b>Pas vérifié :</b> qui tu es. Elle n’identifie personne et ne reconnaît aucune célébrité."
+        },
+        "limits": "Elle peut se tromper, surtout avec un sosie, une casquette, une lumière forte ou un visage tout petit. Si une photo est refusée et que tu penses que ça ne devrait pas l’être, choisis-en une autre de toi.",
+        "more": "Le détail est dans la politique de confidentialité.",
+        "comparison": {
+          "OFF": "Tes photos ne sont pas comparées entre elles : on compte seulement les visages.",
+          "NEEDS_CONSENT": "Tes photos ne sont pas comparées entre elles tant que tu n’as pas donné ton accord plus haut : on compte seulement les visages.",
+          "ON": "Avec ton accord, tes photos sont comparées entre elles pour repérer une photo de quelqu’un d’autre. Rien n’est conservé."
+        }
+      },
+      "consent": {
+        "title": "Comparer mes photos entre elles ?",
+        "lead": "Pour t’assurer que tes photos de visage montrent la même personne, nous pouvons les comparer entre elles. C’est une analyse faciale : nous te demandons d’abord.",
+        "purpose": "Nous comparons tes photos entre elles pour vérifier qu’il s’agit de la même personne ; rien n’est conservé : la comparaison dure quelques secondes en mémoire et aucune empreinte de visage n’est stockée nulle part.",
+        "nothingKept": "Seul le résultat est gardé — une note comme « visage détecté » — jamais une empreinte de visage, une note chiffrée ni une copie de la comparaison.",
+        "optional": "Tu peux dire non, ou reprendre ton accord à tout moment. Sans lui, nous comptons seulement les visages de tes photos et cherchons du texte ou des captures d’écran.",
+        "accept": "J’accepte la comparaison",
+        "withdraw": "Retirer mon accord"
       }
     }
   }

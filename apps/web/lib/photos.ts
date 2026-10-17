@@ -1,10 +1,12 @@
 import { accounts, db, profilePhotos } from "@yasakia/db";
-import { InvalidImageError, MAX_PHOTO_BYTES, MAX_PHOTOS, normalisePhoto, PHOTO_TYPES, photoModeration, type PhotoType, verifyUpload } from "@yasakia/media";
+import { InvalidImageError, MAX_PHOTO_BYTES, normalisePhoto, PHOTO_TYPES, photoModeration, type PhotoType, verifyUpload } from "@yasakia/media";
 import { and, asc, eq, lt, ne, sql } from "drizzle-orm";
 
 import { photoAccess, relationshipFacts } from "./access";
 import { HttpError, refuse } from "./http";
 import { mediaSecret, mediaStorage, signPhotoUpload, signPhotoUrl } from "./media";
+import { queuePhotoCheck } from "./photo-check";
+import { photoRules } from "./rule-sets";
 
 /**
  * Profile photos, from the signed upload to the signed view (docs/ARCHITECTURE.md, "Photos"):
@@ -45,6 +47,7 @@ export async function listOwnPhotos(accountId: string) {
 }
 
 export async function createPhotoUpload(accountId: string, input: { contentType: PhotoType; bytes: number }) {
+  const { params: rules } = await photoRules();
   const created = await db.transaction(async (tx) => {
     // Serialise the account's uploads so two at once cannot pass the count together.
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`photos:${accountId}`}))`);
@@ -52,7 +55,7 @@ export async function createPhotoUpload(accountId: string, input: { contentType:
       .select({ count: sql<number>`count(*) filter (where ${profilePhotos.moderationStatus} <> 'REJECTED')::int`, last: sql<number>`coalesce(max(${profilePhotos.position}), -1)::int` })
       .from(profilePhotos)
       .where(eq(profilePhotos.accountId, accountId));
-    if (count >= MAX_PHOTOS) throw refuse(409, "TOO_MANY_PHOTOS", `A profile holds ${MAX_PHOTOS} photos at most`, { max: MAX_PHOTOS });
+    if (count >= rules.maxPhotos) throw refuse(409, "TOO_MANY_PHOTOS", `A profile holds ${rules.maxPhotos} photos at most`, { max: rules.maxPhotos });
     const id = crypto.randomUUID();
     const [row] = await tx
       .insert(profilePhotos)
@@ -138,6 +141,8 @@ export async function completePhoto(accountId: string, photoId: string) {
     .set({ moderationStatus: verdict, reviewedAt: verdict === "PENDING" ? null : new Date() })
     .where(eq(profilePhotos.id, photoId))
     .returning();
+  // The set changed: Orazaka checks it again (the screen shows « checking » and asks until it is done). Never blocks the upload.
+  if (verdict === "APPROVED") await queuePhotoCheck(accountId).catch((error) => console.error("photos: could not queue the check:", (error as Error).message));
   return ownView(reviewed);
 }
 
@@ -174,6 +179,7 @@ export async function deletePhoto(accountId: string, photoId: string): Promise<v
     throw new HttpError(503, "The photo could not be removed from storage — try again", { code: "STORAGE_UNAVAILABLE" }, { "Retry-After": "10" });
   }
   await db.delete(profilePhotos).where(eq(profilePhotos.id, photoId));
+  await queuePhotoCheck(accountId).catch(() => undefined); // the remaining set is checked again (409 NO_PHOTOS when none is left)
 }
 
 /** A signed URL for a viewer — after the access rule; anyone it refuses gets a 404 (the photo does not exist for them). */

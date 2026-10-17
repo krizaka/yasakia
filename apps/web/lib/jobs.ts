@@ -1,16 +1,18 @@
 import { purgeDeletedMedia } from "./account";
 import { drainAnalytics } from "./analytics";
 import { sweepBatches } from "./batches";
-import { analyticsConnection, setting } from "./env";
+import { analyticsConnection, photoCheckConfig, setting } from "./env";
 import { sweepExports } from "./export";
 import { sweepIntros } from "./intros";
+import { sweepPhotoChecks } from "./photo-check";
+import { processQueue } from "./photo-check-runner";
 import { sweepAbandonedUploads } from "./photos";
 import { sweepRateLimits } from "./rate-limit";
 import { sweepAuthCodes } from "./sign-in";
 import { sweepWebSessions } from "./web-session";
 
 /**
- * The background loops every instance runs (started by instrumentation.ts, never during the build): the purge of
+ * The background loops every instance runs (started by instrumentation.ts, never during the build): the photo checks asked and not yet worked, the purge of
  * deleted accounts' media (`FOR UPDATE SKIP LOCKED`, so instances share it), and the sweeps of what expired —
  * sign-in codes, abandoned uploads, exports, rate-limit windows, batches past their hours (→ debrief), intros past their days (→ faded). Each tick is independent; a failure is logged and the
  * next tick tries again. One timer per process (globalThis), whatever Next loads twice.
@@ -43,6 +45,7 @@ export function startJobs(): void {
         await sweepWebSessions();
         await sweepBatches();
         await sweepIntros();
+        await sweepPhotoChecks();
       }),
     sweepEvery,
   );
@@ -56,10 +59,13 @@ export function startJobs(): void {
       }),
     analyticsEvery,
   );
+  // The photo checks asked and not yet worked (a request works its own at once; this takes what an instance left queued).
+  const photoChecks = setInterval(() => void tick("photo-checks", async () => void (await processQueue(photoCheckConfig))), setting("APP_PHOTO_CHECK_INTERVAL_SECONDS", 15, 5, 600) * 1000);
   purge.unref();
   sweep.unref();
   analytics.unref();
-  holder.__yasakiaJobs = [purge, sweep, analytics];
+  photoChecks.unref();
+  holder.__yasakiaJobs = [purge, sweep, analytics, photoChecks];
 }
 
 /** Purges right away (after a deletion's response) instead of waiting for the next tick. */

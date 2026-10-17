@@ -1,6 +1,6 @@
 /** The limits of profile photos — the only place they are written (the API and the mobile app read them from here). */
 
-/** At most this many photos per profile. */
+/** The ceiling of photos per profile (six slots): the PHOTOS rule set chooses the maximum within it, never above. */
 export const MAX_PHOTOS = 6;
 
 /** The largest original a phone may send (the stored, re-encoded file is much smaller). */

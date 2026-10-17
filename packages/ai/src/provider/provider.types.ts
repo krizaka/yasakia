@@ -3,6 +3,8 @@
  * embeddings. The one adapter is Orazaka's (`orazaka.ts`); Yasakia never calls a model provider.
  */
 
+import type { PhotoCheckInput, PhotoCheckResult } from "./photo-check.types";
+
 export const AiFailure = {
   /** No engine URL or key configured. */
   NotConfigured: "not_configured",
@@ -54,6 +56,11 @@ export interface AiProvider {
   chat(input: ChatInput): Promise<ChatResult>;
   /** Vectors for 1 to {@link MAX_EMBED_BATCH} non-blank texts, in order. */
   embed(texts: readonly string[], signal?: AbortSignal): Promise<EmbedResult>;
+  /**
+   * Checks a set of profile photos with Orazaka's `profile-photo-check` Studio (faces, the same person throughout, no
+   * text or contact over the picture, no screenshot) and returns its verdict as codes.
+   */
+  checkPhotos(input: PhotoCheckInput): Promise<PhotoCheckResult>;
 }
 
 // @fixed: Orazaka's limit per request (EmbeddingClientImpl.MAX_BATCH).

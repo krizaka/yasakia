@@ -21,6 +21,7 @@
     "/app/*/forgot-password",
     "/app/*/intros",
     "/app/*/intros/*",
+    "/app/*/photos",
     "/app/*/sign-in",
     "/app/*/sign-up",
     "/app/*/talk"

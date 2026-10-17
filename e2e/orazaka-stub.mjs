@@ -7,11 +7,18 @@
  *
  *   node e2e/orazaka-stub.mjs [port]          # default 4599
  *   POST /__control/down | /__control/up      # the engine "goes down" (503) and comes back
- *   GET  /__control/runs                      # what it was asked: chats [{id, kind}], embeddings [runId], forgotten [id]
+ *   GET  /__control/runs                      # what it was asked: chats [{id, kind}], embeddings [runId], forgotten [id],
+ *                                             #   photoChecks [{runId, photos, counts, compareFaces}], assets {uploaded, deleted}
+ *
+ * The photo check (Studio `profile-photo-check`): media upload, a run that is RUNNING once and then done, asset deletion. No
+ * model and no face detection — the verdict is read from the *colour* of each thumbnail (see PHOTO_CLASSES), so a scenario
+ * chooses what a photo "shows" by painting it.
  */
 import { createHash, randomUUID } from "node:crypto";
 import http from "node:http";
 import { pathToFileURL } from "node:url";
+
+import sharp from "sharp";
 
 const DIM = 1024;
 
@@ -21,6 +28,62 @@ export function vectorOf(text) {
   for (const raw of text.toLowerCase().match(/[a-zà-ÿ]{4,}/g) ?? []) v[createHash("sha256").update(raw).digest().readUInt16BE(0) % DIM] += 1;
   const norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0)) || 1;
   return v.map((x) => x / norm);
+}
+
+/**
+ * What a flat-coloured thumbnail "shows", for the photo-check stand-in: [name, test on the mean r,g,b]. The scenarios paint
+ * their pictures with these colours (e2e/scenarios.mjs PHOTO_COLORS).
+ */
+export const PHOTO_CLASSES = [
+  ["FACE_A", (r, g, b) => r > 170 && g < 90 && b < 90],
+  ["FACE_B", (r, g, b) => b > 170 && r < 90 && g < 90],
+  ["GROUP", (r, g, b) => g > 170 && b > 170 && r < 90],
+  ["TEXT", (r, g, b) => r > 215 && g > 215 && b > 215],
+  ["SCREENSHOT", (r, g, b) => r > 170 && g > 170 && b < 90],
+  ["MINOR", (r, g, b) => r > 170 && b > 170 && g < 90],
+];
+
+async function classOf(base64) {
+  const { dominant } = await sharp(Buffer.from(base64, "base64")).stats();
+  const [r, g, b] = [dominant.r, dominant.g, dominant.b];
+  return PHOTO_CLASSES.find(([, test]) => test(r, g, b))?.[0] ?? "NONE";
+}
+
+/** The pack's verdict (profile-photo-check, worker/rules.py), computed from the classes: same shape, same codes. */
+export function photoReport(classes, counts, compareFaces = true) {
+  const photos = classes.map((c, index) => {
+    const kind = c === "FACE_A" || c === "FACE_B" || c === "MINOR" ? "FACE" : c === "GROUP" ? "GROUP" : "NO_FACE";
+    const findings = [];
+    if (c === "TEXT") findings.push({ code: "TEXT_OR_CONTACT", severity: "BLOCK" });
+    if (c === "SCREENSHOT") findings.push({ code: "SCREENSHOT", severity: "BLOCK" });
+    if (c === "MINOR") findings.push({ code: "MINOR_LIKELY", severity: "BLOCK" });
+    if (c === "GROUP") findings.push({ code: "GROUP_PHOTO", severity: "INFO" });
+    return { index, kind, faceCount: kind === "FACE" ? 1 : kind === "GROUP" ? 3 : 0, findings };
+  });
+  const a = classes.filter((c) => c === "FACE_A").length;
+  const b = classes.filter((c) => c === "FACE_B").length;
+  const mismatch = compareFaces && a && b ? (a >= b ? "FACE_B" : "FACE_A") : null;
+  classes.forEach((c, i) => c === mismatch && photos[i].findings.push({ code: "FACE_MISMATCH", severity: "BLOCK" }));
+  const facePhotos = photos.filter((p) => p.kind === "FACE" && !p.findings.some((f) => f.code === "FACE_MISMATCH")).length;
+  const blockers = [];
+  if (photos.length < counts.minPhotos) blockers.push({ code: "TOO_FEW_PHOTOS", photos: [] });
+  if (photos.length > counts.maxPhotos) blockers.push({ code: "TOO_MANY_PHOTOS", photos: [] });
+  if (facePhotos < counts.minFacePhotos) blockers.push({ code: "TOO_FEW_FACE_PHOTOS", photos: [] });
+  for (const code of ["FACE_MISMATCH", "MINOR_LIKELY", "SCREENSHOT", "TEXT_OR_CONTACT"]) {
+    const at = photos.filter((p) => p.findings.some((f) => f.code === code)).map((p) => p.index);
+    if (at.length) blockers.push({ code, photos: at });
+  }
+  return {
+    rulesetId: "profile-photo",
+    rulesetVersion: "2026-10-17",
+    rulesetRevision: 1,
+    photos,
+    identity: compareFaces ? { status: mismatch ? "MISMATCH" : a + b > 1 ? "CONSISTENT" : "NOT_COMPARABLE", compared: a + b } : { status: "NOT_COMPARED", compared: 0 },
+    counts: { photos: photos.length, facePhotos, required: counts },
+    passes: blockers.length === 0,
+    blockers,
+    limits: ["FACE_IDENTITY_IS_A_MISMATCH_DETECTOR", "NO_CELEBRITY_RECOGNITION", "MODEL_ANSWERS_CAN_BE_WRONG"],
+  };
 }
 
 const personLines = (prompt) => [...prompt.matchAll(/^PERSON: (.+)$/gm)].map((m) => m[1]);
@@ -86,11 +149,15 @@ function answerFor(prompt) {
 
 export function startOrazakaStub(port = 4599) {
   let isDown = false;
-  const runs = { chats: [], embeddings: [], forgotten: [] };
+  const runs = { chats: [], embeddings: [], forgotten: [], photoChecks: [], assets: { uploaded: [], deleted: [] } };
+  const stored = new Map(); // asset id -> bytes
+  const photoRuns = new Map(); // run id -> { polls, report }
   const server = http.createServer((req, res) => {
-    let body = "";
-    req.on("data", (chunk) => (body += chunk));
-    req.on("end", () => {
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", async () => {
+      const raw = Buffer.concat(chunks);
+      const body = raw.toString("utf8");
       const reply = (status, json) => {
         res.writeHead(status, { "content-type": "application/json" });
         res.end(JSON.stringify(json));
@@ -117,6 +184,39 @@ export function startOrazakaStub(port = 4599) {
         const runId = randomUUID();
         runs.embeddings.push(runId);
         return reply(200, { runId, model: "gte-large-en-v1.5", dimensions: DIM, data: input.map((t, index) => ({ index, embedding: vectorOf(t) })), usage: { promptTokens: input.join(" ").length } });
+      }
+      if (req.method === "POST" && path === "/edge/api/v1/media/upload") {
+        const form = await new Response(raw, { headers: { "content-type": req.headers["content-type"] ?? "" } }).formData().catch(() => null);
+        const file = form?.get("file");
+        if (!file || typeof file === "string" || file.size === 0) return reply(400, {});
+        const assetId = randomUUID();
+        stored.set(assetId, Buffer.from(await file.arrayBuffer()));
+        runs.assets.uploaded.push(assetId);
+        return reply(200, { assetId, filename: "photo.jpg", contentType: "image/jpeg", sizeBytes: file.size });
+      }
+      const asset = /^\/edge\/api\/v1\/media\/assets\/([^/]+)$/.exec(path);
+      if (req.method === "DELETE" && asset) {
+        if (!stored.delete(asset[1])) return reply(404, {});
+        runs.assets.deleted.push(asset[1]);
+        return res.writeHead(204).end();
+      }
+      if (req.method === "POST" && path === "/edge/api/v1/studios/profile-photo-check/runs") {
+        const { inputs } = JSON.parse(body || "{}");
+        const known = (inputs?.photos ?? []).every((id) => stored.has(id));
+        if (!known || !Array.isArray(inputs?.photosBase64) || inputs.photosBase64.length !== inputs.photos.length) return reply(400, { error: "photos and photosBase64 must name the same photos" });
+        const counts = { minPhotos: inputs.minPhotos ?? 4, maxPhotos: inputs.maxPhotos ?? 6, minFacePhotos: inputs.minFacePhotos ?? 2 };
+        const compareFaces = inputs.compareFaces === true;
+        const report = photoReport(await Promise.all(inputs.photosBase64.map(classOf)), counts, compareFaces);
+        const id = randomUUID();
+        photoRuns.set(id, { polls: 0, report });
+        runs.photoChecks.push({ runId: id, photos: inputs.photos.length, counts, compareFaces });
+        return reply(200, { id, studioKey: "profile-photo-check", status: "RUNNING", outputs: [], errorMessage: null, steps: [] });
+      }
+      const photoRun = /^\/edge\/api\/v1\/studios\/runs\/([^/]+)$/.exec(path);
+      if (req.method === "GET" && photoRun && photoRuns.has(photoRun[1])) {
+        const run = photoRuns.get(photoRun[1]);
+        const done = ++run.polls > 1; // RUNNING once, so the client's polling is exercised
+        return reply(200, { id: photoRun[1], studioKey: "profile-photo-check", status: done ? "SUCCEEDED" : "RUNNING", outputs: done ? [{ key: "report", label: "Verdict, en codes", type: "JSON", value: JSON.stringify(run.report) }] : [], errorMessage: null, steps: [] });
       }
       return reply(404, {});
     });

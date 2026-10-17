@@ -63,6 +63,7 @@
         "auth_codes",
         "batch_items",
         "batches",
+        "biometric_consents",
         "blocks",
         "debriefs",
         "facet_embeddings",
@@ -71,6 +72,7 @@
         "intros",
         "pairs_seen",
         "password_reset_codes",
+        "photo_checks",
         "profile_photos",
         "profiles",
         "push_tokens",
@@ -216,6 +218,13 @@
       ]
     },
     {
+      "name": "biometric_consents",
+      "columns": 4,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
       "name": "blocks",
       "columns": 4,
       "references": [
@@ -271,6 +280,13 @@
       "name": "password_reset_codes",
       "columns": 7,
       "references": []
+    },
+    {
+      "name": "photo_checks",
+      "columns": 13,
+      "references": [
+        "accounts"
+      ]
     },
     {
       "name": "profile_photos",
@@ -636,6 +652,36 @@
       "path": "/api/me/photos/{id}/complete",
       "access": "bearer · account",
       "summary": "Completes an upload: checks the bytes are the declared picture, re-encodes them (orientation applied, metadata — GPS included — stripped), computes width, height and blurhash, then moderation (V1: approved automatically)."
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/photos/check",
+      "access": "bearer · account",
+      "summary": "Where the account's photo set stands with Orazaka's check: the rules (min, max, photos with a face), each photo's kind and findings, what still blocks — codes, never a score —, whether faces are compared (`comparison`) and whether the set is `verified` (shown in batches, opens one)."
+    },
+    {
+      "method": "POST",
+      "path": "/api/me/photos/check",
+      "access": "bearer · account",
+      "summary": "Asks Orazaka to check the photos the account has now (idempotent: the check in progress, or the verdict of this very set, is the answer)."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/me/photos/consent",
+      "access": "bearer · account",
+      "summary": "The person takes the consent back: faces are only counted from now on, and nothing was kept in any case."
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/photos/consent",
+      "access": "bearer · account",
+      "summary": "Whether the person agreed to the comparison of their photos with each other (Law 25: explicit, separate, withdrawable)."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/photos/consent",
+      "access": "bearer · account",
+      "summary": "The person agrees, to this wording (`version`), to the comparison of their photos with each other; the photos are checked again."
     },
     {
       "method": "DELETE",

@@ -1,6 +1,6 @@
 "use client";
 
-import { BatchIcon, ChatIcon, ClockIcon, FilterIcon, FlagIcon, GoalIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
+import { BatchIcon, ChatIcon, ClockIcon, FilterIcon, FlagIcon, GoalIcon, HomeIcon, ImageIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
@@ -52,6 +52,8 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
               ? "shell.overview"
               : path.startsWith(`${home}/account`)
                 ? "shell.account"
+                : path.startsWith(`${home}/photos`)
+                  ? "shell.photos"
                 : path.startsWith(`${home}/talk`)
                   ? "shell.talk"
                   : path.startsWith(`${home}/batch`)
@@ -89,6 +91,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
             <AppShell.Group>{say("shell.groupYou")}</AppShell.Group>
             {item(home, say("shell.dashboard"), <HomeIcon />, true)}
             {item(`${home}/talk`, say("shell.talk"), <ChatIcon />)}
+            {item(`${home}/photos`, say("shell.photos"), <ImageIcon />)}
             {item(`${home}/batch`, say("shell.batch"), <BatchIcon />)}
             {item(`${home}/intros`, say("shell.myIntros"), <IntroIcon />)}
             {item(`${home}/account`, say("shell.account"), <SettingsIcon />)}

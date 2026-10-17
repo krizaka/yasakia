@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 27 tables · 18 enums · 8 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 29 tables · 18 enums · 9 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -28,13 +28,14 @@ Every foreign key, read from the schema: what each table points to (through whic
 | :--- | :--- | :--- |
 | `account_credentials` | `accounts` (`account_id`) | — |
 | `account_exports` | `accounts` (`account_id`) | — |
-| `accounts` | — | `account_credentials` · `account_exports` · `agent_sessions` · `ai_calls` · `audit_log` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `reports` · `web_sessions` |
+| `accounts` | — | `account_credentials` · `account_exports` · `agent_sessions` · `ai_calls` · `audit_log` · `batch_items` · `batches` · `biometric_consents` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `photo_checks` · `profile_photos` · `profiles` · `push_tokens` · `reports` · `web_sessions` |
 | `agent_messages` | `agent_sessions` (`session_id`) | `facets` |
 | `agent_sessions` | `accounts` (`account_id`) | `agent_messages` |
 | `ai_calls` | `accounts` (`account_id`) | — |
 | `audit_log` | `accounts` (`actor_id`) | — |
 | `batch_items` | `batches` (`batch_id`) · `accounts` (`candidate_id`) | — |
 | `batches` | `accounts` (`account_id`) | `batch_items` · `debriefs` |
+| `biometric_consents` | `accounts` (`account_id`) | — |
 | `blocks` | `accounts` (`blocker_id`) · `accounts` (`blocked_id`) | — |
 | `debriefs` | `batches` (`batch_id`) · `accounts` (`account_id`) | — |
 | `facet_embeddings` | `accounts` (`account_id`) | — |
@@ -42,6 +43,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `intro_messages` | `intros` (`intro_id`) · `accounts` (`sender_id`) | — |
 | `intros` | `accounts` (`account_a`) · `accounts` (`account_b`) | `intro_messages` |
 | `pairs_seen` | `accounts` (`account_id`) · `accounts` (`seen_account_id`) | — |
+| `photo_checks` | `accounts` (`account_id`) | — |
 | `profile_photos` | `accounts` (`account_id`) | — |
 | `profiles` | `accounts` (`account_id`) | — |
 | `push_tokens` | `accounts` (`account_id`) | — |
@@ -226,6 +228,15 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Indexes:** `batches_account_idx` (account_id, opened_at) · `batches_one_current_idx` (unique, account_id, where status in ('OPEN', 'DEBRIEF_DUE')) · `batches_expiry_idx` (expires_at, where status = 'OPEN')
 
+### `biometric_consents`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `account_id` | uuid | no |  | primary key · → `accounts.id` (on delete cascade) |
+| `version` | varchar(20) | no |  |  |
+| `accepted_at` | timestamp with time zone | no | `now()` |  |
+| `withdrawn_at` | timestamp with time zone | yes |  |  |
+
 ### `blocks`
 
 | Column | Type | Null | Default | Notes |
@@ -338,6 +349,28 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
 **Indexes:** `password_reset_codes_email_idx` (email, created_at)
+
+### `photo_checks`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `account_id` | uuid | no |  | → `accounts.id` (on delete cascade) |
+| `status` | varchar(10) | no | `"QUEUED"` |  |
+| `set_hash` | varchar(64) | no |  |  |
+| `photo_ids` | uuid[] | no |  |  |
+| `rules_version` | integer | no |  |  |
+| `passes` | boolean | yes |  |  |
+| `report` | jsonb | yes |  |  |
+| `engine_run_id` | varchar(80) | yes |  |  |
+| `error_code` | varchar(30) | yes |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+| `started_at` | timestamp with time zone | yes |  |  |
+| `finished_at` | timestamp with time zone | yes |  |  |
+
+**Indexes:** `photo_checks_account_idx` (account_id, created_at) · `photo_checks_one_active_idx` (unique, account_id, where status in ('QUEUED', 'RUNNING'))
+
+**Checks:** `photo_checks_status` (`status in ('QUEUED', 'RUNNING', 'DONE', 'ERROR')`) · `photo_checks_done_has_verdict` (`status <> 'DONE' or (passes is not null and report is not null)`)
 
 ### `profile_photos`
 
@@ -483,3 +516,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0005_intro_days_rule.sql`
 - `0006_app_config.sql`
 - `0007_analytics_outbox.sql`
+- `0008_photo_checks.sql`

@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
-import { InvalidImageError, normalisePhoto, sniffImageType } from "./images";
+import { checkThumbnail, InvalidImageError, normalisePhoto, sniffImageType } from "./images";
 
 async function phonePhoto(width = 1200, height = 1600) {
   return sharp({ create: { width, height, channels: 3, background: { r: 20, g: 184, b: 166 } } })
@@ -43,5 +43,23 @@ describe("photo normalisation", () => {
     expect(sniffImageType(Buffer.from([0xff, 0xd8, 0xff, 0xe0]))).toBe("image/jpeg");
     expect(sniffImageType(Buffer.from("RIFF0000WEBPVP8 ", "ascii"))).toBe("image/webp");
     expect(sniffImageType(Buffer.from("GIF89a"))).toBeNull();
+  });
+});
+
+describe("the thumbnail sent for the photo check", () => {
+  it("is a 512 px JPEG with no metadata — the engine never receives more of a person than it needs", async () => {
+    const stored = (await normalisePhoto(await phonePhoto(1200, 1600), "image/jpeg")).body;
+    const thumb = await checkThumbnail(stored);
+    const meta = await sharp(thumb).metadata();
+    expect(meta.format).toBe("jpeg");
+    expect(Math.max(meta.width ?? 0, meta.height ?? 0)).toBe(512);
+    expect(meta.exif).toBeUndefined();
+    expect(thumb.length).toBeLessThan(200_000);
+  });
+
+  it("never enlarges a small picture", async () => {
+    const small = await sharp({ create: { width: 200, height: 300, channels: 3, background: "#456" } }).jpeg().toBuffer();
+    const meta = await sharp(await checkThumbnail(small)).metadata();
+    expect([meta.width, meta.height]).toEqual([200, 300]);
   });
 });

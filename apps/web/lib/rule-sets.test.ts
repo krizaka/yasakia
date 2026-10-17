@@ -17,9 +17,10 @@ const refusal = (fn: () => unknown): { status: number; code: unknown } => {
 };
 
 describe("an operator publishes a rule set (versioned, bounded, never a constant)", () => {
-  it("knows the two domains the app reads, and nothing else", () => {
+  it("knows the three domains the app reads, and nothing else", () => {
     expect(parseRuleDomain("MATCHING")).toBe(RuleDomain.Matching);
     expect(parseRuleDomain("AGENT")).toBe(RuleDomain.Agent);
+    expect(parseRuleDomain("PHOTOS")).toBe(RuleDomain.Photos);
     expect(refusal(() => parseRuleDomain("CUSTOMIZATION"))).toEqual({ status: 404, code: "NOT_FOUND" });
   });
 
@@ -33,6 +34,15 @@ describe("an operator publishes a rule set (versioned, bounded, never a constant
     expect(refusal(() => checkRuleParams(RuleDomain.Matching, { ...matching, batchMin: 6, batchMax: 4 }))).toEqual({ status: 422, code: "RULES_OUT_OF_BOUNDS" });
     expect(refusal(() => checkRuleParams(RuleDomain.Matching, { ...matching, accentColor: "#10b981" }))).toEqual({ status: 422, code: "RULES_OUT_OF_BOUNDS" });
     expect(refusal(() => checkRuleParams(RuleDomain.Agent, { ...agent, minUserTurns: 0 }))).toEqual({ status: 422, code: "RULES_OUT_OF_BOUNDS" });
+  });
+
+  it("the photo rules are 1 to 6 photos (a profile holds six), with at least as many photos as face photos", () => {
+    const photos = { minPhotos: 4, maxPhotos: 6, minFacePhotos: 2 };
+    expect(checkRuleParams(RuleDomain.Photos, photos)).toEqual(photos);
+    for (const bad of [{ ...photos, maxPhotos: 7 }, { ...photos, minPhotos: 0 }, { ...photos, minPhotos: 5, maxPhotos: 4 }, { ...photos, minFacePhotos: 6, maxPhotos: 5 }, { ...photos, minFacePhotos: -1 }, { ...photos, enforce: false }]) {
+      expect(refusal(() => checkRuleParams(RuleDomain.Photos, bad)), JSON.stringify(bad)).toEqual({ status: 422, code: "RULES_OUT_OF_BOUNDS" });
+    }
+    expect(ruleFields(RuleDomain.Photos).map((f) => f.key)).toEqual(["minPhotos", "maxPhotos", "minFacePhotos"]);
   });
 
   it("names what changed — the preview before publishing and the audit line after", () => {

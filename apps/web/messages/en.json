@@ -56,6 +56,16 @@
         ]
       },
       {
+        "id": "photo-check",
+        "title": "How your photos are checked",
+        "paragraphs": [
+          "<b>Yasakia is for real people</b>, so your photos are checked once you add them: 4 to 6 photos, at least 2 showing your face. The check is done by Orazaka, the AI platform built by Krizaka, which runs on our own servers — never by a third-party AI service.",
+          "<b>What it looks at:</b> how many faces each photo holds and which one is the subject; three yes/no questions put to a vision model (is it a screenshot, is something written over it, does the person look under 18); and — <b>only with your separate, explicit agreement, which you can withdraw at any time</b> — whether your face photos could be of different people (the comparison lasts a few seconds in memory — <b>no face print is stored, anywhere</b>). Purpose: keeping Yasakia for real people.",
+          "<b>What it does not do:</b> it identifies no one, recognises no celebrity, and keeps nothing of the comparison. We store only the result — a list of codes such as « face detected » — with the check’s date.",
+          "<b>It can be wrong.</b> Face and image models make mistakes (a lookalike, strong light, a small face). A photo it refuses never leads to a penalty: you choose another one. The thumbnails sent for the check (about 512 pixels, no metadata) are deleted from Orazaka’s file store as soon as the check ends; the record of the check run, which still holds them, is purged within 30 days at the latest."
+        ]
+      },
+      {
         "id": "where",
         "title": "Where it is kept",
         "paragraphs": [
@@ -197,7 +207,8 @@
       "reset": "Choose a new password",
       "signUp": "Create an account",
       "talk": "Talk to your agent",
-      "batch": "Your batch"
+      "batch": "Your batch",
+      "photos": "Photos"
     },
     "form": {
       "errors": {
@@ -247,7 +258,8 @@
       "batch": "Your batch",
       "rules": "Rules",
       "myIntros": "Introductions",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "photos": "Photos"
     },
     "signIn": {
       "title": "Welcome back",
@@ -312,7 +324,14 @@
       "INTRO_CLOSED": "This introduction is over — nobody can write in it any more.",
       "INTRO_FROZEN": "This introduction is paused while a report is reviewed.",
       "ALREADY_CONTINUED": "You already said you want to continue.",
-      "QA_RESET_REFUSED": "This reset is refused: only a QA address, never on production."
+      "QA_RESET_REFUSED": "This reset is refused: only a QA address, never on production.",
+      "PHOTOS_REQUIRED": "Your photos have to pass the check first — 4 to 6 photos, at least 2 showing your face.",
+      "NO_PHOTOS": "Add a photo first.",
+      "TOO_MANY_PHOTOS": "A profile holds six photos at most.",
+      "INVALID_IMAGE": "This file is not a photo we can read. Use a JPEG, PNG or WebP photo.",
+      "UPLOAD_MISSING": "The photo did not arrive. Try adding it again.",
+      "UPLOAD_TOO_LARGE": "This photo is too large (10 MB at most).",
+      "STORAGE_UNAVAILABLE": "Photos cannot be stored right now. Try again in a moment."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -748,11 +767,13 @@
         "description": "What the batch and the agent run on: versioned, published with a reason, audited. A batch already open keeps the version it was made under.",
         "domains": {
           "MATCHING": "The batch",
-          "AGENT": "The agent"
+          "AGENT": "The agent",
+          "PHOTOS": "The photos"
         },
         "domainHints": {
           "MATCHING": "Who may be in a batch, how many people, and for how long it stays open.",
-          "AGENT": "How long the agent talks before it writes a portrait, and what it needs to know."
+          "AGENT": "How long the agent talks before it writes a portrait, and what it needs to know.",
+          "PHOTOS": "How many photos a profile holds, and how many of them must show the person’s face. Orazaka checks the set; a profile that has not passed is not shown and cannot open a batch."
         },
         "params": {
           "batchMin": "Fewest people in a batch",
@@ -764,7 +785,10 @@
           "historyMessages": "Messages the agent rereads",
           "messageMaxChars": "Longest message (characters)",
           "requiredFacets": "Facets always needed",
-          "minFacets": "Fewest facets for a portrait"
+          "minFacets": "Fewest facets for a portrait",
+          "minPhotos": "Fewest photos",
+          "maxPhotos": "Most photos (six slots)",
+          "minFacePhotos": "Fewest photos showing the face"
         },
         "activeVersion": "Version {version} active",
         "noActive": "No active version",
@@ -938,7 +962,9 @@
             "different": "Someone a bit different"
           }
         }
-      }
+      },
+      "photosNeeded": "Before your first batch, your photos must pass the check. It keeps Yasakia for real people.",
+      "photosLink": "Go to my photos"
     },
     "intros": {
       "title": "Introductions",
@@ -965,6 +991,89 @@
         "CONTINUED": "Continued — you both said so",
         "FADED": "Faded — the time ran out",
         "CLOSED": "Closed"
+      }
+    },
+    "photos": {
+      "lead": "Add {min} to {max} photos, at least {faces} where your face is clearly the subject. They stay private to you until they pass a check — then only the people of your batches see them.",
+      "add": "Add photos",
+      "counts": "{count} of {min} photos at least ({max} at most)",
+      "faceCount": "{count} of {min} photos showing your face",
+      "grid": {
+        "add": "Add a photo",
+        "main": "Main",
+        "photo": "Photo {position}",
+        "moveEarlier": "Move earlier",
+        "moveLater": "Move later",
+        "remove": "Remove",
+        "moved": "Moved to place {position}"
+      },
+      "state": {
+        "EMPTY": "Add your first photo to begin.",
+        "UNCHECKED": "Your photos are about to be checked.",
+        "CHECKING": "Checking your photos…",
+        "PASSED": "Your photos are ready. They can be shown, and your batch can open.",
+        "FAILED": "A few photos need another look before you continue.",
+        "UNAVAILABLE": "The check could not run just now. Your photos are safe — try again in a moment."
+      },
+      "status": {
+        "PENDING": "Waiting to be checked",
+        "CHECKING": "Checking…",
+        "FACE": "Face detected ✓",
+        "GROUP": "Several faces — this one does not count as a face photo",
+        "NO_FACE": "No face here — fine, but it does not count as a face photo"
+      },
+      "finding": {
+        "FACE_MISMATCH": "This face does not look like the one on your other photos. Choose photos of you.",
+        "MINOR_LIKELY": "The person here may be under 18. Yasakia is for adults only.",
+        "TEXT_OR_CONTACT": "Something is written over this photo (text, a number, a username). Choose a photo without.",
+        "SCREENSHOT": "This looks like a screenshot or a photo of a screen. Choose a real photo.",
+        "UNVERIFIED": "The automatic reading did not answer for this one. It does not stop you.",
+        "GROUP_PHOTO": "Nobody stands out in this photo."
+      },
+      "blocker": {
+        "TOO_FEW_PHOTOS": "Add photos until you have {min}.",
+        "TOO_MANY_PHOTOS": "Remove photos until you have {max} or fewer.",
+        "TOO_FEW_FACE_PHOTOS": "At least {faces} photos must show your face clearly — add one where we see you.",
+        "FACE_MISMATCH": "Some photos do not seem to show the same person. Replace them.",
+        "MINOR_LIKELY": "A photo may show someone under 18. Replace it.",
+        "TEXT_OR_CONTACT": "Remove the photos with text or contact details written on them.",
+        "SCREENSHOT": "Replace the screenshots with real photos."
+      },
+      "upload": {
+        "working": "Adding your photo…",
+        "tooLarge": "This photo is too large (10 MB at most).",
+        "wrongType": "Use a JPEG, PNG or WebP photo.",
+        "failed": "This photo could not be added. Try another."
+      },
+      "retry": "Check again",
+      "continue": "Continue to my batch",
+      "continueHint": "Available once your photos have passed the check.",
+      "removeFailed": "The photo could not be removed. Try again.",
+      "privacy": {
+        "title": "What is checked, and what is not",
+        "intro": "Yasakia is for real people. When you add photos, Orazaka — Krizaka’s own AI platform, not a third-party service — looks at them once.",
+        "items": {
+          "faces": "<b>Faces:</b> it counts the faces in each photo and which one is the subject.",
+          "same": "<b>The same person — only if you agree:</b> it can compare your face photos with each other, only to catch a photo that is clearly someone else. The comparison lasts a few seconds in memory; no face print is kept, anywhere.",
+          "questions": "<b>Three yes/no questions</b> to a vision model: does it look like a screenshot, is something written over it (text, a number, a username), does the person look under 18?",
+          "not": "<b>Not checked:</b> who you are. It identifies no one and recognises no celebrity."
+        },
+        "limits": "It can be wrong, especially with a lookalike, a hat, strong light or a small face. If a photo is refused and you think it should not be, choose another one of you.",
+        "more": "Details in the privacy policy.",
+        "comparison": {
+          "OFF": "Your photos are not compared with each other: faces are only counted.",
+          "NEEDS_CONSENT": "Your photos are not compared with each other until you agree above: faces are only counted.",
+          "ON": "With your agreement, your photos are compared with each other to catch a photo of someone else. Nothing is kept."
+        }
+      },
+      "consent": {
+        "title": "Compare my photos with each other?",
+        "lead": "To make sure your face photos show the same person, we can compare them with each other. This is facial analysis, so we ask you first.",
+        "purpose": "We compare your photos with each other to check they show the same person. Nothing is kept: the comparison lasts a few seconds in memory, and no face print is stored anywhere.",
+        "nothingKept": "Only the result is kept — a note such as « face detected » — never a face print, a score or a copy of the comparison.",
+        "optional": "You can say no, or take your agreement back at any time. Without it, we only count the faces in your photos and look for text and screenshots.",
+        "accept": "I agree to the comparison",
+        "withdraw": "Withdraw my agreement"
       }
     }
   }

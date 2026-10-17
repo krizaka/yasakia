@@ -24,6 +24,8 @@ paperwork.
 | Profile (name, gender, seeking, age range, intent, radius) | `profiles` | — | while the account exists |
 | Position | `profiles.lat/lng` | **rounded to ~1 km before it is written**; `geo_precision_m` | while the account exists |
 | Photos | Bunny Storage (`photos/<account>/<photo>.jpg`) + `profile_photos` | re-encoded (EXIF/GPS stripped); private; viewed only through 300-second signed URLs after the access rule | until removed or the account is deleted; storage purge ≤ 30 days |
+| Photo checks | `photo_checks` | **codes only** (« face detected », « text on the photo »…), the date, the engine's run id; never a score, a face print or a vector — Orazaka's worker compares faces in memory for the length of one job. The 512 px thumbnails sent to Orazaka are deleted from its file store when the check ends; its run record, which still holds them, is purged within 30 days (the pack is `SENSITIVE`) | while the account exists |
+| Consent to compare photos | `biometric_consents` | the wording's version, when it was given, when withdrawn; the comparison is off until given (and while the deployment's flag is off) | while the account exists |
 | Conversation with the agent | `agent_messages` (PY3) | never used to train a model | while the account exists |
 | Facets (the portrait) | `facets` | sensitive facets **sealed** (AES-256-GCM, bound to account + key) | while the account exists; editable |
 | Embeddings | `facet_embeddings` | derived from facets; never shown | while the account exists |

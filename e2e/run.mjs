@@ -25,6 +25,8 @@ export const E2E_ENV = {
   OPERATOR_ALLOWED_IPS: "203.0.113.7",
   APP_ACCOUNT_PURGE_INTERVAL_SECONDS: "1",
   MEDIA_STORAGE_PROVIDER: "local",
+  // The comparison of photos is biometric processing: off by default in production; the scenarios run it on (and prove it needs the person's consent).
+  APP_PHOTO_FACE_COMPARISON: "on",
   REALTIME_BUS: "postgres",
   ABUSE_RATE_LIMIT_STORE: "postgres",
   // The web console: sign-up open on the main server (the scenarios sign people up), the console answers one address.

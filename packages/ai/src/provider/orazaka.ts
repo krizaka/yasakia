@@ -1,3 +1,4 @@
+import { type PhotoCheckInput, PhotoCheckReport, type PhotoCheckResult, RunStatus } from "./photo-check.types";
 import { AiFailure, type AiProvider, AiUnavailableError, type ChatInput, type ChatResult, type EmbedResult, MAX_EMBED_BATCH } from "./provider.types";
 
 export interface OrazakaOptions {
@@ -9,6 +10,10 @@ export interface OrazakaOptions {
   chatTimeoutMs: number;
   /** How long an embedding call may take, in milliseconds. */
   embedTimeoutMs: number;
+  /** How long a whole photo check (uploads, the Studio run, its answer) may take, in milliseconds. Default 180 000. */
+  photoCheckTimeoutMs?: number;
+  /** How often the run is asked about, in milliseconds. Default 2 000. */
+  photoCheckPollMs?: number;
   fetchImpl?: typeof fetch;
   /** The clock, injected (milliseconds). */
   now?: () => number;
@@ -48,7 +53,9 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
   const call = async (path: string, init: RequestInit, timeoutMs: number, signal?: AbortSignal): Promise<Response> => {
     const timeout = AbortSignal.timeout(timeoutMs);
     try {
-      return await doFetch(`${base}${path}`, { ...init, headers: { ...headers, ...(init.headers ?? {}) }, signal: signal ? AbortSignal.any([timeout, signal]) : timeout, cache: "no-store" });
+      const merged: Record<string, string> = { ...headers, ...(init.headers as Record<string, string> | undefined) };
+      if (init.body instanceof FormData) delete merged["content-type"]; // fetch writes the multipart boundary itself
+      return await doFetch(`${base}${path}`, { ...init, headers: merged, signal: signal ? AbortSignal.any([timeout, signal]) : timeout, cache: "no-store" });
     } catch {
       // A network error can name the host, never the key; the type is all a caller needs.
       return failure(AiFailure.Unreachable, "Orazaka did not answer");
@@ -56,7 +63,64 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
   };
   const refusal = (response: Response) => failure(response.status >= 500 ? AiFailure.Unreachable : AiFailure.Refused, `Orazaka answered ${response.status}`);
 
+  /**
+   * The photo check: the thumbnails are uploaded as assets (the vision step reads them by id) and also travel as bytes (the face
+   * worker reads those), the `profile-photo-check` Studio is run, and the run is asked about until it ends. The engine's own words
+   * (a model's error, a stack) stay in its logs: the product only learns that the check was out of reach.
+   */
+  async function runPhotoCheck({ photos, counts, compareFaces, signal }: PhotoCheckInput, assetIds: string[]): Promise<PhotoCheckResult> {
+    const start = now();
+    const deadline = start + (options.photoCheckTimeoutMs ?? 180_000); // @fixed: three minutes for a vision model reading up to six photos on a small machine
+    const pollEvery = options.photoCheckPollMs ?? 2_000; // @fixed: a poll every two seconds is gentle on the engine and quick for the person
+    const left = () => Math.max(1, deadline - now());
+    for (const photo of photos) {
+      const form = new FormData();
+      form.append("file", new Blob([new Uint8Array(photo)], { type: "image/jpeg" }), "photo.jpg");
+      const uploaded = await call("/api/v1/media/upload", { method: "POST", body: form }, left(), signal);
+      if (!uploaded.ok) return refusal(uploaded);
+      const id = await uploaded.json().then((j: { assetId?: unknown }) => j.assetId, () => undefined);
+      if (typeof id !== "string" || !id) return failure(AiFailure.BadResponse, "Orazaka answered an upload without an asset id");
+      assetIds.push(id);
+    }
+    const started = await call(
+      "/api/v1/studios/profile-photo-check/runs",
+      { method: "POST", body: JSON.stringify({ inputs: { photos: assetIds, photosBase64: photos.map((p) => p.toString("base64")), compareFaces, ...counts } }) },
+      left(),
+      signal,
+    );
+    if (!started.ok) return refusal(started);
+    const first = await readRun(started);
+    let current = first;
+    while (current.status === RunStatus.Running || current.status === RunStatus.Pending || current.status === RunStatus.Waiting) {
+      if (now() >= deadline) return failure(AiFailure.Unreachable, "Orazaka's photo check did not finish in time");
+      await new Promise((resolve) => setTimeout(resolve, pollEvery));
+      const polled = await call(`/api/v1/studios/runs/${encodeURIComponent(first.id)}`, { method: "GET" }, left(), signal);
+      if (!polled.ok) return refusal(polled);
+      current = await readRun(polled);
+    }
+    if (current.status !== RunStatus.Succeeded) return failure(AiFailure.Unreachable, `Orazaka's photo check ended ${current.status}`);
+    const value = current.outputs.find((o) => o.key === "report")?.value;
+    let report: PhotoCheckReport;
+    try {
+      report = PhotoCheckReport.parse(JSON.parse(String(value)));
+    } catch {
+      return failure(AiFailure.BadResponse, "Orazaka's photo check answered something that is not the contract");
+    }
+    return { runId: first.id, report, ms: now() - start };
+  }
+
   return {
+    async checkPhotos(input: PhotoCheckInput): Promise<PhotoCheckResult> {
+      if (input.photos.length < 1 || input.photos.length > MAX_CHECK_PHOTOS) throw new Error(`checkPhotos takes 1 to ${MAX_CHECK_PHOTOS} photos`);
+      const assetIds: string[] = [];
+      try {
+        return await runPhotoCheck(input, assetIds);
+      } finally {
+        // The person's photos are read once; they are taken back the moment the answer is in, whatever it is (best effort).
+        await Promise.allSettled(assetIds.map((id) => call(`/api/v1/media/assets/${encodeURIComponent(id)}`, { method: "DELETE" }, options.embedTimeoutMs)));
+      }
+    },
+
     async chat({ conversationId, prompt, signal }: ChatInput): Promise<ChatResult> {
       const start = now();
       const response = await call(`/api/v1/chat/stream/${encodeURIComponent(conversationId)}`, { method: "POST", body: JSON.stringify({ prompt }) }, options.chatTimeoutMs, signal);
@@ -98,6 +162,25 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
       return { ...parsed, ms: now() - start };
     },
   };
+}
+
+const MAX_CHECK_PHOTOS = 12;
+
+interface RunView {
+  id: string;
+  status: string;
+  outputs: { key?: string; value?: unknown }[];
+}
+
+async function readRun(response: Response): Promise<RunView> {
+  let body: { id?: unknown; status?: unknown; outputs?: unknown };
+  try {
+    body = await response.json();
+  } catch {
+    return failure(AiFailure.BadResponse, "Orazaka answered a run that is not JSON");
+  }
+  if (typeof body.id !== "string" || typeof body.status !== "string") return failure(AiFailure.BadResponse, "Orazaka answered an unexpected run");
+  return { id: body.id, status: body.status, outputs: Array.isArray(body.outputs) ? (body.outputs as RunView["outputs"]) : [] };
 }
 
 function parseEmbeddings(body: unknown, expected: number): Omit<EmbedResult, "ms"> | null {

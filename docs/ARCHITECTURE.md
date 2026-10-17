@@ -73,6 +73,38 @@ is not suspended, nobody blocked anybody, and the viewer has the owner in a curr
 shares an OPEN / CONTINUED intro. Anyone else gets a 404. No answer ever carries a raw URL or a storage key (an e2e
 scan over every answer enforces it).
 
+### The photo check — « real people »
+
+A profile holds **4 to 6 photos, at least 2 showing the person's face** (`rule_sets` domain `PHOTOS`: `minPhotos`, `maxPhotos`,
+`minFacePhotos`, versioned and bounded like the others). The photos are stored as they are added, private to their owner;
+they are *used* — shown to others, a batch opened — only once Orazaka has checked the whole set.
+
+```sequence
+participant api: Yasakia API
+participant job: The check loop
+participant oz: Orazaka (Studio profile-photo-check)
+
+api -> api: a photo completes or is removed: photo_checks row QUEUED (one active per account)
+job -> job: claims it (FOR UPDATE SKIP LOCKED), reads the set from storage, 512 px thumbnails
+job -> oz: POST /api/v1/media/upload (each thumbnail), POST /api/v1/studios/profile-photo-check/runs
+oz --> job: faces (worker), a vision question per photo, the verdict as codes
+job -> oz: DELETE /api/v1/media/assets/[id] (every thumbnail, whatever the answer)
+job -> api: photo_checks DONE: passes, report (codes only), the engine's run id
+```
+
+**Comparing faces with each other is biometric processing** (Québec Law 25): the engine is told `compareFaces` only when the deployment's flag `APP_PHOTO_FACE_COMPARISON` is `on` (off until reviewed) **and** the person gave their explicit, separate consent (`biometric_consents`, withdrawable at once); otherwise faces are only counted and no vector is computed (`identity: NOT_COMPARED`).
+
+The verdict belongs to **one set**: `photo_checks.set_hash` is `photo_set_hash(account)` (the SQL function over the APPROVED
+photos); any other set is unchecked, and the screen asks again by itself. The report is **codes** — `TOO_FEW_PHOTOS`,
+`TOO_FEW_FACE_PHOTOS`, `FACE_MISMATCH`, `TEXT_OR_CONTACT`, `SCREENSHOT`, `MINOR_LIKELY`, `UNVERIFIED`, `GROUP_PHOTO` — never a
+score or a vector (the face vectors live for one job in the engine's worker, in memory). A model answer that cannot be read is
+`UNVERIFIED` and blocks nothing. `GET /api/me/photos/check` is the view (`lib/photo-rules.ts`: state `EMPTY · UNCHECKED ·
+CHECKING · PASSED · FAILED · UNAVAILABLE`, each photo's kind and findings, the blockers by photo id); `POST` asks for a check.
+`POST /api/batches` answers 409 `PHOTOS_REQUIRED` until the set has passed, and the candidates of a batch are people whose
+set passed (the fictional dev cast excepted — it says so). The engine out of reach is `UNAVAILABLE`: the photos are kept, nothing
+is decided, asking again works. What it cannot do is written where the person reads it: it identifies no one, recognises no
+celebrity, and can be wrong (a lookalike, strong light) — a refused photo is replaced, never punished.
+
 ## Safety and privacy
 
 - **Blocks** are immediate, invisible and mutual in effect: the intro closes, each leaves the other's current batch.

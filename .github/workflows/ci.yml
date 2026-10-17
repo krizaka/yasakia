@@ -103,6 +103,7 @@ jobs:
       MAIL_DELIVERY: file
       MAIL_OUTBOX_DIR: ${{ github.workspace }}/.mail-outbox
       MEDIA_STORAGE_PROVIDER: local
+      APP_PHOTO_FACE_COMPARISON: "on"
       MEDIA_STORAGE_LOCAL_DIR: ${{ github.workspace }}/.storage
       OPERATOR_API_TOKEN: e2e-only-operator-token-0123456789abcdef0123
       OPERATOR_ALLOWED_IPS: 203.0.113.7
