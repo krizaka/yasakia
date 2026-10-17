@@ -10,6 +10,7 @@ import { AnalyticsKind, recordAnalytics } from "./analytics";
 import { allDecided, BatchStatus, type DebriefAnswers, Decision, decisionRefusal } from "./batch-rules";
 import { isUniqueViolation, refuse } from "./http";
 import { openIntro } from "./intros";
+import { requirePhotosVerified } from "./photo-check";
 import { PERSONA_DOMAIN } from "./personas";
 import { publishToAccount } from "./realtime";
 import { matchingRules } from "./rule-sets";
@@ -86,7 +87,8 @@ async function loadMe(accountId: string, now: Date): Promise<Me> {
 
 /**
  * The candidates the database lets through for one person: active, with a portrait, the right genders both ways, inside
- * both radii, no block either way, never shown before — the nearest portraits first, `pool` of them. Ages and intents
+ * both radii, no block either way, never shown before, photos that passed the check (the dev cast excepted: it is fictional and
+ * says so) — the nearest portraits first, `pool` of them. Ages and intents
  * are checked by the pure matching, which repeats every filter (it is the rule; this query is only the narrowing).
  */
 async function candidatesFor(me: Person, pool: number, now: Date): Promise<(Person & { name: string; about: string; fictional: boolean })[]> {
@@ -104,6 +106,8 @@ async function candidatesFor(me: Person, pool: number, now: Date): Promise<(Pers
       and p.gender::text in (${sql.join(me.seekingGenders.map((g) => sql`${g}`), sql`, `)})
       and ${me.gender}::gender = any(p.seeking_genders)
       and earth_distance(ll_to_earth(${me.lat}, ${me.lng}), ll_to_earth(p.lat, p.lng)) <= least(${me.radiusKm}, p.radius_km) * 1000
+      and (a.email like ${`%${PERSONA_DOMAIN}`}
+           or exists (select 1 from photo_checks pc where pc.account_id = p.account_id and pc.status = 'DONE' and pc.passes and pc.set_hash = photo_set_hash(p.account_id)))
       and not exists (select 1 from blocks b where (b.blocker_id = ${me.id} and b.blocked_id = p.account_id) or (b.blocker_id = p.account_id and b.blocked_id = ${me.id}))
       and not exists (select 1 from pairs_seen ps where (ps.account_id = ${me.id} and ps.seen_account_id = p.account_id) or (ps.account_id = p.account_id and ps.seen_account_id = ${me.id}))
     order by sv.vector <=> ${seekingVector}::vector
@@ -161,6 +165,8 @@ export async function openBatch(ai: AiProvider, account: { id: string; locale: L
   const [session] = await db.select({ state: agentSessions.state }).from(agentSessions).where(eq(agentSessions.accountId, account.id)).limit(1);
   if (!session || session.state === AgentState.Onboarding || session.state === AgentState.Discovery) throw refuse(409, "NOT_READY", "The agent has not written your portrait yet");
   if (session.state !== AgentState.WaitingPool) throw refuse(409, "BATCH_ALREADY_OPEN", "You already have a batch to answer");
+  // « Real people »: nobody is shown, and nobody sees anyone, before their photos passed Orazaka's check (the dev cast is fictional and says so).
+  await requirePhotosVerified(account.id);
 
   const { version, params } = await matchingRules();
   const me = await loadMe(account.id, now);

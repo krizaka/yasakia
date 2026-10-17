@@ -16,7 +16,7 @@ import { ButtonLink } from "@/components/console/ButtonLink";
 import { DebriefForm } from "@/components/console/DebriefForm";
 import type { AgentDto } from "@/lib/agent-dto";
 import type { BatchView as BatchDto } from "@/lib/batches";
-import { errorKey } from "@/lib/client";
+import { errorKey, serverCode } from "@/lib/client";
 import { useSay } from "@/lib/i18n-client";
 
 const keys = defineKeys("batch", { current: () => ["current"] });
@@ -123,6 +123,14 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
             <div className="flex flex-col gap-4">
               <EmptyState icon={<BatchIcon />} title={say("batch.readyTitle")} description={say("batch.readyDescription")} />
               {open.isError ? <Alert tone="info" title={say(`errors.${errorKey(open.error)}`)} /> : null}
+              {open.isError && serverCode(open.error) === "PHOTOS_REQUIRED" ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-fg-secondary">{say("batch.photosNeeded")}</p>
+                  <ButtonLink href={`${home}/photos`} shape="cut" variant="secondary" className="w-fit">
+                    {say("batch.photosLink")}
+                  </ButtonLink>
+                </div>
+              ) : null}
               <Button shape="cut" variant="primary" loading={open.isPending} onClick={() => open.mutate()} className="w-fit">
                 {open.isPending ? say("batch.looking") : say("batch.look")}
               </Button>

@@ -66,6 +66,7 @@ export function aiProvider(env: Env = process.env): AiProvider {
     key,
     chatTimeoutMs: setting("AI_CHAT_TIMEOUT_SECONDS", 45, 5, 120, env) * 1000, // @fixed: seconds to milliseconds
     embedTimeoutMs: setting("AI_EMBED_TIMEOUT_SECONDS", 15, 2, 60, env) * 1000, // @fixed: seconds to milliseconds
+    photoCheckTimeoutMs: setting("AI_PHOTO_CHECK_TIMEOUT_SECONDS", 180, 30, 600, env) * 1000, // @fixed: seconds to milliseconds
   });
 }
 

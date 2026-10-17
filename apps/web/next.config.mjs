@@ -21,12 +21,16 @@ const production = process.env.NODE_ENV === "production";
  */
 // The landing's demo recordings and images come from the CDN (hashed files), nothing else outside this origin.
 const CDN = "https://krizaka-assets.b-cdn.net";
+// The person's own photos come from the private pull zone (token-authenticated, signed for one viewer, 300 s): its host is
+// the one the API signs with (the pull zone setting of the media context).
+const PHOTO_HOST = process.env.MEDIA_CDN_HOSTNAME?.trim();
+const PHOTOS = PHOTO_HOST ? ` https://${PHOTO_HOST}` : "";
 
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${production ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${CDN}`,
+  `img-src 'self' data: blob: ${CDN}${PHOTOS}`,
   `media-src 'self' blob: ${CDN}`,
   "font-src 'self' data:",
   `connect-src 'self'${production ? "" : " ws: http://localhost:* http://127.0.0.1:*"}`,

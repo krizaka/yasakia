@@ -132,6 +132,15 @@ yasakia/                           npm workspaces — Apache-2.0
   photo and 300 s, the bytes checked against the declaration, then **re-encoded** at completion — orientation applied,
   **every metadata block stripped (GPS included)**, ≤ 2048 px, blurhash computed — then `PhotoModeration.review()`
   (V1: approved automatically; a report reopens the review). Six photos at most.
+- **Real people — the photo rule** (Oussama, 2026-10-17): a profile holds **4 to 6 photos, at least 2 showing the person's face**
+  (`rule_sets` `PHOTOS`, never constants). **Orazaka checks the set** (Studio `profile-photo-check`, krizaka/orazaka-packs; the
+  adapter is `packages/ai` `checkPhotos`): a face is the subject of the face photos, it is the same person across them (a
+  mismatch detector — **no face print is stored anywhere**, the engine's worker compares in memory), nothing is written over a
+  photo, no screenshot, nobody who looks under 18. The answer is **codes** (`lib/photo-rules.ts` words nothing; the screen does,
+  in `console.photos.*`), kept in `photo_checks` with the set's hash and the engine's run id. A set that did not pass is not
+  shown and opens no batch (`PHOTOS_REQUIRED`); the engine out of reach is `UNAVAILABLE`, never a pass. The thumbnails sent to
+  the engine (512 px, no metadata) are deleted from its file store when the check ends. The check is a mismatch detector that
+  can be wrong: a refused photo is replaced, never punished, and the text says what is and is not checked.
 
 ### C. Position, minimisation
 - The position is **rounded to ~1 km before it is written** (`lib/geo.ts`); `geo_precision_m` is stored; the exact

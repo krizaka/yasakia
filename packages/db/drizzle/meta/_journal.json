@@ -57,6 +57,13 @@
       "when": 1792459030532,
       "tag": "0007_analytics_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792267738993,
+      "tag": "0008_photo_checks",
+      "breakpoints": true
     }
   ]
 }

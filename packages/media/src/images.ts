@@ -52,3 +52,14 @@ export async function normalisePhoto(bytes: Buffer, declared: string): Promise<N
   const blurhash = encode(new Uint8ClampedArray(thumb.data), thumb.info.width, thumb.info.height, 4, 3);
   return { body, mimeType: "image/jpeg", width: info.width, height: info.height, blurhash };
 }
+
+/** The longest edge of the picture sent to the photo check. */
+export const CHECK_THUMBNAIL_EDGE = 512;
+
+/**
+ * The picture Orazaka's photo check receives: the stored JPEG shrunk to 512 px, no metadata. Enough for a face to be found
+ * and compared, far less of a person than the stored photo.
+ */
+export async function checkThumbnail(stored: Buffer): Promise<Buffer> {
+  return sharp(stored).rotate().resize({ width: CHECK_THUMBNAIL_EDGE, height: CHECK_THUMBNAIL_EDGE, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 80 }).toBuffer();
+}

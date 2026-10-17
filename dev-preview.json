@@ -25,6 +25,26 @@
       "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/loop.31a8872f96.mp4",
       "checked": "2026-10-17"
     },
+    "journey.real-people": {
+      "evidence": null,
+      "gap": "Photo rules (4 to 6, two with the face) and Orazaka's photo check are built and tested in CI; the live run on dev with the persona Camille is not recorded yet.",
+      "issue": "https://github.com/krizaka/yasakia/issues/110"
+    },
+    "journey.no-ghostwriting": {
+      "evidence": null,
+      "gap": "Not done: the introduction screen still shows « Your agent suggests a first line » until the ghost-writing is removed.",
+      "issue": "https://github.com/krizaka/yasakia/issues/111"
+    },
+    "journey.authenticity-signal": {
+      "evidence": null,
+      "gap": "Not built: no signal on messages yet, no calibration set, no false-positive rate.",
+      "issue": "https://github.com/krizaka/yasakia/issues/112"
+    },
+    "journey.media-messages": {
+      "evidence": null,
+      "gap": "Not built: an introduction carries text only; no photo, video or audio message.",
+      "issue": "https://github.com/krizaka/yasakia/issues/113"
+    },
     "ui.krizaka-ui": {
       "evidence": null,
       "gap": "No CI crawl; the dev home shows no <footer> at / (it redirects to a locale/app path): check the real entry.",

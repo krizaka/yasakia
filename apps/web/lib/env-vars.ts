@@ -54,6 +54,7 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("APP_ANALYTICS_CONSOLE_DAYS", "APP", "optional", int(7, 366), "The period the console's analytics page shows.", { default: "28" }),
   v("APP_ANALYTICS_INTERVAL_SECONDS", "APP", "optional", int(5, 3600), "How often the analytics outbox is sent to Orazaka.", { default: "30" }),
   v("APP_SWEEP_INTERVAL_SECONDS", "APP", "optional", int(5, 86400), "How often expired codes, sessions and uploads are swept.", { default: "600" }),
+  v("APP_PHOTO_CHECK_INTERVAL_SECONDS", "APP", "optional", int(5, 600), "How often an instance picks up the photo checks asked and not yet worked.", { default: "15" }),
   v("APP_EXPORT_SYNC_BUDGET_MS", "APP", "optional", int(0, 30000), "A data export answers at once when it builds within this budget, else 202 and a background build.", { default: "1000" }),
   v("DATABASE_URL", "DATABASE", "required", text, "PostgreSQL 16 with pgvector."),
   v("DATABASE_DIRECT_URL", "DATABASE", "optional", text, "A direct (session) connection for LISTEN and the migrations when DATABASE_URL goes through a transaction pooler."),
@@ -95,6 +96,7 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("AI_PSEUDONYM_KEY", "AI", "optional", z.string().min(32, "must be at least 32 characters"), "The key of the pseudonyms Yasakia sends to Orazaka's analytics (`HMAC-SHA256`, 32+ characters). Unset: nothing is sent. Rotating it forgets every history at Orazaka.", { secret: true }),
   v("AI_CHAT_TIMEOUT_SECONDS", "AI", "optional", int(5, 120), "How long one conversational call to Orazaka may take before the agent gives up.", { default: "45" }),
   v("AI_EMBED_TIMEOUT_SECONDS", "AI", "optional", int(2, 60), "How long one embedding call may take.", { default: "15" }),
+  v("AI_PHOTO_CHECK_TIMEOUT_SECONDS", "AI", "optional", int(30, 600), "How long Orazaka's photo check (up to six photos: faces, then a vision model) may take before the check is given up and can be asked again.", { default: "180" }),
   v("OPERATOR_API_TOKEN", "OPERATOR", "recommended", z.string().min(32, "must be at least 32 characters"), "The operators' service token for `/api/admin/*` (32+ characters). Unset: no admin route answers.", { secret: true }),
   v("OPERATOR_ALLOWED_IPS", "OPERATOR", "recommended", text, "Addresses allowed to call the admin API (comma separated; empty: any outside production, none in production)."),
 ];

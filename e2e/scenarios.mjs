@@ -441,10 +441,10 @@ let adaPhoto;
     `select (select count(*) from accounts where id = $1) + (select count(*) from profiles where account_id = $1) + (select count(*) from profile_photos where account_id = $1)
       + (select count(*) from agent_sessions where account_id = $1) + (select count(*) from blocks where blocker_id = $1 or blocked_id = $1)
       + (select count(*) from batch_items where candidate_id = $1) + (select count(*) from intros where account_a = $1 or account_b = $1)
-      + (select count(*) from account_exports where account_id = $1) as n`,
+      + (select count(*) from account_exports where account_id = $1) + (select count(*) from photo_checks where account_id = $1) as n`,
     [ada.id],
   );
-  check("…every row of hers is gone (profile, photos, agent, blocks, batches, intros, exports)", Number(leftovers[0].n) === 0, leftovers[0]);
+  check("…every row of hers is gone (profile, photos, photo checks, agent, blocks, batches, intros, exports)", Number(leftovers[0].n) === 0, leftovers[0]);
   check("…the reports about her stay, without her name", (await sql("select count(*)::int as n from reports where reported_id is null and reason in ('SCAM', 'UNDERAGE')"))[0].n >= 2);
   let purged = false;
   for (let i = 0; i < 40 && !purged; i++) {
@@ -872,6 +872,97 @@ let adaPhoto;
     await sql("update rule_sets set active = false where domain = 'MATCHING'");
     await sql("insert into rule_sets (domain, version, active, params, reason) values ('MATCHING', 2, true, $1, 'e2e: the stand-in embeds bags of words, so its cosines are lower than a real model has')", [JSON.stringify({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 0.35, introDays: 7 })]);
 
+    // ── The photos: 4 to 6, two with a face — checked by Orazaka, a batch needs them (Oussama's rule: real people) ─────
+    {
+      const COLORS = { FACE_A: { r: 220, g: 40, b: 40 }, FACE_B: { r: 40, g: 40, b: 220 }, GROUP: { r: 40, g: 220, b: 220 }, NONE: { r: 20, g: 184, b: 166 }, TEXT: { r: 250, g: 250, b: 250 }, SCREENSHOT: { r: 230, g: 230, b: 40 }, MINOR: { r: 230, g: 40, b: 230 } };
+      const paint = (what) => sharp({ create: { width: 640, height: 800, channels: 3, background: COLORS[what] } }).jpeg({ quality: 92 }).toBuffer();
+      const add = async (user, what) => (await uploadPhoto(user, await paint(what))).id;
+      const checkOf = async (user) => (await call("/api/me/photos/check", { token: user.token, ip: user.ip })).json.check;
+      const settle = (user, states = ["PASSED", "FAILED", "UNAVAILABLE"]) => waitFor(async () => {
+        const c = await checkOf(user);
+        return states.includes(c.state) ? c : null;
+      }, 30000);
+      const rest = async () => (await runsOfStub()).photoChecks.length;
+
+      check("photos: no session, no check (401)", (await call("/api/me/photos/check")).status === 401 && (await call("/api/me/photos/check", { method: "POST" })).status === 401);
+      const empty = await checkOf(camille);
+      check("photos: a person with none is EMPTY, with the rules from the database (4 to 6, two with a face) and nothing to show", empty.state === "EMPTY" && empty.verified === false && empty.rules.minPhotos === 4 && empty.rules.maxPhotos === 6 && empty.rules.minFacePhotos === 2 && empty.photos.length === 0, empty);
+      check("photos: nothing to check is a 409 NO_PHOTOS, and nothing is sent to the engine", (await call("/api/me/photos/check", { method: "POST", token: camille.token, ip: camille.ip })).json.code === "NO_PHOTOS" && (await rest()) === 0);
+
+      // The gate: without photos that passed, no batch — the refusal says what is missing, in codes.
+      const gated = await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "en" }, ip: camille.ip });
+      check("photos: without photos that passed, a batch is refused — 409 PHOTOS_REQUIRED, with the rules and the state", gated.status === 409 && gated.json.code === "PHOTOS_REQUIRED" && gated.json.rules?.minPhotos === 4 && gated.json.state === "EMPTY", gated.json);
+
+      // Three photos, two with a face: the engine reads them as they come; too few is a blocker, not a failure of the photos.
+      await add(camille, "FACE_A");
+      await add(camille, "FACE_A");
+      await add(camille, "NONE");
+      const few = await settle(camille);
+      check("photos: three photos (two faces) — FAILED only for TOO_FEW_PHOTOS; each photo says what the engine found", few?.state === "FAILED" && few.blockers.map((b) => b.code).join() === "TOO_FEW_PHOTOS" && few.photos.map((p) => p.check).join() === "FACE,FACE,NO_FACE" && few.counts.facePhotos === 2, few);
+      check("photos: …and a batch is still refused", (await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "en" }, ip: camille.ip })).json.code === "PHOTOS_REQUIRED");
+
+      // A photo with something written on it, a screenshot, someone who looks under 18 — each named by photo.
+      const text = await add(camille, "TEXT");
+      const textual = await settle(camille);
+      check("photos: a photo with text over it is TEXT_OR_CONTACT — on that photo, and it blocks", textual?.state === "FAILED" && textual.blockers.some((b) => b.code === "TEXT_OR_CONTACT" && b.photos.join() === text) && textual.photos.find((p) => p.id === text).findings.includes("TEXT_OR_CONTACT"), textual);
+      await call(`/api/me/photos/${text}`, { method: "DELETE", token: camille.token, ip: camille.ip });
+      const shot = await add(camille, "SCREENSHOT");
+      const minor = await add(camille, "MINOR");
+      const bad = await settle(camille);
+      check("photos: a screenshot is SCREENSHOT and someone who looks under 18 is MINOR_LIKELY, each on its own photo", bad?.blockers.some((b) => b.code === "SCREENSHOT" && b.photos.join() === shot) && bad.blockers.some((b) => b.code === "MINOR_LIKELY" && b.photos.join() === minor), bad);
+      await call(`/api/me/photos/${shot}`, { method: "DELETE", token: camille.token, ip: camille.ip });
+      await call(`/api/me/photos/${minor}`, { method: "DELETE", token: camille.token, ip: camille.ip });
+
+      // A face that is not the same person.
+      const stranger = await add(camille, "FACE_B");
+      const mismatch = await settle(camille);
+      check("photos: a face that clearly is not the same person is FACE_MISMATCH, on that photo — and does not count as a face photo", mismatch?.state === "FAILED" && mismatch.blockers.some((b) => b.code === "FACE_MISMATCH" && b.photos.join() === stranger) && mismatch.counts.facePhotos === 2, mismatch);
+      await call(`/api/me/photos/${stranger}`, { method: "DELETE", token: camille.token, ip: camille.ip });
+
+      // A group photo is no face photo; the fourth good photo passes the set.
+      const group = await add(camille, "GROUP");
+      const passed = await settle(camille);
+      check("photos: three plus a group photo — the group photo does not count as a face photo, but four photos with two faces pass", passed?.state === "PASSED" && passed.verified === true && passed.counts.photos === 4 && passed.counts.facePhotos === 2 && passed.photos.find((p) => p.id === group).check === "GROUP", passed);
+      check("photos: the answer is words' keys — codes only, never a score, a similarity or a vector", !/score|similar|cosine|embedding|vector/i.test(JSON.stringify(passed)) && !/score|similar|cosine|embedding|vector/i.test(JSON.stringify((await sql("select report from photo_checks where account_id = $1", [camille.id])).map((r) => r.report))));
+
+      // The photos that were read are taken back from the engine; and only one check is kept per set.
+      const seen = await runsOfStub();
+      check("photos: every thumbnail sent to Orazaka was deleted from its file store when the check ended", seen.assets.uploaded.length > 0 && (await waitFor(async () => (await runsOfStub()).assets.deleted.length === seen.assets.uploaded.length)) !== null);
+      const hashRows = await sql("select status, passes, rules_version, engine_run_id, set_hash = photo_set_hash(account_id) as current from photo_checks where account_id = $1 order by created_at desc limit 1", [camille.id]);
+      check("photos: the verdict belongs to this very set (hash), carries the rules' version and the engine's run id — the proof of use", hashRows[0].status === "DONE" && hashRows[0].passes === true && hashRows[0].current === true && hashRows[0].rules_version === 1 && Boolean(hashRows[0].engine_run_id));
+      const idem = await rest();
+      const again = await call("/api/me/photos/check", { method: "POST", token: camille.token, ip: camille.ip });
+      check("photos: asking again for a set already checked is answered by that verdict — 202, nothing new sent to the engine", again.status === 202 && again.json.check.state === "PASSED" && (await rest()) === idem, again.json);
+
+      // Changing the set makes the verdict stale at once: a photo added is pending, and a new check starts by itself.
+      const sixth = await add(camille, "FACE_A");
+      const fresh = await checkOf(camille);
+      check("photos: a photo added after the verdict is not covered by it (never carried over) — the set is checked again", fresh.photos.find((p) => p.id === sixth).check === "PENDING" || fresh.state === "PASSED", fresh);
+      await settle(camille, ["PASSED"]);
+
+      // The bounds are the database's: lower the maximum and a further photo is refused.
+      await sql("update rule_sets set active = false where domain = 'PHOTOS'");
+      await sql("insert into rule_sets (domain, version, active, params, reason) values ('PHOTOS', 2, true, $1, 'e2e: five photos at most')", [JSON.stringify({ minPhotos: 4, maxPhotos: 5, minFacePhotos: 2 })]);
+      const over = await uploadPhoto(camille, await paint("NONE"));
+      check("photos: the maximum is a rule set — at five, the sixth is refused (409 TOO_MANY_PHOTOS, max 5)", over.start.status === 409 && over.start.json.code === "TOO_MANY_PHOTOS" && over.start.json.max === 5, over.start.json);
+      await sql("delete from rule_sets where domain = 'PHOTOS' and version = 2");
+      await sql("update rule_sets set active = true where domain = 'PHOTOS' and version = 1");
+      await call(`/api/me/photos/${sixth}`, { method: "DELETE", token: camille.token, ip: camille.ip });
+      await settle(camille, ["PASSED"]);
+
+      // The engine out of reach: the photos are safe, the state says so, and asking again works when it is back.
+      await control("down");
+      const seventh = await add(camille, "FACE_A");
+      const down = await settle(camille, ["UNAVAILABLE", "PASSED", "FAILED"]);
+      check("photos: with the engine down the check is UNAVAILABLE — not failed, not passed, the photos are kept", down?.state === "UNAVAILABLE" && down.verified === false && (await call("/api/me/photos", { token: camille.token, ip: camille.ip })).json.photos.some((p) => p.id === seventh), down);
+      await control("up");
+      const retried = await call("/api/me/photos/check", { method: "POST", token: camille.token, ip: camille.ip });
+      check("photos: …and asking again when it is back works", retried.status === 202 && (await settle(camille, ["PASSED"]))?.verified === true);
+      await call(`/api/me/photos/${seventh}`, { method: "DELETE", token: camille.token, ip: camille.ip });
+      await settle(camille, ["PASSED"]);
+      check("photos: someone else never reads another person's check (it is the caller's own)", (await checkOf(carla)).state === "EMPTY");
+    }
+
     check("batch: the language asked for is en or fr — anything else is refused (400), on the batch and on the talk", (await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "de" }, ip: camille.ip })).status === 400 && (await call("/api/agent/messages", { method: "POST", token: camille.token, body: { content: "hi", locale: "de" }, ip: camille.ip })).status === 400);
     const opened = await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "en" }, ip: camille.ip });
     check("batch: the agent opens a batch for her — 201", opened.status === 201 && opened.json.batch?.people >= 3, opened.json);
@@ -898,6 +989,8 @@ let adaPhoto;
     await sql("update profiles set display_name = 'Lonely', gender = 'WOMAN', seeking_genders = '{WOMAN}', age_min = 18, age_max = 99, intent = 'NOT_SURE', radius_km = 5, lat = -33.86, lng = 151.2, onboarding_completed_at = now() where account_id = $1", [lonely.id]);
     await sql("insert into agent_sessions (account_id, state, portrait) values ($1, 'WAITING_POOL', $2) on conflict (account_id) do update set state = 'WAITING_POOL', portrait = excluded.portrait", [lonely.id, JSON.stringify({ self: "x", seeking: "y" })]);
     await sql("insert into facet_embeddings (account_id, kind, vector, model) values ($1, 'SELF', $2::vector, 'stub'), ($1, 'SEEKING', $2::vector, 'stub') on conflict (account_id, kind) do nothing", [lonely.id, vec("nothing alike anywhere")]);
+    for (let i = 0; i < 4; i++) await sql("insert into profile_photos (account_id, storage_key, mime_type, bytes, moderation_status, position, upload_expires_at) values ($1, $2, 'image/jpeg', 100, 'APPROVED', $3, now())", [lonely.id, `photos/${lonely.id}/seeded-${i}.jpg`, i]);
+    await sql("insert into photo_checks (account_id, status, set_hash, photo_ids, rules_version, passes, report) values ($1, 'DONE', photo_set_hash($1), (select array_agg(id order by position) from profile_photos where account_id = $1), 1, true, '{}'::jsonb)", [lonely.id]);
     const none = await call("/api/batches", { method: "POST", token: lonely.token, ip: lonely.ip });
     check("batch: when fewer than three fit both ways it is a 409 NO_FIT_YET — the person stays in WAITING_POOL, nobody is invented", none.status === 409 && none.json.code === "NO_FIT_YET" && (await sql("select state::text from agent_sessions where account_id = $1", [lonely.id]))[0].state === "WAITING_POOL", none.json);
     check("batch: an engine out of reach is a 503 AI_UNAVAILABLE and leaves no half-batch", await (async () => {
