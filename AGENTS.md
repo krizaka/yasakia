@@ -153,6 +153,23 @@ yasakia/                           npm workspaces — Apache-2.0
   no endpoint returns one (`apps/web/lib/no-ghostwriting.test.ts`, and the e2e checks the intro detail's exact shape), and the words
   of the app say so where the person types. Orazaka may *judge* a message (an authenticity signal, a safety check) — it never writes one.
 
+### B3. The authenticity signal — a signal, never a verdict
+- Every intro message carries a small mark, shown to **both** people: *written by hand · uncertain · probably generated · too short
+  to judge* (`console.intros.authenticity.*`, with a tooltip that says it can be wrong). **No number**, ever, and it **never blocks or
+  delays a message** (the message is delivered at once; its mark arrives a moment later, or from how it was typed alone when the
+  engine is out of reach).
+- Two independent signs, combined in `lib/authenticity-rules.ts` (a pure function; thresholds are the `AUTHENTICITY` rule set):
+  Orazaka's reading of the **text** (Studio `message-authenticity`, krizaka/orazaka-packs: a small Apache-2.0 classifier, a *coarse
+  level*, `UNAVAILABLE` under 12 words or outside EN/FR) and **how the message arrived**, measured by the composer
+  (`lib/composer-signals.ts`: five counters — typing time, characters typed, characters pasted, paste events, deletions; no
+  keystroke, no text), which is often stronger than any text classifier. « Probably generated » needs the text to read as machine
+  **and** the message to have arrived pasted or faster than a hand types.
+- **Honesty about the classifier** (pack README, `calibration/`): on a small FR/EN set (80 + 80 per language) its AUC is 0.62 (EN) /
+  0.71 (FR); thresholds are set for **zero false « HIGH » on human texts** (0/80 each, 95 % upper bound 4.6 %), and at that price it
+  recognises only 3/80 (EN) and 10/80 (FR) generated texts. The human texts are public user-generated text, not dating chat. It is a
+  corroborating sign, not a detector to rely on.
+- The agent still never reads the conversation; a classifier (not the chat model) reads each message once for its mark and keeps nothing.
+
 ### C. Position, minimisation
 - The position is **rounded to ~1 km before it is written** (`lib/geo.ts`); `geo_precision_m` is stored; the exact
   coordinates exist nowhere. Never the phone's contacts.
