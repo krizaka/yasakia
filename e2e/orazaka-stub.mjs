@@ -13,6 +13,9 @@
  * The photo check (Studio `profile-photo-check`): media upload, a run that is RUNNING once and then done, asset deletion. No
  * model and no face detection — the verdict is read from the *colour* of each thumbnail (see PHOTO_CLASSES), so a scenario
  * chooses what a photo "shows" by painting it.
+ *
+ * The message check (Studio `message-authenticity`): a coarse level from marker words — « delve » reads as machine (HIGH), « tapestry »
+ * as doubtful (MID), anything else LOW, UNAVAILABLE under 12 words — in the pack's closed shape. It keeps no text.
  */
 import { createHash, randomUUID } from "node:crypto";
 import http from "node:http";
@@ -86,6 +89,15 @@ export function photoReport(classes, counts, compareFaces = true) {
   };
 }
 
+/** The pack's closed report for a text (message-authenticity): a level, never a score. */
+export function messageReport(text) {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const lower = text.toLowerCase();
+  const detector = words < 12 ? "UNAVAILABLE" : lower.includes("delve") ? "HIGH" : lower.includes("tapestry") ? "MID" : "LOW";
+  const language = /\b(le|la|tu|des|est|que|pour)\b/.test(lower) ? "fr" : "en";
+  return { detector, language, rulesetVersion: "2026-10-17", limits: ["CAN_BE_WRONG", "UNRELIABLE_ON_SHORT_TEXTS", "UNRELIABLE_ON_NON_NATIVE_AND_FRENCH_WRITING", "A_SIGNAL_NEVER_A_VERDICT"] };
+}
+
 const personLines = (prompt) => [...prompt.matchAll(/^PERSON: (.+)$/gm)].map((m) => m[1]);
 
 /** What the "model" extracts: the e2e messages state their facts with fixed phrases (see e2e/scenarios.mjs). */
@@ -144,9 +156,10 @@ function answerFor(prompt) {
 
 export function startOrazakaStub(port = 4599) {
   let isDown = false;
-  const runs = { chats: [], embeddings: [], forgotten: [], photoChecks: [], assets: { uploaded: [], deleted: [] } };
+  const runs = { chats: [], embeddings: [], forgotten: [], photoChecks: [], assets: { uploaded: [], deleted: [] }, messageJudgements: [] };
   const stored = new Map(); // asset id -> bytes
   const photoRuns = new Map(); // run id -> { polls, report }
+  const messageRuns = new Map(); // run id -> { polls, report }
   const server = http.createServer((req, res) => {
     const chunks = [];
     req.on("data", (chunk) => chunks.push(chunk));
@@ -207,7 +220,20 @@ export function startOrazakaStub(port = 4599) {
         runs.photoChecks.push({ runId: id, photos: inputs.photos.length, counts, compareFaces });
         return reply(200, { id, studioKey: "profile-photo-check", status: "RUNNING", outputs: [], errorMessage: null, steps: [] });
       }
+      if (req.method === "POST" && path === "/edge/api/v1/studios/message-authenticity/runs") {
+        const { inputs } = JSON.parse(body || "{}");
+        if (typeof inputs?.text !== "string" || !inputs.text.trim()) return reply(400, { error: "text is required" });
+        const id = randomUUID();
+        messageRuns.set(id, { polls: 0, report: messageReport(inputs.text) });
+        runs.messageJudgements.push({ runId: id, words: inputs.text.trim().split(/\s+/).length });
+        return reply(200, { id, studioKey: "message-authenticity", status: "RUNNING", outputs: [], errorMessage: null, steps: [] });
+      }
       const photoRun = /^\/edge\/api\/v1\/studios\/runs\/([^/]+)$/.exec(path);
+      if (req.method === "GET" && photoRun && messageRuns.has(photoRun[1])) {
+        const run = messageRuns.get(photoRun[1]);
+        const done = ++run.polls > 1;
+        return reply(200, { id: photoRun[1], studioKey: "message-authenticity", status: done ? "SUCCEEDED" : "RUNNING", outputs: done ? [{ key: "report", label: "Niveau, grossier", type: "JSON", value: JSON.stringify(run.report) }] : [], errorMessage: null, steps: [] });
+      }
       if (req.method === "GET" && photoRun && photoRuns.has(photoRun[1])) {
         const run = photoRuns.get(photoRun[1]);
         const done = ++run.polls > 1; // RUNNING once, so the client's polling is exercised

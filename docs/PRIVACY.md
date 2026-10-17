@@ -25,12 +25,13 @@ paperwork.
 | Position | `profiles.lat/lng` | **rounded to ~1 km before it is written**; `geo_precision_m` | while the account exists |
 | Photos | Bunny Storage (`photos/<account>/<photo>.jpg`) + `profile_photos` | re-encoded (EXIF/GPS stripped); private; viewed only through 300-second signed URLs after the access rule | until removed or the account is deleted; storage purge ≤ 30 days |
 | Photo checks | `photo_checks` | **codes only** (« face detected », « text on the photo »…), the date, the engine's run id; never a score, a face print or a vector — Orazaka's worker compares faces in memory for the length of one job. The 512 px thumbnails sent to Orazaka are deleted from its file store when the check ends; its run record, which still holds them, is purged within 30 days (the pack is `SENSITIVE`) | while the account exists |
+| Authenticity signals | `intro_message_signals` | one of four words per message (HAND · UNSURE · LIKELY_GENERATED · TOO_SHORT), the classifier's coarse level, and five counters of how the message was typed (time, characters typed and pasted, paste events, deletions) — no keystroke, no timing series, no text | gone with the message |
 | Consent to compare photos | `biometric_consents` | the wording's version, when it was given, when withdrawn; the comparison is off until given (and while the deployment's flag is off) | while the account exists |
 | Conversation with the agent | `agent_messages` (PY3) | never used to train a model | while the account exists |
 | Facets (the portrait) | `facets` | sensitive facets **sealed** (AES-256-GCM, bound to account + key) | while the account exists; editable |
 | Embeddings | `facet_embeddings` | derived from facets; never shown | while the account exists |
 | Batches, decisions, debriefs | `batches`, `batch_items`, `debriefs`, `pairs_seen` | reasons in words, never a score | while the account exists |
-| Intro messages | `intro_messages` | the agent never reads them | while the intro exists; gone for both when either account is deleted |
+| Intro messages | `intro_messages` | the agent never reads them; a small classifier at Orazaka reads each message once for its authenticity mark (a coarse level, never a score, nothing kept by the worker) | while the intro exists; gone for both when either account is deleted |
 | Blocks | `blocks` | invisible to the blocked person | while the blocker's account exists |
 | Reports | `reports` | details **sealed**; operators only | for safety reviews; the account references become null on deletion |
 | Push tokens | `push_tokens` | — | until sign-out, dead token or deletion |

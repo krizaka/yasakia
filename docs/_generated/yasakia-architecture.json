@@ -68,6 +68,7 @@
         "debriefs",
         "facet_embeddings",
         "facets",
+        "intro_message_signals",
         "intro_messages",
         "intros",
         "pairs_seen",
@@ -252,6 +253,13 @@
       "references": [
         "accounts",
         "agent_messages"
+      ]
+    },
+    {
+      "name": "intro_message_signals",
+      "columns": 12,
+      "references": [
+        "intro_messages"
       ]
     },
     {

@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 29 tables · 18 enums · 10 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 30 tables · 18 enums · 11 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -40,7 +40,8 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `debriefs` | `batches` (`batch_id`) · `accounts` (`account_id`) | — |
 | `facet_embeddings` | `accounts` (`account_id`) | — |
 | `facets` | `accounts` (`account_id`) · `agent_messages` (`source_message_id`) | — |
-| `intro_messages` | `intros` (`intro_id`) · `accounts` (`sender_id`) | — |
+| `intro_message_signals` | `intro_messages` (`message_id`) | — |
+| `intro_messages` | `intros` (`intro_id`) · `accounts` (`sender_id`) | `intro_message_signals` |
 | `intros` | `accounts` (`account_a`) · `accounts` (`account_b`) | `intro_messages` |
 | `pairs_seen` | `accounts` (`account_id`) · `accounts` (`seen_account_id`) | — |
 | `photo_checks` | `accounts` (`account_id`) | — |
@@ -291,6 +292,23 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Checks:** `facets_one_value` (`(value is null) <> (value_sealed is null)`) · `facets_sealed_when_sensitive` (`not sensitive or value is null`)
 
+### `intro_message_signals`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `message_id` | uuid | no |  | primary key · → `intro_messages.id` (on delete cascade) |
+| `typed_ms` | integer | yes |  |  |
+| `typed_chars` | integer | yes |  |  |
+| `pasted_chars` | integer | yes |  |  |
+| `paste_events` | integer | yes |  |  |
+| `deletions` | integer | yes |  |  |
+| `detector` | varchar(12) | yes |  |  |
+| `signal` | varchar(20) | yes |  |  |
+| `rules_version` | integer | yes |  |  |
+| `engine_run_id` | varchar(80) | yes |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+| `judged_at` | timestamp with time zone | yes |  |  |
+
 ### `intro_messages`
 
 | Column | Type | Null | Default | Notes |
@@ -516,3 +534,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0007_analytics_outbox.sql`
 - `0008_photo_checks.sql`
 - `0009_no_ghostwriting.sql`
+- `0010_message_signals.sql`

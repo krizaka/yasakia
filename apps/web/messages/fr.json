@@ -48,7 +48,7 @@
           "<b>Tes photos</b> : réencodées à l’envoi, ce qui retire toutes les métadonnées ajoutées par ton téléphone — y compris l’endroit où la photo a été prise.",
           "<b>Ta conversation avec l’agent et ton portrait</b> : ce que tu as dit à l’agent et ce qu’il en a compris, pour que chaque lot te ressemble un peu plus.",
           "<b>Tes lots, tes décisions et tes débriefs</b> : qui t’a été proposé, ce que tu as répondu, et tes réponses au débrief.",
-          "<b>Tes intros</b> : les messages que vous échangez pendant une intro. L’agent ne les lit jamais.",
+          "<b>Tes présentations</b> : les messages que vous échangez pendant une présentation. L’agent ne les lit jamais ; un petit classifieur lit chaque message une fois pour donner la marque d’authenticité affichée au-dessus (un signal qui peut se tromper, jamais un verdict, et qui ne retient jamais un message), avec quelques compteurs sur la façon dont il a été tapé (durée, caractères tapés et collés, suppressions — aucune touche, aucun texte), gardés avec le message.",
           "<b>Tes gestes de sécurité</b> : les personnes que tu as bloquées et les signalements que tu as faits.",
           "<b>Le jeton de notification de ton téléphone</b>, pour te prévenir quand un lot est prêt ou qu’on t’a écrit.",
           "<b>Le coût de l’agent</b> : pour chaque appel à un modèle d’IA, sa taille et sa durée — jamais son contenu.",
@@ -987,7 +987,7 @@
       "send": "Envoyer",
       "closed": "Cette présentation est terminée.",
       "frozen": "En pause pendant l’examen d’un signalement.",
-      "agentNeverReads": "Ton agent ne lit jamais cette conversation.",
+      "agentNeverReads": "Ton agent ne lit jamais cette conversation. Pour afficher la petite marque au-dessus de chaque message, un classifieur lit chaque message une fois, sur les serveurs de Krizaka, et ne garde rien ; la marque est un signal qui peut se tromper, jamais un verdict.",
       "continueLead": "Envie de continuer après les sept jours ? Ça continue quand vous le dites tous les deux.",
       "continue": "Continuer",
       "waitingForThem": "Tu as dit que tu veux continuer. On attend {name}.",
@@ -997,7 +997,30 @@
         "FADED": "Éteinte — le temps s’est écoulé",
         "CLOSED": "Fermée"
       },
-      "typedByYou": "Chaque message ici est écrit par vous deux. L’agent n’écrit rien à ta place et ne lit jamais cette conversation."
+      "typedByYou": "Chaque message ici est écrit par vous deux. L’agent n’écrit rien à ta place et ne lit jamais cette conversation.",
+      "authenticity": {
+        "PENDING": {
+          "label": "…",
+          "hint": "Lecture du message."
+        },
+        "HAND": {
+          "label": "Écrit à la main",
+          "hint": "Rien n’indique que ce message a été généré : il a été tapé ici, à un rythme humain."
+        },
+        "UNSURE": {
+          "label": "Incertain",
+          "hint": "On ne peut pas dire. Un signal n’est pas un verdict : beaucoup de gens collent un message écrit ailleurs."
+        },
+        "LIKELY_GENERATED": {
+          "label": "Probablement généré",
+          "hint": "Le texte ressemble à un texte de machine et il est arrivé collé ou plus vite qu’une main ne tape. Ce peut être un message que la personne a écrit ailleurs."
+        },
+        "TOO_SHORT": {
+          "label": "Trop court pour juger",
+          "hint": "Un texte court en dit trop peu pour dire quoi que ce soit."
+        },
+        "canBeWrong": "Ce signal peut se tromper, surtout sur les textes courts et sur une écriture en français ou non native. Il ne bloque jamais un message."
+      }
     },
     "photos": {
       "lead": "Ajoute de {min} à {max} photos, dont au moins {faces} où ton visage est clairement le sujet. Elles restent privées tant qu’elles n’ont pas passé une vérification — ensuite, seules les personnes de tes lots les voient.",

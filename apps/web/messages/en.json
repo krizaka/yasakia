@@ -48,7 +48,7 @@
           "<b>Your photos</b>: re-encoded when you upload them, which removes every piece of metadata your phone added — including where the photo was taken.",
           "<b>Your conversation with the agent and your portrait</b>: what you told the agent and what it understood, so the batches fit you better each time.",
           "<b>Your batches, decisions and debriefs</b>: who was proposed to you, what you answered, and your debrief answers.",
-          "<b>Your intros</b>: the messages you exchange during an intro. The agent never reads them.",
+          "<b>Your intros</b>: the messages you exchange during an intro. The agent never reads them; a small classifier reads each message once to give the authenticity mark shown above it (a signal that can be wrong, never a verdict, and it never holds a message back), together with a few counters of how the message was typed (time, characters typed and pasted, deletions — no keystroke and no text), kept with the message.",
           "<b>Your safety actions</b>: the people you blocked and the reports you filed.",
           "<b>Your phone's notification token</b>, so we can tell you when a batch is ready or someone wrote to you.",
           "<b>The cost of the agent</b>: for each call to an AI model, its size and duration — never its content.",
@@ -987,7 +987,7 @@
       "send": "Send",
       "closed": "This introduction is over.",
       "frozen": "Paused while a report is reviewed.",
-      "agentNeverReads": "Your agent never reads this conversation.",
+      "agentNeverReads": "Your agent never reads this conversation. To show the small mark above each message, a classifier reads each message once, on Krizaka’s own servers, and keeps nothing; the mark is a signal that can be wrong, never a verdict.",
       "continueLead": "Want to keep talking after the seven days? It continues when you both say so.",
       "continue": "Continue",
       "waitingForThem": "You said you want to continue. Waiting for {name}.",
@@ -997,7 +997,30 @@
         "FADED": "Faded — the time ran out",
         "CLOSED": "Closed"
       },
-      "typedByYou": "Every message here is typed by you two. The agent writes nothing for you and never reads this conversation."
+      "typedByYou": "Every message here is typed by you two. The agent writes nothing for you and never reads this conversation.",
+      "authenticity": {
+        "PENDING": {
+          "label": "…",
+          "hint": "Reading this message."
+        },
+        "HAND": {
+          "label": "Written by hand",
+          "hint": "Nothing points to this message being generated: it was typed here, at a human pace."
+        },
+        "UNSURE": {
+          "label": "Uncertain",
+          "hint": "We cannot tell. A signal is not a verdict: many people paste a message they wrote elsewhere."
+        },
+        "LIKELY_GENERATED": {
+          "label": "Probably generated",
+          "hint": "The text reads like machine text and it arrived pasted or faster than a hand types. It may be a message the person wrote elsewhere."
+        },
+        "TOO_SHORT": {
+          "label": "Too short to judge",
+          "hint": "A short text says too little to say anything."
+        },
+        "canBeWrong": "This signal can be wrong, especially on short texts and on French or non-native writing. It never blocks a message."
+      }
     },
     "photos": {
       "lead": "Add {min} to {max} photos, at least {faces} where your face is clearly the subject. They stay private to you until they pass a check — then only the people of your batches see them.",

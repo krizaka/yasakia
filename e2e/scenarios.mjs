@@ -1049,6 +1049,48 @@ let adaPhoto;
       const again = await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "Salut ! Ton marché préféré ?", clientId: "camille-0001" } });
       check("intros: a message is written once, even sent twice (clientId)", sent.status === 201 && again.json.message?.id === sent.json.message.id && (await sql("select count(*)::int as n from intro_messages where intro_id = $1", [yes.json.introId]))[0].n === 1);
       check("intros: an empty message is refused (400)", (await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "  ", clientId: "camille-0002" } })).status === 400);
+      // ── The authenticity signal: a signal, never a verdict, never a number, and it never holds a message back ──────────────────
+      {
+        const typed = { typedMs: 16000, typedChars: 96, pastedChars: 0, pasteEvents: 0, deletions: 4 };
+        const pasted = { typedMs: 500, typedChars: 0, pastedChars: 96, pasteEvents: 1, deletions: 0 };
+        const plain = "Salut ! Ton marché préféré, c’est Jean-Talon ou Atwater, et tu y vas avec qui le samedi matin ?";
+        const machine = "Hello! I would love to delve into what makes your weekends special, and learn which trail you love most.";
+        const doubtful = "What a tapestry of interests you have, I would love to hear how you found the time for all of them.";
+        const mid = (n) => `camille-sig-${String(n).padStart(4, "0")}`;
+        const send = (body, signals, n) => as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body, clientId: mid(n), ...(signals ? { signals } : {}) } });
+        const signalOf = async (id) => (await waitFor(async () => (await sql("select signal from intro_message_signals where message_id = $1 and signal is not null", [id]))[0]?.signal))?.valueOf();
+        const sentAt = Date.now();
+        const m1 = await send(plain, typed, 1);
+        check("signal: a message is delivered at once (201) — its signal arrives a moment later, never before it", m1.status === 201 && m1.json.message.signal === null && Date.now() - sentAt < 3000);
+        check("signal: typed by hand and nothing odd in the text → HAND", (await signalOf(m1.json.message.id)) === "HAND");
+        const m2 = await send(machine, pasted, 2);
+        check("signal: the text reads as machine AND it arrived pasted → LIKELY_GENERATED (two independent signs)", (await signalOf(m2.json.message.id)) === "LIKELY_GENERATED");
+        const m3 = await send(machine.replace("Hello!", "Hey!"), typed, 3);
+        check("signal: the text reads as machine but was typed → only UNSURE", (await signalOf(m3.json.message.id)) === "UNSURE");
+        const m4 = await send(doubtful, pasted, 4);
+        check("signal: a doubtful text that was pasted → UNSURE, not an accusation", (await signalOf(m4.json.message.id)) === "UNSURE");
+        const m5 = await send("Salut, ça va ?", pasted, 5);
+        check("signal: under the minimum number of words → TOO_SHORT, whatever the rest says", (await signalOf(m5.json.message.id)) === "TOO_SHORT");
+        const m6 = await send(plain.replace("Salut", "Coucou"), undefined, 6);
+        check("signal: with no measure at all (another client) a text that does not read as machine is HAND, and the counters are stored as null", (await signalOf(m6.json.message.id)) === "HAND" && (await sql("select typed_ms from intro_message_signals where message_id = $1", [m6.json.message.id]))[0].typed_ms === null);
+        const m7 = await send(doubtful.replace("tapestry", "tapestry"), undefined, 7);
+        check("signal: with no measure, a doubtful text is UNSURE", (await signalOf(m7.json.message.id)) === "UNSURE");
+
+        const seen = await runsOfStub();
+        check("signal: each message was read once by Orazaka's message-authenticity Studio (run ids kept as proof), and the engine's report carried no score", seen.messageJudgements.length >= 6 && (await sql("select count(*)::int as n from intro_message_signals where engine_run_id is not null and signal is not null"))[0].n >= 6);
+        const detail2 = await as(`/api/intros/${yes.json.introId}`);
+        check("signal: the signal rides every message of the thread — both people read the same four words, and no number", detail2.json.intro.messages.every((m) => "signal" in m && [null, "HAND", "UNSURE", "LIKELY_GENERATED", "TOO_SHORT"].includes(m.signal)) && !/"(score|probability|confidence|detector)"/.test(JSON.stringify(detail2.json)));
+        check("signal: the counters are five numbers per message, no keystroke and no text", (await sql("select column_name from information_schema.columns where table_name = 'intro_message_signals' order by 1")).map((r) => r.column_name).join() === "created_at,deletions,detector,engine_run_id,judged_at,message_id,paste_events,pasted_chars,rules_version,signal,typed_chars,typed_ms");
+        check("signal: counters outside their bounds, or a field nobody asked for, are refused (400)", (await send(plain, { ...typed, typedMs: -1 }, 8)).status === 400 && (await send(plain, { ...typed, keystrokes: [1, 2] }, 9)).status === 400);
+
+        // The engine out of reach: the message still goes; its signal is made from how it arrived alone.
+        await control("down");
+        const m10 = await send(plain.replace("Salut", "Allô"), typed, 10);
+        check("signal: with the engine down the message is delivered all the same (201)", m10.status === 201);
+        check("signal: …and its signal comes from how it was typed alone (HAND), never a block", (await signalOf(m10.json.message.id)) === "HAND");
+        await control("up");
+        check("signal: a signal is first-write-wins: a message judged once keeps its word", (await sql("select count(*)::int as n from intro_message_signals where signal is not null and judged_at is not null"))[0].n >= 8);
+      }
       const cont = await as(`/api/intros/${yes.json.introId}/continue`, { method: "POST" });
       check("intros: « continue » alone waits for the other (still OPEN), and is said once", cont.json.state === "OPEN" && (await as(`/api/intros/${yes.json.introId}/continue`, { method: "POST" })).json.code === "ALREADY_CONTINUED" && (await as(`/api/intros/${yes.json.introId}`)).json.intro.continuedByMe === true);
       await sql("update intros set expires_at = now() - interval '1 minute' where id = $1", [yes.json.introId]);
