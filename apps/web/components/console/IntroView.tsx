@@ -9,6 +9,8 @@ import { DashboardLayout, Widget } from "@krizaka/ui/dashboard-layout";
 import { useEffect, useRef, useState } from "react";
 
 import { AuthenticityMark } from "@/components/console/AuthenticityMark";
+import { MediaMessage } from "@/components/console/MediaMessage";
+import { MediaPicker } from "@/components/console/MediaPicker";
 import { errorKey } from "@/lib/client";
 import { ComposerTracker } from "@/lib/composer-signals";
 import { useSay } from "@/lib/i18n-client";
@@ -70,13 +72,20 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
             {intro.messages.length === 0 ? <p className="text-sm text-fg-muted">{say("intros.noMessage")}</p> : null}
             {intro.messages.map((m) => (
               <div key={m.id} className={m.mine ? "flex flex-col items-end gap-1" : "flex flex-col items-start gap-1"}>
-                <AuthenticityMark signal={m.signal} />
-                <MessageBubble mine={m.mine} text={m.body} time={time.format(new Date(m.createdAt))} />
+                {m.kind === "TEXT" ? (
+                  <>
+                    <AuthenticityMark signal={m.signal} />
+                    <MessageBubble mine={m.mine} text={m.body} time={time.format(new Date(m.createdAt))} />
+                  </>
+                ) : (
+                  <MediaMessage introId={intro.id} message={m} />
+                )}
               </div>
             ))}
             <div ref={end} />
           </div>
           {send.isError ? <Alert tone="danger" title={say(`errors.${errorKey(send.error)}`)} /> : null}
+          <MediaPicker introId={intro.id} limits={intro.mediaLimits} disabled={!writable} onSent={reread} />
           <MessageComposer value={draft} onValueChange={setDraft} onSend={submit} placeholder={say("intros.placeholder")} sendLabel={say("intros.send")} inputProps={{ onBeforeInput: (e) => tracker.current.input((e.nativeEvent as InputEvent).inputType ?? "insertText", (e.nativeEvent as InputEvent).data?.length ?? 1, performance.now()), onPaste: (e) => tracker.current.input("insertFromPaste", e.clipboardData.getData("text").length, performance.now()), onKeyDown: (e) => { if (e.key === "Backspace" || e.key === "Delete") tracker.current.input("deleteContentBackward", 0, performance.now()); } }} disabledReason={writable ? undefined : intro.frozen ? say("intros.frozen") : say("intros.closed")} maxLength={2000} />
         </div>
       </Widget>

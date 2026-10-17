@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { check, index, integer, pgTable, smallint, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 import { accounts } from "./accounts";
 import { introStateEnum } from "./enums";
@@ -49,10 +49,16 @@ export const introMessages = pgTable(
       .references(() => accounts.id, { onDelete: "cascade" })
       .notNull(),
     body: text("body").notNull(),
+    /** TEXT · PHOTO · VIDEO · AUDIO. A media message has an empty `body` and its file in `intro_media`. */
+    kind: varchar("kind", { length: 8 }).default("TEXT").notNull(),
     clientId: varchar("client_id", { length: 64 }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
-  (t) => [index("intro_messages_intro_idx").on(t.introId, t.createdAt), uniqueIndex("intro_messages_client_idx").on(t.introId, t.senderId, t.clientId)],
+  (t) => [
+    index("intro_messages_intro_idx").on(t.introId, t.createdAt),
+    uniqueIndex("intro_messages_client_idx").on(t.introId, t.senderId, t.clientId),
+    check("intro_messages_kind", sql`${t.kind} in ('TEXT', 'PHOTO', 'VIDEO', 'AUDIO')`),
+  ],
 );
 
 /**
@@ -80,3 +86,42 @@ export const introMessageSignals = pgTable("intro_message_signals", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   judgedAt: timestamp("judged_at", { withTimezone: true }),
 });
+
+/**
+ * The file of a media message — a photo, a short video or a voice message — private on Bunny (`messages/<intro>/<message>.<ext>`),
+ * never served as such: `GET /api/intros/{id}/media/{messageId}` evaluates who asks and signs a 300-second URL. Nothing is edited: the
+ * file is only made clean (metadata removed), measured and judged. `status`: UPLOADING → PENDING (waiting for the safety check —
+ * Orazaka's `media-safety`, which fails closed) → APPROVED (the other person can see it) | REJECTED (deleted) | GONE (the conversation ended: deleted). The limits are the
+ * MEDIA rule set's. It goes with the message, and its bytes with the conversation (faded, closed, or an account deleted).
+ */
+export const introMedia = pgTable(
+  "intro_media",
+  {
+    messageId: uuid("message_id")
+      .primaryKey()
+      .references(() => introMessages.id, { onDelete: "cascade" }),
+    kind: varchar("kind", { length: 8 }).notNull(),
+    status: varchar("status", { length: 10 }).default("UPLOADING").notNull(),
+    storageKey: varchar("storage_key", { length: 200 }).notNull().unique(),
+    posterKey: varchar("poster_key", { length: 200 }),
+    mimeType: varchar("mime_type", { length: 40 }).notNull(),
+    /** The declared size, then the stored size. */
+    bytes: integer("bytes").notNull(),
+    durationMs: integer("duration_ms"),
+    /** 64 peaks, 0 to 100, for a voice message's waveform. */
+    waveform: smallint("waveform").array(),
+    /** The codes the safety check raised (words in the app, never the engine's). */
+    moderationCodes: text("moderation_codes").array(),
+    engineRunId: varchar("engine_run_id", { length: 80 }),
+    /** How many times the safety check was tried and could not decide. */
+    attempts: smallint("attempts").default(0).notNull(),
+    uploadExpiresAt: timestamp("upload_expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("intro_media_status_idx").on(t.status, t.createdAt),
+    check("intro_media_kind", sql`${t.kind} in ('PHOTO', 'VIDEO', 'AUDIO')`),
+    check("intro_media_status_known", sql`${t.status} in ('UPLOADING', 'PENDING', 'APPROVED', 'REJECTED', 'GONE')`),
+  ],
+);

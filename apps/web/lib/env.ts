@@ -66,6 +66,16 @@ export function photoCheckConfig(env: Env = process.env): { ai: AiProvider; comp
   return { ai: aiProvider(env), compareFaces: faceComparisonEnabled(env) };
 }
 
+/** The ffmpeg binary media messages are processed with (`MEDIA_FFMPEG_PATH`; unset: the one `ffmpeg-static` brought). */
+export function ffmpegBinary(env: Env = process.env): string | undefined {
+  return env.MEDIA_FFMPEG_PATH?.trim() || undefined;
+}
+
+/** What the media safety loop needs of the deployment: the engine. */
+export function mediaReviewConfig(env: Env = process.env): { ai: AiProvider } {
+  return { ai: aiProvider(env) };
+}
+
 /**
  * The door to AI: Orazaka's edge with Yasakia's service key (`AI_ENGINE_URL`, `AI_ENGINE_API_KEY`). Nothing else exists —
  * no model provider, no stand-in: unconfigured, the agent and the batches answer 503 (AGENTS.md §3.F). Read at the edge

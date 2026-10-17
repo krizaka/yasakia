@@ -78,6 +78,13 @@
       "when": 1792459210532,
       "tag": "0010_message_signals",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792459270532,
+      "tag": "0011_message_media",
+      "breakpoints": true
     }
   ]
 }

@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 30 tables · 18 enums · 11 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 31 tables · 18 enums · 12 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -40,8 +40,9 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `debriefs` | `batches` (`batch_id`) · `accounts` (`account_id`) | — |
 | `facet_embeddings` | `accounts` (`account_id`) | — |
 | `facets` | `accounts` (`account_id`) · `agent_messages` (`source_message_id`) | — |
+| `intro_media` | `intro_messages` (`message_id`) | — |
 | `intro_message_signals` | `intro_messages` (`message_id`) | — |
-| `intro_messages` | `intros` (`intro_id`) · `accounts` (`sender_id`) | `intro_message_signals` |
+| `intro_messages` | `intros` (`intro_id`) · `accounts` (`sender_id`) | `intro_media` · `intro_message_signals` |
 | `intros` | `accounts` (`account_a`) · `accounts` (`account_b`) | `intro_messages` |
 | `pairs_seen` | `accounts` (`account_id`) · `accounts` (`seen_account_id`) | — |
 | `photo_checks` | `accounts` (`account_id`) | — |
@@ -292,6 +293,30 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Checks:** `facets_one_value` (`(value is null) <> (value_sealed is null)`) · `facets_sealed_when_sensitive` (`not sensitive or value is null`)
 
+### `intro_media`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `message_id` | uuid | no |  | primary key · → `intro_messages.id` (on delete cascade) |
+| `kind` | varchar(8) | no |  |  |
+| `status` | varchar(10) | no | `"UPLOADING"` |  |
+| `storage_key` | varchar(200) | no |  | unique |
+| `poster_key` | varchar(200) | yes |  |  |
+| `mime_type` | varchar(40) | no |  |  |
+| `bytes` | integer | no |  |  |
+| `duration_ms` | integer | yes |  |  |
+| `waveform` | smallint[] | yes |  |  |
+| `moderation_codes` | text[] | yes |  |  |
+| `engine_run_id` | varchar(80) | yes |  |  |
+| `attempts` | smallint | no | `0` |  |
+| `upload_expires_at` | timestamp with time zone | no |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+| `reviewed_at` | timestamp with time zone | yes |  |  |
+
+**Indexes:** `intro_media_status_idx` (status, created_at)
+
+**Checks:** `intro_media_kind` (`kind in ('PHOTO', 'VIDEO', 'AUDIO')`) · `intro_media_status_known` (`status in ('UPLOADING', 'PENDING', 'APPROVED', 'REJECTED', 'GONE')`)
+
 ### `intro_message_signals`
 
 | Column | Type | Null | Default | Notes |
@@ -317,10 +342,13 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `intro_id` | uuid | no |  | → `intros.id` (on delete cascade) |
 | `sender_id` | uuid | no |  | → `accounts.id` (on delete cascade) |
 | `body` | text | no |  |  |
+| `kind` | varchar(8) | no | `"TEXT"` |  |
 | `client_id` | varchar(64) | no |  |  |
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
 **Indexes:** `intro_messages_intro_idx` (intro_id, created_at) · `intro_messages_client_idx` (unique, intro_id, sender_id, client_id)
+
+**Checks:** `intro_messages_kind` (`kind in ('TEXT', 'PHOTO', 'VIDEO', 'AUDIO')`)
 
 ### `intros`
 
@@ -535,3 +563,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0008_photo_checks.sql`
 - `0009_no_ghostwriting.sql`
 - `0010_message_signals.sql`
+- `0011_message_media.sql`

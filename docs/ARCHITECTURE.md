@@ -105,6 +105,30 @@ set passed (the fictional dev cast excepted — it says so). The engine out of r
 is decided, asking again works. What it cannot do is written where the person reads it: it identifies no one, recognises no
 celebrity, and can be wrong (a lookalike, strong light) — a refused photo is replaced, never punished.
 
+### Media messages
+
+```sequence
+participant app: The Yasakia app
+participant api: Yasakia API
+participant storage: Bunny Storage
+participant oz: Orazaka (Studio media-safety)
+
+app -> api: POST /api/intros/[id]/media (kind, type, size, length)
+api --> app: a message UPLOADING + an upload URL signed for this message, 300 s (413 beyond the MEDIA limits)
+app -> api: PUT the bytes
+app -> api: PUT /api/intros/[id]/media/[messageId]/complete
+api -> api: sniffed, measured (ffmpeg), metadata removed; length checked again
+api -> storage: the clean file (+ a poster for a video); PENDING
+api -> oz: frames (photo, video) or the sound; verdict as codes
+oz --> api: APPROVED → visible to the other person | REJECTED → bytes deleted, codes to the sender | UNREADABLE → held, tried again
+app -> api: GET /api/intros/[id]/media/[messageId] → a URL signed for this reader, 300 s
+```
+
+Limits are the `MEDIA` rule set (photo ≤ 10 MB, video ≤ 60 s / 50 MB, voice ≤ 2 min / 10 MB at version 1). Nothing is edited. The access rule
+(`lib/intro-media-rules.ts`) is the conversation's: the sender sees their own while its bytes exist, the other person only once APPROVED, nobody
+once the introduction is faded, closed or frozen — the sweep then deletes the files (GONE). The safety check fails closed (a HOLD, never an
+approval). A video is judged on three frames, a voice message on its words — the report says so.
+
 ## Safety and privacy
 
 - **Blocks** are immediate, invisible and mutual in effect: the intro closes, each leaves the other's current batch.

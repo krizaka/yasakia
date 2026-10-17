@@ -31,7 +31,7 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${production ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${CDN}${PHOTOS}`,
-  `media-src 'self' blob: ${CDN}`,
+  `media-src 'self' blob: ${CDN}${PHOTOS}`,
   "font-src 'self' data:",
   `connect-src 'self'${production ? "" : " ws: http://localhost:* http://127.0.0.1:*"}`,
   "frame-src 'none'",
@@ -79,7 +79,7 @@ const nextConfig = {
   transpilePackages: ["@yasakia/ai", "@yasakia/db", "@yasakia/matching", "@yasakia/media"],
   // Native and driver modules stay Node modules, required at run time: sharp (images), pg (the pool, LISTEN), ioredis
   // (@krizaka/realtime/redis — it connects only with REALTIME_BUS=redis).
-  serverExternalPackages: ["sharp", "pg", "ioredis"],
+  serverExternalPackages: ["sharp", "pg", "ioredis", "ffmpeg-static"],
   // The mail templates are read from disk at run time; the image copies them next to the server (deploy/docker/Dockerfile).
   skipTrailingSlashRedirect: true,
   async rewrites() {

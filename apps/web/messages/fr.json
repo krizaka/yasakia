@@ -49,6 +49,7 @@
           "<b>Ta conversation avec l’agent et ton portrait</b> : ce que tu as dit à l’agent et ce qu’il en a compris, pour que chaque lot te ressemble un peu plus.",
           "<b>Tes lots, tes décisions et tes débriefs</b> : qui t’a été proposé, ce que tu as répondu, et tes réponses au débrief.",
           "<b>Tes présentations</b> : les messages que vous échangez pendant une présentation. L’agent ne les lit jamais ; un petit classifieur lit chaque message une fois pour donner la marque d’authenticité affichée au-dessus (un signal qui peut se tromper, jamais un verdict, et qui ne retient jamais un message), avec quelques compteurs sur la façon dont il a été tapé (durée, caractères tapés et collés, suppressions — aucune touche, aucun texte), gardés avec le message.",
+          "<b>Les photos, vidéos et messages vocaux que tu envoies</b> dans une conversation : ils partent tels que tu les as faits — rien n’est coupé, filtré ni retouché — débarrassés de toute métadonnée (la position comprise). Ils sont privés, montrés seulement à vous deux, et seulement après une vérification de sécurité (Orazaka regarde l’image ou des images de la vidéo, et lit les mots d’un message vocal ; le vérificateur ne garde rien). Ils sont effacés quand la conversation se termine ou que l’un des comptes est supprimé.",
           "<b>Tes gestes de sécurité</b> : les personnes que tu as bloquées et les signalements que tu as faits.",
           "<b>Le jeton de notification de ton téléphone</b>, pour te prévenir quand un lot est prêt ou qu’on t’a écrit.",
           "<b>Le coût de l’agent</b> : pour chaque appel à un modèle d’IA, sa taille et sa durée — jamais son contenu.",
@@ -331,7 +332,14 @@
       "INVALID_IMAGE": "Ce fichier n’est pas une photo que nous savons lire. Utilise une photo JPEG, PNG ou WebP.",
       "UPLOAD_MISSING": "La photo n’est pas arrivée. Essaie de l’ajouter à nouveau.",
       "UPLOAD_TOO_LARGE": "Cette photo est trop lourde (10 Mo au plus).",
-      "STORAGE_UNAVAILABLE": "Les photos ne peuvent pas être enregistrées pour l’instant. Réessaie dans un moment."
+      "STORAGE_UNAVAILABLE": "Les photos ne peuvent pas être enregistrées pour l’instant. Réessaie dans un moment.",
+      "MEDIA_TOO_LARGE": "Ce fichier est plus gros que ce qui est permis.",
+      "MEDIA_TOO_LONG": "C’est plus long que ce qui est permis.",
+      "MEDIA_TYPE": "Ce type de fichier n’est pas accepté ici.",
+      "MEDIA_UNREADABLE": "Ce fichier ne se lit pas comme une photo, une vidéo ou un son.",
+      "MEDIA_WRONG_KIND": "Ce fichier n’est pas du type de média annoncé.",
+      "MEDIA_UNAVAILABLE": "Les médias ne peuvent pas être traités pour l’instant. Réessaie dans un moment.",
+      "DUPLICATE": "Ceci a déjà été envoyé."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -769,13 +777,15 @@
           "MATCHING": "La sélection",
           "AGENT": "L’agent",
           "PHOTOS": "Les photos",
-          "AUTHENTICITY": "Authenticité des messages"
+          "AUTHENTICITY": "Authenticité des messages",
+          "MEDIA": "Messages médias"
         },
         "domainHints": {
           "MATCHING": "Qui peut être dans une sélection, combien de personnes, et combien de temps elle reste ouverte.",
           "AGENT": "Combien de temps l’agent parle avant d’écrire un portrait, et ce qu’il doit savoir.",
           "PHOTOS": "Combien de photos contient un profil, et combien doivent montrer le visage de la personne. Orazaka vérifie l’ensemble ; un profil qui n’a pas passé la vérification n’est pas montré et ne peut pas ouvrir de lot.",
-          "AUTHENTICITY": "À partir de combien de mots un message est jugeable, et comment on distingue un message collé ou tapé plus vite qu’une main. Un signal, jamais un verdict : il ne retient jamais un message."
+          "AUTHENTICITY": "À partir de combien de mots un message est jugeable, et comment on distingue un message collé ou tapé plus vite qu’une main. Un signal, jamais un verdict : il ne retient jamais un message.",
+          "MEDIA": "La taille et la durée d’une photo, d’une vidéo ou d’un message vocal dans une conversation. Le fichier part tel quel : rien n’est coupé ni retouché, et il est vérifié avant que l’autre personne puisse le voir."
         },
         "params": {
           "batchMin": "Le moins de personnes par sélection",
@@ -794,7 +804,12 @@
           "minWords": "Nombre minimal de mots pour juger un message",
           "pasteRatio": "Part des caractères collés pour « collé » (0,5 à 1)",
           "fastCharsPerSecond": "Vitesse de frappe plus rapide qu’une main (caractères par seconde)",
-          "minTypedShare": "Part des caractères tapés pour « tapé » (0,5 à 1)"
+          "minTypedShare": "Part des caractères tapés pour « tapé » (0,5 à 1)",
+          "photoMaxBytes": "Plus grosse photo (octets)",
+          "videoMaxSeconds": "Plus longue vidéo (secondes)",
+          "videoMaxBytes": "Plus grosse vidéo (octets)",
+          "audioMaxSeconds": "Plus long message vocal (secondes)",
+          "audioMaxBytes": "Plus gros message vocal (octets)"
         },
         "activeVersion": "Version {version} active",
         "noActive": "Aucune version active",
@@ -1020,6 +1035,40 @@
           "hint": "Un texte court en dit trop peu pour dire quoi que ce soit."
         },
         "canBeWrong": "Ce signal peut se tromper, surtout sur les textes courts et sur une écriture en français ou non native. Il ne bloque jamais un message."
+      },
+      "media": {
+        "attach": "Envoyer une photo, une vidéo ou un message vocal",
+        "photo": "Photo",
+        "video": "Vidéo",
+        "voice": "Vocal",
+        "limits": "Photo jusqu’à {photo} Mo · vidéo jusqu’à {video} s · vocal jusqu’à {voice} min",
+        "asIs": "Elle part telle quelle ({size} Mo) : rien n’est coupé, filtré ni retouché. L’autre personne la voit une fois qu’elle a passé une vérification de sécurité.",
+        "send": "Envoyer",
+        "cancel": "Annuler",
+        "uploading": "Envoi…",
+        "checking": "Vérification de sécurité… toi seul·e la vois pour l’instant",
+        "unavailable": "Impossible de charger ceci. Recharge la conversation.",
+        "refused": "Ceci n’a pas été envoyé — ça n’a pas passé la vérification de sécurité :",
+        "gone": "Ce média n’est plus disponible (la conversation est terminée).",
+        "title": {
+          "PHOTO": "Photo",
+          "VIDEO": "Vidéo {duration}",
+          "AUDIO": "Message vocal {duration}"
+        },
+        "problem": {
+          "tooLarge": "Ce fichier fait plus de {max} Mo.",
+          "tooLong": "C’est plus long que {max} secondes.",
+          "unreadable": "Ce fichier ne se lit pas comme une photo, une vidéo ou un son.",
+          "upload": "L’envoi a échoué. Réessaie."
+        },
+        "codes": {
+          "SEXUAL_CONTENT": "de la nudité ou du contenu sexuel",
+          "GRAPHIC_VIOLENCE": "de la violence graphique",
+          "MINOR_UNSAFE": "une personne jeune dans un contexte dangereux",
+          "THREAT_OR_HARASSMENT": "une menace ou du harcèlement",
+          "SEXUAL_SPEECH": "des propos sexuellement explicites",
+          "HATE": "des propos haineux"
+        }
       }
     },
     "photos": {

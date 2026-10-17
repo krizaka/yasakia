@@ -47,6 +47,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `APP_ANALYTICS_INTERVAL_SECONDS` | — |  | `30` | How often the analytics outbox is sent to Orazaka. |
 | `APP_SWEEP_INTERVAL_SECONDS` | — |  | `600` | How often expired codes, sessions and uploads are swept. |
 | `APP_PHOTO_FACE_COMPARISON` | — |  | `off` | Whether Orazaka may compare a person's photos with each other to catch a photo of someone else (biometric processing, Québec Law 25: `off` until reviewed; `on` still needs the person's own consent). Counting faces does not depend on it. |
+| `APP_MEDIA_REVIEW_INTERVAL_SECONDS` | — |  | `30` | How often an instance picks up the media messages whose safety check is waiting (or could not decide). |
 | `APP_PHOTO_CHECK_INTERVAL_SECONDS` | — |  | `15` | How often an instance picks up the photo checks asked and not yet worked. |
 | `APP_EXPORT_SYNC_BUDGET_MS` | — |  | `1000` | A data export answers at once when it builds within this budget, else 202 and a background build. |
 
@@ -81,6 +82,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `MEDIA_STORAGE_ENDPOINT` | — |  | `storage.bunnycdn.com` | The zone's region host. |
 | `MEDIA_CDN_HOSTNAME` | ✓ |  |  | Pull zone serving the photos (Optimizer and token authentication on). |
 | `MEDIA_CDN_TOKEN_AUTH_KEY` | ✓ | ✓ |  | Signs the photo URLs (the pull zone's token authentication key). |
+| `MEDIA_FFMPEG_PATH` | — |  |  | The ffmpeg binary that cleans and measures videos and voice messages (the container image copies one to a fixed path). Unset: the one the `ffmpeg-static` package downloaded. |
 | `MEDIA_PHOTO_MODERATION` | — |  | `auto` | Photo moderation: `auto` (V1 — approved at once; a report reopens the review). |
 
 ### E-mail — `MAIL_`

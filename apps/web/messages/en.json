@@ -49,6 +49,7 @@
           "<b>Your conversation with the agent and your portrait</b>: what you told the agent and what it understood, so the batches fit you better each time.",
           "<b>Your batches, decisions and debriefs</b>: who was proposed to you, what you answered, and your debrief answers.",
           "<b>Your intros</b>: the messages you exchange during an intro. The agent never reads them; a small classifier reads each message once to give the authenticity mark shown above it (a signal that can be wrong, never a verdict, and it never holds a message back), together with a few counters of how the message was typed (time, characters typed and pasted, deletions — no keystroke and no text), kept with the message.",
+          "<b>Photos, videos and voice messages you send</b> in a conversation: sent as you made them — nothing is cut, filtered or edited — with every metadata block removed (GPS included). They are private, shown only to the two of you, and only after a safety check (Orazaka looks at the picture or frames of the video, and reads the words of a voice message; nothing is kept by the checker). They are deleted when the conversation ends or either account is deleted.",
           "<b>Your safety actions</b>: the people you blocked and the reports you filed.",
           "<b>Your phone's notification token</b>, so we can tell you when a batch is ready or someone wrote to you.",
           "<b>The cost of the agent</b>: for each call to an AI model, its size and duration — never its content.",
@@ -331,7 +332,14 @@
       "INVALID_IMAGE": "This file is not a photo we can read. Use a JPEG, PNG or WebP photo.",
       "UPLOAD_MISSING": "The photo did not arrive. Try adding it again.",
       "UPLOAD_TOO_LARGE": "This photo is too large (10 MB at most).",
-      "STORAGE_UNAVAILABLE": "Photos cannot be stored right now. Try again in a moment."
+      "STORAGE_UNAVAILABLE": "Photos cannot be stored right now. Try again in a moment.",
+      "MEDIA_TOO_LARGE": "This file is larger than allowed.",
+      "MEDIA_TOO_LONG": "This is longer than allowed.",
+      "MEDIA_TYPE": "This type of file is not accepted here.",
+      "MEDIA_UNREADABLE": "This file cannot be read as a photo, video or sound.",
+      "MEDIA_WRONG_KIND": "This file is not the kind of media you said it was.",
+      "MEDIA_UNAVAILABLE": "Media cannot be processed right now. Try again in a moment.",
+      "DUPLICATE": "This was already sent."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -769,13 +777,15 @@
           "MATCHING": "The batch",
           "AGENT": "The agent",
           "PHOTOS": "The photos",
-          "AUTHENTICITY": "Message authenticity"
+          "AUTHENTICITY": "Message authenticity",
+          "MEDIA": "Media messages"
         },
         "domainHints": {
           "MATCHING": "Who may be in a batch, how many people, and for how long it stays open.",
           "AGENT": "How long the agent talks before it writes a portrait, and what it needs to know.",
           "PHOTOS": "How many photos a profile holds, and how many of them must show the person’s face. Orazaka checks the set; a profile that has not passed is not shown and cannot open a batch.",
-          "AUTHENTICITY": "When a message counts as too short to judge, and how a message that arrived pasted or typed faster than a hand is told apart. A signal, never a verdict: it never holds a message back."
+          "AUTHENTICITY": "When a message counts as too short to judge, and how a message that arrived pasted or typed faster than a hand is told apart. A signal, never a verdict: it never holds a message back.",
+          "MEDIA": "How large and how long a photo, a video or a voice message may be in a conversation. The file is sent as it is: nothing is trimmed or edited, and it is checked for safety before the other person can see it."
         },
         "params": {
           "batchMin": "Fewest people in a batch",
@@ -794,7 +804,12 @@
           "minWords": "Fewest words to judge a message",
           "pasteRatio": "Share of characters pasted for « pasted » (0.5 to 1)",
           "fastCharsPerSecond": "Typing speed faster than a hand (characters a second)",
-          "minTypedShare": "Share of characters typed for « typed » (0.5 to 1)"
+          "minTypedShare": "Share of characters typed for « typed » (0.5 to 1)",
+          "photoMaxBytes": "Largest photo (bytes)",
+          "videoMaxSeconds": "Longest video (seconds)",
+          "videoMaxBytes": "Largest video (bytes)",
+          "audioMaxSeconds": "Longest voice message (seconds)",
+          "audioMaxBytes": "Largest voice message (bytes)"
         },
         "activeVersion": "Version {version} active",
         "noActive": "No active version",
@@ -1020,6 +1035,40 @@
           "hint": "A short text says too little to say anything."
         },
         "canBeWrong": "This signal can be wrong, especially on short texts and on French or non-native writing. It never blocks a message."
+      },
+      "media": {
+        "attach": "Send a photo, a video or a voice message",
+        "photo": "Photo",
+        "video": "Video",
+        "voice": "Voice",
+        "limits": "Photo up to {photo} MB · video up to {video} s · voice up to {voice} min",
+        "asIs": "It is sent as it is ({size} MB): nothing is cut, filtered or edited. The other person sees it once it has passed a safety check.",
+        "send": "Send",
+        "cancel": "Cancel",
+        "uploading": "Sending…",
+        "checking": "Safety check… only you can see it for now",
+        "unavailable": "This could not be loaded. Reload the conversation.",
+        "refused": "This was not sent — it did not pass the safety check:",
+        "gone": "This media is no longer available (the conversation has ended).",
+        "title": {
+          "PHOTO": "Photo",
+          "VIDEO": "Video {duration}",
+          "AUDIO": "Voice message {duration}"
+        },
+        "problem": {
+          "tooLarge": "This file is larger than {max} MB.",
+          "tooLong": "This is longer than {max} seconds.",
+          "unreadable": "This file cannot be read as a photo, video or sound.",
+          "upload": "The upload failed. Try again."
+        },
+        "codes": {
+          "SEXUAL_CONTENT": "nudity or sexual content",
+          "GRAPHIC_VIOLENCE": "graphic violence",
+          "MINOR_UNSAFE": "a young person in an unsafe context",
+          "THREAT_OR_HARASSMENT": "a threat or harassment",
+          "SEXUAL_SPEECH": "sexually explicit words",
+          "HATE": "hateful words"
+        }
       }
     },
     "photos": {

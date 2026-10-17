@@ -42,7 +42,7 @@
     },
     "journey.media-messages": {
       "evidence": null,
-      "gap": "Not built: an introduction carries text only; no photo, video or audio message.",
+      "gap": "Built and tested in CI (limits as data, no editing, private signed URLs, moderation that fails closed, waveform, expiry with the conversation); not yet seen running on dev (needs the media-safety pack installed and the Mac's audio transcription for voice messages).",
       "issue": "https://github.com/krizaka/yasakia/issues/113"
     },
     "ui.krizaka-ui": {
