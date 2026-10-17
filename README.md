@@ -32,6 +32,7 @@ Then [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md): sign up the way the app
   account on every request.
 - **Private photos**: a signed upload, re-encoding that strips every metadata block (GPS included), blurhash, then a
   URL signed for one viewer for 300 seconds — only for someone in your batch or your intro.
+- **Real people** — a profile holds 4 to 6 photos, at least 2 with the face (rules as data), checked by Orazaka (faces counted, nothing written over a photo, no screenshot, nobody who looks under 18; **no identification**; the face comparison is off until reviewed and needs the person's explicit consent, nothing kept) before they are shown or a batch opens. **The AI never writes for you**: every message of an introduction is typed by a person; a small mark (*written by hand · uncertain · probably generated · too short to judge*) is a signal, never a verdict, never a number, never a block. Photos, videos and voice messages can be sent — as they are, privately, after a safety check that fails closed, limits as data, gone with the conversation. See [AGENTS.md](AGENTS.md) §3.
 - **Privacy by design**: the position rounded to ~1 km before it is stored, sensitive answers encrypted at rest
   (AES-256-GCM), export and deletion in the API from day one, blocks and reports that work at once.
 - **PostgreSQL does the heavy lifting**: pgvector (HNSW) for who you are and who you seek, `earthdistance` for the
