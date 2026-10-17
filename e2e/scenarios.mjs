@@ -887,7 +887,8 @@ let adaPhoto;
       check("photos: no session, no check (401)", (await call("/api/me/photos/check")).status === 401 && (await call("/api/me/photos/check", { method: "POST" })).status === 401);
       const empty = await checkOf(camille);
       check("photos: a person with none is EMPTY, with the rules from the database (4 to 6, two with a face) and nothing to show", empty.state === "EMPTY" && empty.verified === false && empty.rules.minPhotos === 4 && empty.rules.maxPhotos === 6 && empty.rules.minFacePhotos === 2 && empty.photos.length === 0, empty);
-      check("photos: nothing to check is a 409 NO_PHOTOS, and nothing is sent to the engine", (await call("/api/me/photos/check", { method: "POST", token: camille.token, ip: camille.ip })).json.code === "NO_PHOTOS" && (await rest()) === 0);
+      const sentBefore = await rest();
+      check("photos: nothing to check is a 409 NO_PHOTOS, and nothing is sent to the engine", (await call("/api/me/photos/check", { method: "POST", token: camille.token, ip: camille.ip })).json.code === "NO_PHOTOS" && (await rest()) === sentBefore);
 
       // The gate: without photos that passed, no batch — the refusal says what is missing, in codes.
       const gated = await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "en" }, ip: camille.ip });
@@ -916,7 +917,7 @@ let adaPhoto;
       // A face that is not the same person — compared only with the person's own, separate agreement (Québec Law 25).
       const stranger = await add(camille, "FACE_B");
       const uncompared = await settle(camille);
-      check("photos: without her agreement faces are only counted — a face of someone else is not flagged, the view says it waits for her consent", uncompared?.comparison === "NEEDS_CONSENT" && !uncompared.blockers.some((b) => b.code === "FACE_MISMATCH") && (await runsOfStub()).photoChecks.every((r) => r.compareFaces === false), uncompared);
+      check("photos: without her agreement faces are only counted — a face of someone else is not flagged, the view says it waits for her consent", uncompared?.comparison === "NEEDS_CONSENT" && !uncompared.blockers.some((b) => b.code === "FACE_MISMATCH") && (await runsOfStub()).photoChecks.every((r) => r.compareFaces === false), { comparison: uncompared?.comparison });
       check("photos: …and the consent is not given by default", (await call("/api/me/photos/consent", { token: camille.token, ip: camille.ip })).json.consent.given === false);
       check("photos: a consent to another wording, or none, is refused (400); a visitor gets 401", (await call("/api/me/photos/consent", { method: "PUT", token: camille.token, body: { version: "1999-01" }, ip: camille.ip })).status === 400 && (await call("/api/me/photos/consent", { method: "PUT", token: camille.token, body: {}, ip: camille.ip })).status === 400 && (await call("/api/me/photos/consent", { method: "PUT", body: { version: "2026-10" } })).status === 401);
       const agreed = await call("/api/me/photos/consent", { method: "PUT", token: camille.token, body: { version: "2026-10" }, ip: camille.ip });
@@ -1000,7 +1001,7 @@ let adaPhoto;
     await sql("insert into agent_sessions (account_id, state, portrait) values ($1, 'WAITING_POOL', $2) on conflict (account_id) do update set state = 'WAITING_POOL', portrait = excluded.portrait", [lonely.id, JSON.stringify({ self: "x", seeking: "y" })]);
     await sql("insert into facet_embeddings (account_id, kind, vector, model) values ($1, 'SELF', $2::vector, 'stub'), ($1, 'SEEKING', $2::vector, 'stub') on conflict (account_id, kind) do nothing", [lonely.id, vec("nothing alike anywhere")]);
     for (let i = 0; i < 4; i++) await sql("insert into profile_photos (account_id, storage_key, mime_type, bytes, moderation_status, position, upload_expires_at) values ($1, $2, 'image/jpeg', 100, 'APPROVED', $3, now())", [lonely.id, `photos/${lonely.id}/seeded-${i}.jpg`, i]);
-    await sql("insert into photo_checks (account_id, status, set_hash, photo_ids, rules_version, passes, report) values ($1, 'DONE', photo_set_hash($1), (select array_agg(id order by position) from profile_photos where account_id = $1), 1, true, '{}'::jsonb)", [lonely.id]);
+    await sql("insert into photo_checks (account_id, status, set_hash, photo_ids, rules_version, passes, report) values ($1, 'DONE', photo_set_hash($1), (select array_agg(id order by position) from profile_photos where account_id = $1), 1, true, $2::jsonb)", [lonely.id, JSON.stringify({ photos: [0, 1, 2, 3].map((index) => ({ index, kind: index < 2 ? 'FACE' : 'NO_FACE', faceCount: index < 2 ? 1 : 0, findings: [] })), counts: { photos: 4, facePhotos: 2 }, blockers: [], passes: true })]);
     const none = await call("/api/batches", { method: "POST", token: lonely.token, ip: lonely.ip });
     check("batch: when fewer than three fit both ways it is a 409 NO_FIT_YET — the person stays in WAITING_POOL, nobody is invented", none.status === 409 && none.json.code === "NO_FIT_YET" && (await sql("select state::text from agent_sessions where account_id = $1", [lonely.id]))[0].state === "WAITING_POOL", none.json);
     check("batch: an engine out of reach is a 503 AI_UNAVAILABLE and leaves no half-batch", await (async () => {
