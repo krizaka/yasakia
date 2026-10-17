@@ -768,12 +768,14 @@
         "domains": {
           "MATCHING": "The batch",
           "AGENT": "The agent",
-          "PHOTOS": "The photos"
+          "PHOTOS": "The photos",
+          "AUTHENTICITY": "Message authenticity"
         },
         "domainHints": {
           "MATCHING": "Who may be in a batch, how many people, and for how long it stays open.",
           "AGENT": "How long the agent talks before it writes a portrait, and what it needs to know.",
-          "PHOTOS": "How many photos a profile holds, and how many of them must show the person’s face. Orazaka checks the set; a profile that has not passed is not shown and cannot open a batch."
+          "PHOTOS": "How many photos a profile holds, and how many of them must show the person’s face. Orazaka checks the set; a profile that has not passed is not shown and cannot open a batch.",
+          "AUTHENTICITY": "When a message counts as too short to judge, and how a message that arrived pasted or typed faster than a hand is told apart. A signal, never a verdict: it never holds a message back."
         },
         "params": {
           "batchMin": "Fewest people in a batch",
@@ -788,7 +790,11 @@
           "minFacets": "Fewest facets for a portrait",
           "minPhotos": "Fewest photos",
           "maxPhotos": "Most photos (six slots)",
-          "minFacePhotos": "Fewest photos showing the face"
+          "minFacePhotos": "Fewest photos showing the face",
+          "minWords": "Fewest words to judge a message",
+          "pasteRatio": "Share of characters pasted for « pasted » (0.5 to 1)",
+          "fastCharsPerSecond": "Typing speed faster than a hand (characters a second)",
+          "minTypedShare": "Share of characters typed for « typed » (0.5 to 1)"
         },
         "activeVersion": "Version {version} active",
         "noActive": "No active version",

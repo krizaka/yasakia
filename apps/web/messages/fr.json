@@ -768,12 +768,14 @@
         "domains": {
           "MATCHING": "La sélection",
           "AGENT": "L’agent",
-          "PHOTOS": "Les photos"
+          "PHOTOS": "Les photos",
+          "AUTHENTICITY": "Authenticité des messages"
         },
         "domainHints": {
           "MATCHING": "Qui peut être dans une sélection, combien de personnes, et combien de temps elle reste ouverte.",
           "AGENT": "Combien de temps l’agent parle avant d’écrire un portrait, et ce qu’il doit savoir.",
-          "PHOTOS": "Combien de photos contient un profil, et combien doivent montrer le visage de la personne. Orazaka vérifie l’ensemble ; un profil qui n’a pas passé la vérification n’est pas montré et ne peut pas ouvrir de lot."
+          "PHOTOS": "Combien de photos contient un profil, et combien doivent montrer le visage de la personne. Orazaka vérifie l’ensemble ; un profil qui n’a pas passé la vérification n’est pas montré et ne peut pas ouvrir de lot.",
+          "AUTHENTICITY": "À partir de combien de mots un message est jugeable, et comment on distingue un message collé ou tapé plus vite qu’une main. Un signal, jamais un verdict : il ne retient jamais un message."
         },
         "params": {
           "batchMin": "Le moins de personnes par sélection",
@@ -788,7 +790,11 @@
           "minFacets": "Le moins de facettes pour un portrait",
           "minPhotos": "Nombre minimal de photos",
           "maxPhotos": "Nombre maximal de photos (six emplacements)",
-          "minFacePhotos": "Nombre minimal de photos montrant le visage"
+          "minFacePhotos": "Nombre minimal de photos montrant le visage",
+          "minWords": "Nombre minimal de mots pour juger un message",
+          "pasteRatio": "Part des caractères collés pour « collé » (0,5 à 1)",
+          "fastCharsPerSecond": "Vitesse de frappe plus rapide qu’une main (caractères par seconde)",
+          "minTypedShare": "Part des caractères tapés pour « tapé » (0,5 à 1)"
         },
         "activeVersion": "Version {version} active",
         "noActive": "Aucune version active",
