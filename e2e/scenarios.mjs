@@ -1047,7 +1047,7 @@ let adaPhoto;
       const list = await as("/api/intros");
       check("intros: mine are listed, with the other's first name and the time left", list.status === 200 && list.json.intros.length === 1 && list.json.intros[0].id === yes.json.introId && list.json.intros[0].name === first.name && list.json.intros[0].fictional === true);
       const detail = await as(`/api/intros/${yes.json.introId}`);
-      check("intros: no endpoint returns a suggested message — the detail carries only who, until when, and the two people's own messages", detail.status === 200 && !("opener" in detail.json.intro) && Object.keys(detail.json.intro).sort().join() === "continuedByMe,continuedByThem,expiresAt,frozen,id,messages,openedAt,state,them");
+      check("intros: no endpoint returns a suggested message — the detail carries only who, until when, and the two people's own messages", detail.status === 200 && !("opener" in detail.json.intro) && Object.keys(detail.json.intro).sort().join() === "continuedByMe,continuedByThem,expiresAt,frozen,id,mediaLimits,messages,openedAt,state,them");
       check("intros: nobody else reads it (404), nor writes in it", (await call(`/api/intros/${yes.json.introId}`, { token: carla.token, ip: carla.ip })).status === 404 && (await call(`/api/intros/${yes.json.introId}/messages`, { method: "POST", token: carla.token, ip: carla.ip, body: { body: "hi", clientId: "carla-0001" } })).status === 404);
       const sent = await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "Salut ! Ton marché préféré ?", clientId: "camille-0001" } });
       const again = await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "Salut ! Ton marché préféré ?", clientId: "camille-0001" } });
