@@ -12,6 +12,8 @@ COPY apps/web/package.json ./apps/web/
 COPY apps/site/package.json ./apps/site/
 COPY packages/db/package.json ./packages/db/
 COPY packages/media/package.json ./packages/media/
+COPY packages/ai/package.json ./packages/ai/
+COPY packages/matching/package.json ./packages/matching/
 COPY packages/config/package.json ./packages/config/
 RUN npm ci --no-audit --no-fund --ignore-scripts
 

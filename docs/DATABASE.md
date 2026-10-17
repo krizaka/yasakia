@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 25 tables · 17 enums · 4 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 26 tables · 17 enums · 5 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -148,6 +148,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `tokens_out` | integer | no | `0` |  |
 | `latency_ms` | integer | no | `0` |  |
 | `ok` | boolean | no | `true` |  |
+| `run_ref` | varchar(80) | yes |  |  |
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
 **Indexes:** `ai_calls_created_idx` (created_at) · `ai_calls_account_idx` (account_id)
@@ -240,7 +241,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `id` | uuid | no | `gen_random_uuid()` | primary key |
 | `account_id` | uuid | no |  | → `accounts.id` (on delete cascade) |
 | `kind` | embedding_kind | no |  |  |
-| `vector` | vector(768) | no |  |  |
+| `vector` | vector(1024) | no |  |  |
 | `model` | varchar(100) | no |  |  |
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
@@ -404,6 +405,20 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Indexes:** `reports_status_idx` (status, created_at) · `reports_reported_idx` (reported_id)
 
+### `rule_sets`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `domain` | varchar(20) | no |  |  |
+| `version` | integer | no |  |  |
+| `active` | boolean | no | `false` |  |
+| `params` | jsonb | no |  |  |
+| `reason` | text | no |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `rule_sets_domain_version_idx` (unique, domain, version) · `rule_sets_one_active_idx` (unique, domain, where active)
+
 ### `web_sessions`
 
 | Column | Type | Null | Default | Notes |
@@ -448,3 +463,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0001_initial_schema.sql`
 - `0002_console_accounts.sql`
 - `0003_password_reset_codes.sql`
+- `0004_rule_sets_and_1024_vectors.sql`

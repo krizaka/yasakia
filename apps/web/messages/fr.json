@@ -195,7 +195,8 @@
       "audit": "Journal d’audit",
       "forgot": "Mot de passe oublié",
       "reset": "Choisir un nouveau mot de passe",
-      "signUp": "Créer un compte"
+      "signUp": "Créer un compte",
+      "talk": "Parle à ton agent"
     },
     "form": {
       "errors": {
@@ -240,7 +241,8 @@
       "intros": "Présentations",
       "health": "Santé",
       "adminBrand": "Admin",
-      "devBadge": "DEV · {version}"
+      "devBadge": "DEV · {version}",
+      "talk": "Parle à ton agent"
     },
     "signIn": {
       "title": "Content de te revoir",
@@ -285,7 +287,12 @@
       "network": "Pas de connexion. Vérifie ton réseau et réessaie.",
       "CODE_INVALID": "Ce code n’est plus valide. Demande-en un nouveau.",
       "LAST_ADMIN": "Le dernier administrateur garde son rôle.",
-      "CONFIRM_MISMATCH": "Le courriel saisi ne correspond pas au compte."
+      "CONFIRM_MISMATCH": "Le courriel saisi ne correspond pas au compte.",
+      "MESSAGE_LENGTH": "Un message fait entre un mot et quelques lignes.",
+      "CONVERSATION_CLOSED": "Ton portrait est déjà écrit. La conversation rouvre après ton premier lot.",
+      "BUDGET_SPENT": "L’agent a dit tout ce qu’il pouvait pour l’instant.",
+      "TURN_IN_PROGRESS": "L’agent répond encore. Un instant.",
+      "AI_UNAVAILABLE": "L’agent est injoignable un moment. Ton message n’est pas parti — réessaie."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -306,9 +313,9 @@
         "DEBRIEF_DUE": "Un bilan t’attend"
       },
       "agentHint": {
-        "ONBOARDING": "Parle avec l’agent dans l’appli.",
+        "ONBOARDING": "Parle avec ton agent — c’est la première étape.",
         "DISCOVERY": "Encore quelques questions et il pourra commencer.",
-        "WAITING_POOL": "Seuls les accords mutuels te sont montrés.",
+        "WAITING_POOL": "Ton portrait est écrit. Seuls les accords mutuels te sont montrés.",
         "BATCH_READY": "Ouvre l’appli pour les rencontrer.",
         "BATCH_OPEN": "Prends ton temps.",
         "DEBRIEF_DUE": "Raconte à l’agent comment ça s’est passé."
@@ -733,6 +740,47 @@
       "closedTitle": "L’inscription est fermée.",
       "closed": "Yasakia est en développement ; les comptes sont créés par notre équipe.",
       "contact": "Nous joindre"
+    },
+    "talk": {
+      "lead": "Tu parles en premier. Ton agent apprend à te connaître avec tes mots, une question à la fois — pas de formulaire, pas de swipe.",
+      "threadLabel": "Ta conversation avec l’agent",
+      "agent": "Agent",
+      "placeholder": "Écris à ton agent…",
+      "send": "Envoyer",
+      "typing": "Ton agent écrit…",
+      "empty": "Dis bonjour — l’agent part de ce que tu lui racontes.",
+      "closed": "Ton portrait est écrit. La conversation rouvre après ton premier lot.",
+      "understoodTitle": "Ce que l’agent a compris",
+      "understoodDescription": "Avec tes mots, rien de plus. Dis-le à l’agent s’il s’est trompé.",
+      "understoodEmpty": "Rien pour l’instant. Il écoute.",
+      "sealed": "Scellé — toi seul·e peux le lire.",
+      "facets": {
+        "story": "Qui tu es",
+        "passions": "Ce que tu aimes",
+        "values": "Ce qui compte pour toi",
+        "humour": "Ce qui te fait rire",
+        "weekend": "Un bon week-end",
+        "seeking": "Qui tu espères rencontrer",
+        "dealbreakers": "Ce que tu ne supportes pas",
+        "beliefs": "Tes convictions"
+      },
+      "progressTitle": "Il apprend à te connaître",
+      "progressMessages": "{count} messages jusqu’ici — l’agent en veut au moins {min}.",
+      "stillToLearn": "Encore à apprendre",
+      "basics": {
+        "gender": "Qui tu es",
+        "seekingGenders": "Qui tu veux rencontrer",
+        "ageRange": "Leur âge",
+        "intent": "Ce que tu cherches",
+        "place": "Où tu vis"
+      },
+      "allLearned": "L’essentiel est là.",
+      "portraitTitle": "Ton portrait",
+      "portraitDescription": "Ce que l’agent utilisera pour trouver des personnes qui te correspondent — et pour qui tu corresponds aussi. Des mots, jamais une note.",
+      "portraitSelf": "Qui tu es",
+      "portraitSeeking": "Qui tu cherches",
+      "portraitNext": "Ensuite : l’agent cherche un petit lot de personnes qui te correspondent dans les deux sens.",
+      "dashboardAction": "Parle à ton agent"
     }
   }
 }

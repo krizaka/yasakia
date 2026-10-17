@@ -86,11 +86,11 @@ export async function patchMe(accountId: string, patch: ProfilePatch) {
 }
 
 /** The position, rounded to ~1 km **before** it is written: the exact one is never stored. */
-export async function setLocation(accountId: string, lat: number, lng: number) {
-  const rounded = roundPosition(lat, lng);
+export async function setLocation(accountId: string, lat: number, lng: number, now: Date, precisionM?: number) {
+  const rounded = roundPosition(lat, lng, precisionM);
   await db
     .update(profiles)
-    .set({ lat: rounded.lat, lng: rounded.lng, geoPrecisionM: rounded.precisionM, locationUpdatedAt: new Date(), updatedAt: new Date() })
+    .set({ lat: rounded.lat, lng: rounded.lng, geoPrecisionM: rounded.precisionM, locationUpdatedAt: now, updatedAt: now })
     .where(eq(profiles.accountId, accountId));
   return rounded;
 }

@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (48)
+## Endpoints (50)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -30,6 +30,8 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/admin/users/{id}/role` | public | Grants or withdraws the administrator role. |
 | `POST` | `/api/admin/users/{id}/sessions` | public | Ends every session of an account, on the web and in the app, leaving it active. |
 | `POST` | `/api/admin/users/{id}/suspend` | public | Suspends an account: it cannot sign in and every session of the app and the browser ends at once; the reason is logged. |
+| `GET` | `/api/agent` | bearer · account | The person's agent: the conversation, what it understood in their own words, the portrait once written, what it still has to learn. |
+| `POST` | `/api/agent/messages` | bearer · account | Says something to the agent and gets its answer; what the agent understood of it follows (extraction, then the portrait when it knows enough). |
 | `POST` | `/api/auth/logout` | bearer · account | Signs out: forgets this phone's push token, and with `everywhere` invalidates every session token of the account at once (the app also deletes its own token from secure storage). |
 | `POST` | `/api/auth/password` | public | Signs a person in to the web console with their e-mail and password: the answer sets an HttpOnly session cookie. |
 | `POST` | `/api/auth/password/forgot` | public | "Forgot password": a reset code by e-mail, the same answer whether an account exists or not. |
@@ -64,6 +66,6 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/reports` | bearer · account | Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it. |
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
 
-## Database tables (25)
+## Database tables (26)
 
-See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `web_sessions`.
+See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.

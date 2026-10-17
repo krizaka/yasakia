@@ -114,6 +114,15 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `ABUSE_CLIENT_IP_HEADER` | recommended |  |  | The header the edge sets with the client's address (App Platform: `do-connecting-ip`). |
 | `ABUSE_TRUSTED_PROXY_HOPS` | — |  | `1` | Else: the entry this far from the right of `X-Forwarded-For`. |
 
+### AI — `AI_`
+
+| Variable | Production | Secret | Default | What it does |
+| :--- | :---: | :---: | :--- | :--- |
+| `AI_ENGINE_URL` | — |  |  | Base URL of the Orazaka engine's edge (its `/edge` path). Yasakia reaches a model through Orazaka only. Unset: the agent and the batches answer 503 — never a demo, never a stand-in. |
+| `AI_ENGINE_API_KEY` | — | ✓ |  | Yasakia's service key at Orazaka (`oz_…`, the account `svc_yasakia`). A SECRET set with `doctl apps update`; never printed. |
+| `AI_CHAT_TIMEOUT_SECONDS` | — |  | `45` | How long one conversational call to Orazaka may take before the agent gives up. |
+| `AI_EMBED_TIMEOUT_SECONDS` | — |  | `15` | How long one embedding call may take. |
+
 ### Operator — `OPERATOR_`
 
 | Variable | Production | Secret | Default | What it does |

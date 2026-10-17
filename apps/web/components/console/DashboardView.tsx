@@ -54,7 +54,14 @@ export function DashboardView({ initial }: { initial: DashboardDto }) {
       description={d.accountStatus === "PAUSED" ? say("dashboard.paused") : say("dashboard.lead")}
     >
       <Widget level={3} title={say("dashboard.stats.agent")} description={say(`dashboard.agentHint.${d.agentState}`)}>
-        <p className="font-display text-xl font-extrabold text-fg">{say(`dashboard.agentState.${d.agentState}`)}</p>
+        <div className="flex flex-col gap-3">
+          <p className="font-display text-xl font-extrabold text-fg">{say(`dashboard.agentState.${d.agentState}`)}</p>
+          {d.agentState === "ONBOARDING" ? (
+            <ButtonLink href={`${home}/talk`} size="sm" variant="primary" shape="cut" className="w-fit">
+              {say("talk.dashboardAction")}
+            </ButtonLink>
+          ) : null}
+        </div>
       </Widget>
       <Widget level={3} title={say("dashboard.stats.batch")} description={batchOpen ? say("dashboard.batchHintOpen", { decided: d.batch!.decided, count: d.batch!.people }) : say("dashboard.batchHintNone")}>
         <p className="font-display text-xl font-extrabold text-fg">{batchOpen ? say("dashboard.batchValue", { count: d.batch!.people }) : say("dashboard.batchNone")}</p>

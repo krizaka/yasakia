@@ -4,6 +4,7 @@
  * and `assertProductionConfig` (instrumentation.ts) refuses to start a production server without the secrets every
  * request needs. Development defaults exist only outside production.
  */
+import { type AiProvider, createOrazakaProvider } from "@yasakia/ai";
 import { keyring } from "@yasakia/db";
 
 import { schemaProblems } from "./env-vars";
@@ -49,6 +50,23 @@ export function setting(name: string, fallback: number, min: number, max: number
   const value = Number(raw);
   if (!Number.isInteger(value) || value < min || value > max) throw new ConfigurationError(name, `must be a whole number from ${min} to ${max}`);
   return value;
+}
+
+/**
+ * The door to AI: Orazaka's edge with Yasakia's service key (`AI_ENGINE_URL`, `AI_ENGINE_API_KEY`). Nothing else exists —
+ * no model provider, no stand-in: unconfigured, the agent and the batches answer 503 (AGENTS.md §3.F). Read at the edge
+ * (the route) and handed to the domain, which never reads the environment.
+ */
+export function aiProvider(env: Env = process.env): AiProvider {
+  const url = env.AI_ENGINE_URL?.trim();
+  const key = env.AI_ENGINE_API_KEY?.trim();
+  if (!url || !key) throw new ConfigurationError("AI_ENGINE_URL and AI_ENGINE_API_KEY", "are required for the agent");
+  return createOrazakaProvider({
+    url,
+    key,
+    chatTimeoutMs: setting("AI_CHAT_TIMEOUT_SECONDS", 45, 5, 120, env) * 1000, // @fixed: seconds to milliseconds
+    embedTimeoutMs: setting("AI_EMBED_TIMEOUT_SECONDS", 15, 2, 60, env) * 1000, // @fixed: seconds to milliseconds
+  });
 }
 
 /** True on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): the only place where e-mail and photo storage may be left unconfigured. */

@@ -26,9 +26,11 @@ Orazaka (sovereign AI) and Orochia (video for creators).
   (profile, rounded position, pause, export, deletion and the media purge), photos (signed upload → normalised →
   moderated → signed view), blocks, reports, push tokens, the event stream, encryption at rest, the three legal pages,
   generated docs synced to krizaka.com, Docker, the DigitalOcean spec, CI.
-- **Next (PY3)**: the brain — `packages/ai` (port `AiProvider`, adapters `orazaka` · `openai-compatible` · `fake`),
-  `packages/matching` (bilateral filters, the min score, batches, the two state machines), the agent, batches,
-  debriefs and intros endpoints.
+- **PY3, in increments** ([ADR-001](docs/adr/ADR-001-talk-first-agent-and-bilateral-matching.md)): **done** — the talk-first
+  agent (`packages/ai`: port `AiProvider` and its one adapter, Orazaka; `apps/web/lib/agent*.ts`; `/app/{en|fr}/talk`; the
+  extraction, the sealed facets, the portrait and its two 1024-d vectors), `packages/matching` (hard filters both ways,
+  the weaker direction, the batch), the versioned `rule_sets`. **Next** — the batch (candidates from pgvector, reasons in
+  words, `batches`/`batch_items`), the debrief, the introductions.
 - **Allowed on GitHub**: Actions that lint, type-check, test (unit, realtime contract, end-to-end on PostgreSQL +
   pgvector), build, check the generated docs. Production is **fail-closed** (§3.F): never a placeholder secret, never a
   demo mode, never a fake profile.
@@ -82,6 +84,8 @@ yasakia/                           npm workspaces — Apache-2.0
 │   └── messages/                  en.json, fr.json (+ errors/) — every word of the web pages
 ├── packages/db/                   Drizzle schema (source of truth), migrations (0000 = extensions vector · cube ·
 │                                  earthdistance), migrator, the process-wide pool, crypto (AES-256-GCM), facets door, seed
+├── packages/ai/                   the port to AI (chat, embed) and its Orazaka adapter; the agent's prompts and facet schemas as data
+├── packages/matching/             pure: hard filters both ways, the weaker direction, the batch of three to five
 ├── packages/media/                storage (Bunny · local), signatures (upload, Bunny token, local media), image
 │                                  normalisation + blurhash, PhotoModeration, limits
 ├── packages/config/               TypeScript presets
@@ -103,15 +107,16 @@ yasakia/                           npm workspaces — Apache-2.0
   for LISTEN and migrations. Never `new Pool()` in the app. The budget is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 - **Shared UI and platform bricks come from npm, never from a copy** (`@krizaka/*`). A missing generic piece is built
   in krizaka-ui first, released, then adopted. No product word (`yasakia`) goes into a platform brick.
-- The AI is consumed **over HTTP** (Orazaka's API, or an OpenAI-compatible endpoint) — never as a library (PY3).
+- The AI is consumed **over HTTP, through Orazaka only** (`packages/ai`, the service key `AI_ENGINE_API_KEY`) — never a model
+  provider, never as a library. The engine's address and key are read at the edge (`lib/env.ts` `aiProvider`, the route) and handed to the domain.
 
 ---
 
 ## 3. Absolute invariants
 
 ### A. Never a score, never a fake person
-- No similarity, score or rank number ever reaches a client: reasons are **words**, both ways (PY3 adds an e2e check
-  over batches; the foundations' e2e already scans every answer for `score` / `similarity` keys).
+- No similarity, score or rank number ever reaches a client: reasons are **words**, both ways (the e2e checks every
+  answer, the agent's included; the foundations' e2e already scans every answer for `score` / `similarity` keys).
 - No fake profile and no invented figure in the real database. The development seed says it is one (`@seed.yasakia.test`,
   "(seed)", generated geometric avatars — never a real photo). The demo (a fictional cast) lives only in `yasakia_demo`.
 
@@ -163,8 +168,9 @@ yasakia/                           npm workspaces — Apache-2.0
   hour per address); `POST /api/auth/verify` with `client: "native"` answers a stateless signed token (`yz1.…`, 30 days)
   sent as `Authorization: Bearer` — **no cookie, no password** for the app (the web console has its own cookie sessions and operator-provisioned passwords, §6.2). Authorisation is not in the token: `requireUser`
   re-reads the account on every request (suspension 403, deletion 401, `session_version` for "sign out everywhere").
-- No AI provider configured → the AI endpoints answer 503 (PY3), never a demo mode. `AI_PROVIDER=fake` is refused in
-  production.
+- No AI engine configured → the AI endpoints answer 503 (`AI_UNAVAILABLE`), never a demo mode, never a stand-in. The scenarios
+  (`npm run test:e2e`, CI) talk to `e2e/orazaka-stub.mjs`, which speaks Orazaka's contract without a model; the real engine is
+  proven by the live run on dev (`scripts/dev-journey.mjs`).
 - E-mail: production always delivers through Mailgun and **refuses** without it — a sign-in code is never logged there.
 
 ### G. E-mails are templates

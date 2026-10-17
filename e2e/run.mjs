@@ -16,6 +16,7 @@ import crypto from "node:crypto";
 
 import pg from "pg";
 
+import { startOrazakaStub } from "./orazaka-stub.mjs";
 import { c, databaseUrl, fail, isLocalDatabase, ok, ROOT, run, step } from "../scripts/lib.mjs";
 
 export const E2E_ENV = {
@@ -29,6 +30,9 @@ export const E2E_ENV = {
   // The web console: sign-up open on the main server (the scenarios sign people up), the console answers one address.
   AUTH_SIGNUP_ENABLED: "true",
   AUTH_ALLOWED_IPS: "203.0.113.7",
+  // The agent talks to a stand-in for Orazaka's edge (e2e/orazaka-stub.mjs): same contract, no model. The real one is proven on dev.
+  AI_ENGINE_URL: "http://127.0.0.1:4599/edge",
+  AI_ENGINE_API_KEY: "oz_e2e_only_stub_key",
 };
 
 if (process.env.APP_URL) {
@@ -66,6 +70,10 @@ if (process.env.APP_URL) {
   run("npm", ["run", "build:site", "--silent"]);
   run("node", ["scripts/sync-site.mjs"]);
 
+  step("Orazaka stand-in on :4599");
+  const orazaka = startOrazakaStub(4599);
+  process.on("exit", () => orazaka.stop());
+
   step("API on :3100 (next dev, its own build folder)");
   const port = 3100;
   const server = spawn("npx", ["next", "dev", "--port", String(port)], {
@@ -99,7 +107,7 @@ if (process.env.APP_URL) {
   const closedPort = 3101;
   const closed = spawn("npx", ["next", "dev", "--port", String(closedPort)], {
     cwd: path.join(ROOT, "apps/web"),
-    env: { ...process.env, ...env, AUTH_SIGNUP_ENABLED: "", NEXT_DIST_DIR: ".next-e2e-closed", NEXT_PUBLIC_APP_URL: `http://localhost:${closedPort}`, PORT: String(closedPort) },
+    env: { ...process.env, ...env, AUTH_SIGNUP_ENABLED: "", AI_ENGINE_URL: "", AI_ENGINE_API_KEY: "", NEXT_DIST_DIR: ".next-e2e-closed", NEXT_PUBLIC_APP_URL: `http://localhost:${closedPort}`, PORT: String(closedPort) },
     stdio: "ignore",
   });
   process.on("exit", () => closed.kill("SIGTERM"));
@@ -117,6 +125,7 @@ if (process.env.APP_URL) {
   } finally {
     stop();
     closed.kill("SIGTERM");
+    orazaka.stop();
   }
   if (process.exitCode) console.log(c.dim(`server log: ${path.join(tmp, "web.log")}`));
 }

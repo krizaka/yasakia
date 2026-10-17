@@ -1,3 +1,4 @@
+import { AiUnavailableError } from "@yasakia/ai";
 import { EncryptionKeyError, isDatabaseUnavailable } from "@yasakia/db";
 import { NextResponse } from "next/server";
 import { type z, ZodError } from "zod";
@@ -39,6 +40,11 @@ export function errorResponse(error: unknown, context: string) {
     console.error(`[${context}] configuration error: ${error.message}`);
     // Developers see what to configure; production never tells clients about its configuration.
     return jsonError(503, process.env.NODE_ENV === "production" ? "Service temporarily unavailable" : error.message, { code: "UNAVAILABLE" });
+  }
+  if (error instanceof AiUnavailableError) {
+    // The engine's state is ours to log; the client only learns that the agent is out of reach, and can retry.
+    console.error(`[${context}] ai unavailable: ${error.code}`);
+    return jsonError(503, "The agent is out of reach, try again in a moment", { code: "AI_UNAVAILABLE" }, { "Retry-After": "10" });
   }
   if (isDatabaseUnavailable(error)) return jsonError(503, "Service temporarily unavailable", { code: "UNAVAILABLE" }, { "Retry-After": "5" });
   console.error(`[${context}]`, error);

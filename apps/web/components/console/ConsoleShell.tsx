@@ -1,6 +1,6 @@
 "use client";
 
-import { ClockIcon, FlagIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
+import { ChatIcon, ClockIcon, FlagIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
@@ -48,7 +48,9 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
               ? "shell.overview"
               : path.startsWith(`${home}/account`)
                 ? "shell.account"
-                : "shell.dashboard";
+                : path.startsWith(`${home}/talk`)
+                  ? "shell.talk"
+                  : "shell.dashboard";
   const item = (to: string, label: string, icon: React.ReactNode, exact = false) => (
     <AppShell.Item asChild label={label} icon={icon} current={current(to, exact)}>
       <Link href={to}>{label}</Link>
@@ -78,6 +80,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
           <>
             <AppShell.Group>{say("shell.groupYou")}</AppShell.Group>
             {item(home, say("shell.dashboard"), <HomeIcon />, true)}
+            {item(`${home}/talk`, say("shell.talk"), <ChatIcon />)}
             {item(`${home}/account`, say("shell.account"), <SettingsIcon />)}
           </>
         )}

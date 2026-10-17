@@ -1,6 +1,6 @@
 {
   "counters": {
-    "no-ambient-clock": 79,
+    "no-ambient-clock": 77,
     "no-db-in-service-or-rules": 0,
     "no-enum-string-compare": 21,
     "no-env-in-domain": 12,
@@ -12,6 +12,6 @@
     "no-hand-ms-one-hour": 0,
     "no-ts-enum": 0,
     "no-types-at-package-root": 0,
-    "no-unjustified-numeric-export": 19
+    "no-unjustified-numeric-export": 18
   }
 }

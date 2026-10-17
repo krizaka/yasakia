@@ -18,6 +18,7 @@ export const ENV_CONTEXTS = {
   PUSH: "Mobile push",
   REALTIME: "Realtime — events stream",
   ABUSE: "Abuse defences — rate limits, client address",
+  AI: "AI — Orazaka, the only way to a model",
   OPERATOR: "Operator — the admin API",
 } as const;
 export type EnvContext = keyof typeof ENV_CONTEXTS;
@@ -85,6 +86,10 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("ABUSE_RATE_LIMIT_STORE", "ABUSE", "recommended", z.enum(["memory", "postgres"]), "`memory` (one instance) or `postgres` (shared — required before a second instance).", { default: "memory" }),
   v("ABUSE_CLIENT_IP_HEADER", "ABUSE", "recommended", text, "The header the edge sets with the client's address (App Platform: `do-connecting-ip`)."),
   v("ABUSE_TRUSTED_PROXY_HOPS", "ABUSE", "optional", int(0, 10), "Else: the entry this far from the right of `X-Forwarded-For`.", { default: "1" }),
+  v("AI_ENGINE_URL", "AI", "optional", url, "Base URL of the Orazaka engine's edge (its `/edge` path). Yasakia reaches a model through Orazaka only. Unset: the agent and the batches answer 503 — never a demo, never a stand-in."),
+  v("AI_ENGINE_API_KEY", "AI", "optional", text, "Yasakia's service key at Orazaka (`oz_…`, the account `svc_yasakia`). A SECRET set with `doctl apps update`; never printed.", { secret: true }),
+  v("AI_CHAT_TIMEOUT_SECONDS", "AI", "optional", int(5, 120), "How long one conversational call to Orazaka may take before the agent gives up.", { default: "45" }),
+  v("AI_EMBED_TIMEOUT_SECONDS", "AI", "optional", int(2, 60), "How long one embedding call may take.", { default: "15" }),
   v("OPERATOR_API_TOKEN", "OPERATOR", "recommended", z.string().min(32, "must be at least 32 characters"), "The operators' service token for `/api/admin/*` (32+ characters). Unset: no admin route answers.", { secret: true }),
   v("OPERATOR_ALLOWED_IPS", "OPERATOR", "recommended", text, "Addresses allowed to call the admin API (comma separated; empty: any outside production, none in production)."),
 ];
