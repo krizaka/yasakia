@@ -1,12 +1,14 @@
 import { type AiProvider, AiUnavailableError, BatchReasons, type Language, parseModel, type Reasons, reasonsPrompt } from "@yasakia/ai";
-import { agentSessions, aiCalls, batches, batchItems, db, pairsSeen } from "@yasakia/db";
+import { agentSessions, aiCalls, batches, batchItems, db, debriefs, pairsSeen } from "@yasakia/db";
 import { type Gender, type Intent, type Person, type RankedPair, selectBatch } from "@yasakia/matching";
 import { addHours } from "date-fns";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, lte, sql } from "drizzle-orm";
 
 import { ageOn } from "./age";
 import { AgentState } from "./agent-rules";
+import { allDecided, BatchStatus, type DebriefAnswers, Decision, decisionRefusal } from "./batch-rules";
 import { isUniqueViolation, refuse } from "./http";
+import { openIntro } from "./intros";
 import { PERSONA_DOMAIN } from "./personas";
 import { publishToAccount } from "./realtime";
 import { matchingRules } from "./rule-sets";
@@ -18,8 +20,7 @@ import { matchingRules } from "./rule-sets";
  * No score ever leaves this module (ADR-001).
  */
 
-/** The statuses of a batch the person has to act on (the `batch_status` enum). */
-const BatchStatus = { Open: "OPEN", DebriefDue: "DEBRIEF_DUE" } as const;
+/** The statuses of a batch the person has to act on. */
 const CURRENT = [BatchStatus.Open, BatchStatus.DebriefDue] as const;
 
 const parseVector = (text: string): number[] => text.slice(1, -1).split(",").map(Number);
@@ -202,7 +203,9 @@ export interface BatchPersonView {
   reasons: { forYou: string[]; forThem: string[] };
   /** A fictional dev/QA persona: said on the card. */
   fictional: boolean;
-  decision: "INTERESTED" | "PASS" | "TELL_ME_MORE" | null;
+  decision: Decision | null;
+  /** Who they hope to meet, in their words — opened once the person has answered (« tell me more » first). */
+  lookingFor: string | null;
 }
 
 export interface BatchView {
@@ -222,7 +225,7 @@ export async function currentBatch(accountId: string): Promise<BatchView | null>
     .orderBy(desc(batches.openedAt))
     .limit(1);
   if (!batch || !(CURRENT as readonly string[]).includes(batch.status)) return null;
-  const res = await db.execute<{ id: string; rank: number; reasons: BatchPersonView["reasons"] | null; decision: BatchPersonView["decision"]; name: string | null; email: string; portrait: { self?: string } | null }>(sql`
+  const res = await db.execute<{ id: string; rank: number; reasons: BatchPersonView["reasons"] | null; decision: BatchPersonView["decision"]; name: string | null; email: string; portrait: { self?: string; seeking?: string } | null }>(sql`
     select bi.id, bi.rank, bi.reasons, bi.decision, p.display_name as name, a.email, s.portrait
     from batch_items bi
     join accounts a on a.id = bi.candidate_id
@@ -243,6 +246,81 @@ export async function currentBatch(accountId: string): Promise<BatchView | null>
       reasons: r.reasons ?? { forYou: [], forThem: [] },
       fictional: r.email.endsWith(PERSONA_DOMAIN),
       decision: r.decision,
+      lookingFor: r.decision ? (r.portrait?.seeking ?? null) : null,
     })),
   };
+}
+
+export interface DecisionResult {
+  decision: Decision;
+  /** Who they hope to meet, in their words (every answer opens it; « tell me more » is the way to ask first). */
+  lookingFor: string | null;
+  /** Both said yes: the introduction that opened. */
+  introId: string | null;
+  /** Everyone is answered: the debrief is due before the next batch. */
+  debriefDue: boolean;
+}
+
+/**
+ * Answers one person of the batch. Yes from both sides opens an introduction. A fictional persona of the dev cast says
+ * yes back — its batch would hold the person, since the fit is both ways by construction; a real person must say yes in
+ * their own batch. When everyone still in the batch is answered, the batch waits for its debrief.
+ */
+export async function decide(ai: AiProvider, me: string, batchId: string, itemId: string, decision: Decision, now: Date): Promise<DecisionResult> {
+  const outcome = await db.transaction(async (tx) => {
+    const [batch] = await tx.select().from(batches).where(and(eq(batches.id, batchId), eq(batches.accountId, me))).for("update").limit(1);
+    if (!batch) throw refuse(404, "NOT_FOUND", "Not found");
+    const items = await tx.select({ id: batchItems.id, candidateId: batchItems.candidateId, decision: batchItems.decision, withdrawnAt: batchItems.withdrawnAt }).from(batchItems).where(eq(batchItems.batchId, batch.id));
+    const item = items.find((i) => i.id === itemId);
+    if (!item) throw refuse(404, "NOT_FOUND", "Not found");
+    const refused = decisionRefusal({ status: batch.status, expiresAt: batch.expiresAt, decision: item.decision, withdrawn: item.withdrawnAt !== null }, decision, now);
+    if (refused) throw refuse(refused.status, refused.code, "This answer is not possible");
+    await tx.update(batchItems).set({ decision, decidedAt: now }).where(eq(batchItems.id, item.id));
+    const after = items.map((i) => ({ decision: i.id === item.id ? decision : i.decision, withdrawn: i.withdrawnAt !== null }));
+    const debriefDue = allDecided(after);
+    if (debriefDue) {
+      await tx.update(batches).set({ status: BatchStatus.DebriefDue }).where(eq(batches.id, batch.id));
+      await tx.update(agentSessions).set({ state: AgentState.DebriefDue, stateChangedAt: now, updatedAt: now }).where(and(eq(agentSessions.accountId, me), eq(agentSessions.state, AgentState.BatchOpen)));
+    }
+    const them = await tx.execute<{ email: string; seeking: string | null; yes: boolean }>(sql`
+      select a.email, s.portrait->>'seeking' as seeking,
+             exists (select 1 from batch_items bi join batches b on b.id = bi.batch_id
+                     where b.account_id = ${item.candidateId} and bi.candidate_id = ${me} and bi.decision = 'INTERESTED' and bi.withdrawn_at is null) as yes
+      from accounts a left join agent_sessions s on s.account_id = a.id where a.id = ${item.candidateId}`);
+    const other = them.rows[0];
+    const mutual = decision === Decision.Interested && !!other && (other.email.endsWith(PERSONA_DOMAIN) || other.yes);
+    return { candidateId: item.candidateId, lookingFor: other?.seeking ?? null, mutual, debriefDue };
+  });
+  const intro = outcome.mutual ? await openIntro(ai, me, outcome.candidateId, now) : null;
+  return { decision, lookingFor: outcome.lookingFor, introId: intro?.introId ?? null, debriefDue: outcome.debriefDue };
+}
+
+/** The debrief of an answered batch: three answers, kept; the batch is done and the agent may look for the next one. */
+export async function submitDebrief(me: string, batchId: string, answers: DebriefAnswers, now: Date): Promise<{ next: "WAITING_POOL" }> {
+  try {
+    await db.transaction(async (tx) => {
+      const [batch] = await tx.select({ id: batches.id, status: batches.status }).from(batches).where(and(eq(batches.id, batchId), eq(batches.accountId, me))).for("update").limit(1);
+      if (!batch) throw refuse(404, "NOT_FOUND", "Not found");
+      if (batch.status !== BatchStatus.DebriefDue) throw refuse(409, "DEBRIEF_NOT_DUE", "This batch is not waiting for its debrief");
+      await tx.insert(debriefs).values({ batchId: batch.id, accountId: me, answers, createdAt: now });
+      await tx.update(batches).set({ status: BatchStatus.Done, closedAt: now }).where(eq(batches.id, batch.id));
+      await tx.update(agentSessions).set({ state: AgentState.WaitingPool, stateChangedAt: now, updatedAt: now }).where(and(eq(agentSessions.accountId, me), eq(agentSessions.state, AgentState.DebriefDue)));
+    });
+  } catch (error) {
+    if (isUniqueViolation(error)) throw refuse(409, "DEBRIEF_NOT_DUE", "This batch already has its debrief");
+    throw error;
+  }
+  return { next: AgentState.WaitingPool };
+}
+
+/** Time ran out: an open batch waits for its debrief (what was not answered stays unanswered). Every instance, idempotent. */
+export async function sweepBatches(): Promise<number> {
+  const due = await db.update(batches).set({ status: BatchStatus.DebriefDue }).where(and(eq(batches.status, BatchStatus.Open), lte(batches.expiresAt, sql`now()`))).returning({ accountId: batches.accountId });
+  if (due.length) {
+    await db
+      .update(agentSessions)
+      .set({ state: AgentState.DebriefDue, stateChangedAt: sql`now()`, updatedAt: sql`now()` })
+      .where(and(inArray(agentSessions.accountId, due.map((d) => d.accountId)), eq(agentSessions.state, AgentState.BatchOpen)));
+  }
+  return due.length;
 }

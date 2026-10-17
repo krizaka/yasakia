@@ -665,6 +665,9 @@ let adaPhoto;
   const batchEn = await page("/app/en/batch", user.cookie);
   const batchFr = await page("/app/fr/batch", user.cookie);
   check("pages: the batch page renders for a person in both languages (talk-first while nothing is written) and not for a stranger", batchEn.status === 200 && batchFr.status === 200 && batchEn.text.includes("Your batch") && batchFr.text.includes("Ton lot") && (await page("/app/en/batch")).status === 307);
+  const introsEn = await page("/app/en/intros", user.cookie);
+  const introsFr = await page("/app/fr/intros", user.cookie);
+  check("pages: the introductions render for a person in both languages, and not for a stranger; someone else's intro is a 404", introsEn.status === 200 && introsFr.status === 200 && introsEn.text.includes("Introductions") && introsFr.text.includes("Présentations") && (await page("/app/en/intros")).status === 307 && (await page(`/app/en/intros/${crypto.randomUUID()}`, user.cookie)).status === 404);
   check("pages: the administration console is a 404 for a person", (await page("/app/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/app/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
   check("pages: ...and for an administrator on a wrong address", (await page("/app/en/admin/users", adminIn.cookie, "198.51.100.200")).status === 404);
   check("pages: ...and renders for an administrator on the allowed address", (await page("/app/en/admin/users", adminIn.cookie, ADMIN_IP_HEADER)).status === 200 && (await page(`/app/fr/admin/users/${someone.id}`, adminIn.cookie, ADMIN_IP_HEADER)).status === 200);
@@ -840,7 +843,7 @@ let adaPhoto;
 
     // The rules are rows: version 2 of the matching rule set (a looser affinity, for the stand-in's bag of words) is published, version 1 stays as the audit trail.
     await sql("update rule_sets set active = false where domain = 'MATCHING'");
-    await sql("insert into rule_sets (domain, version, active, params, reason) values ('MATCHING', 2, true, $1, 'e2e: the stand-in embeds bags of words, so its cosines are lower than a real model has')", [JSON.stringify({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 0.35 })]);
+    await sql("insert into rule_sets (domain, version, active, params, reason) values ('MATCHING', 2, true, $1, 'e2e: the stand-in embeds bags of words, so its cosines are lower than a real model has')", [JSON.stringify({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 0.35, introDays: 7 })]);
 
     check("batch: the language asked for is en or fr — anything else is refused (400), on the batch and on the talk", (await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "de" }, ip: camille.ip })).status === 400 && (await call("/api/agent/messages", { method: "POST", token: camille.token, body: { content: "hi", locale: "de" }, ip: camille.ip })).status === 400);
     const opened = await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "en" }, ip: camille.ip });
@@ -880,6 +883,48 @@ let adaPhoto;
       const left = (await sql("select count(*)::int as n from batches where account_id = $1", [camille.id]))[0].n;
       return down.status === 503 && down.json.code === "AI_UNAVAILABLE" && left === 0 && (await sql("select state::text from agent_sessions where account_id = $1", [camille.id]))[0].state === "WAITING_POOL";
     })());
+
+    // Answering the batch, the debrief, the introduction — the loop, end to end.
+    {
+      const as = (path, init = {}) => call(path, { token: camille.token, ip: camille.ip, ...init });
+      check("loop: a new batch opens once the engine is back", (await as("/api/batches", { method: "POST", body: { locale: "en" } })).status === 201);
+      const batch = (await as("/api/batches/current")).json.batch;
+      const [first, ...rest] = batch.people;
+      const decide = (item, decision) => as(`/api/batches/${batch.id}/items/${item.id}/decision`, { method: "POST", body: { decision } });
+      check("loop: an answer outside the three is refused (400), someone not in my batch is a 404", (await decide(first, "MAYBE")).status === 400 && (await as(`/api/batches/${batch.id}/items/${crypto.randomUUID()}/decision`, { method: "POST", body: { decision: "PASS" } })).status === 404);
+      check("loop: someone else's batch cannot be answered (404)", (await call(`/api/batches/${batch.id}/items/${first.id}/decision`, { method: "POST", token: carla.token, ip: carla.ip, body: { decision: "PASS" } })).status === 404);
+      const more = await decide(first, "TELL_ME_MORE");
+      check("loop: « tell me more » opens who they hope to meet, in their words — once", more.status === 200 && typeof more.json.lookingFor === "string" && more.json.lookingFor.length > 5 && more.json.introId === null && (await decide(first, "TELL_ME_MORE")).json.code === "ALREADY_DECIDED");
+      const yes = await decide(first, "INTERESTED");
+      const intro = yes.json.introId ? (await sql("select account_a, account_b, opener_a, opener_b, state, expires_at - opened_at as length from intros where id = $1", [yes.json.introId]))[0] : null;
+      check("loop: yes to someone who says yes back opens an introduction, for the rule set's seven days", yes.status === 200 && !!intro && intro.state === "OPEN" && intro.length.days === 7 && [intro.account_a, intro.account_b].includes(camille.id), yes.json);
+      check("loop: each agent whispered a private first line, through the engine (one OPENER call, with its run id)", !!intro?.opener_a && !!intro?.opener_b && (await sql("select count(*)::int as n from ai_calls where purpose = 'OPENER' and ok and run_ref is not null")).at(0).n >= 1);
+      check("loop: a yes is final (409 ALREADY_DECIDED)", (await decide(first, "PASS")).json.code === "ALREADY_DECIDED");
+      check("loop: the debrief waits until everyone is answered (409 DEBRIEF_NOT_DUE)", (await as(`/api/batches/${batch.id}/debrief`, { method: "POST", body: { answers: [] } })).status === 400 && (await as(`/api/batches/${batch.id}/debrief`, { method: "POST", body: { answers: [{ questionId: "rangTrue", chips: ["yes"] }, { questionId: "mattered", chips: ["values"] }, { questionId: "next", chips: ["same"] }] } })).json.code === "DEBRIEF_NOT_DUE");
+      let last;
+      for (const p of rest) last = await decide(p, "PASS");
+      check("loop: the last answer makes the debrief due — the agent says so, and no next batch can open before it", last.json.debriefDue === true && (await sql("select state::text from agent_sessions where account_id = $1", [camille.id]))[0].state === "DEBRIEF_DUE" && (await as("/api/batches/current")).json.batch.status === "DEBRIEF_DUE" && (await as("/api/batches", { method: "POST", body: {} })).json.code === "BATCH_ALREADY_OPEN");
+      check("loop: a debrief with a chip of another question is refused (400)", (await as(`/api/batches/${batch.id}/debrief`, { method: "POST", body: { answers: [{ questionId: "rangTrue", chips: ["closer"] }, { questionId: "mattered", chips: ["values"] }, { questionId: "next", chips: ["same"] }] } })).status === 400);
+      const debrief = await as(`/api/batches/${batch.id}/debrief`, { method: "POST", body: { answers: [{ questionId: "rangTrue", chips: ["partly"] }, { questionId: "mattered", chips: ["values", "humour"] }, { questionId: "next", chips: ["closer"], text: "Closer to the Plateau." }] } });
+      check("loop: the debrief is kept, the batch is done, and the agent may look for the next one (WAITING_POOL)", debrief.status === 201 && (await sql("select b.status::text as status, d.answers from batches b join debriefs d on d.batch_id = b.id where b.id = $1", [batch.id]))[0]?.status === "DONE" && (await sql("select state::text from agent_sessions where account_id = $1", [camille.id]))[0].state === "WAITING_POOL" && (await as("/api/batches/current")).json.batch === null);
+      check("loop: one debrief per batch (409)", (await as(`/api/batches/${batch.id}/debrief`, { method: "POST", body: { answers: [{ questionId: "rangTrue", chips: ["yes"] }, { questionId: "mattered", chips: ["values"] }, { questionId: "next", chips: ["same"] }] } })).json.code === "DEBRIEF_NOT_DUE");
+
+      const list = await as("/api/intros");
+      check("intros: mine are listed, with the other's first name and the time left", list.status === 200 && list.json.intros.length === 1 && list.json.intros[0].id === yes.json.introId && list.json.intros[0].name === first.name && list.json.intros[0].fictional === true);
+      const detail = await as(`/api/intros/${yes.json.introId}`);
+      const mySide = intro.account_a === camille.id ? "opener_a" : "opener_b";
+      check("intros: the first line my agent whispered is mine only — the other's is never sent to me", detail.status === 200 && detail.json.intro.opener === intro[mySide] && !JSON.stringify(detail.json).includes(intro[mySide === "opener_a" ? "opener_b" : "opener_a"]));
+      check("intros: nobody else reads it (404), nor writes in it", (await call(`/api/intros/${yes.json.introId}`, { token: carla.token, ip: carla.ip })).status === 404 && (await call(`/api/intros/${yes.json.introId}/messages`, { method: "POST", token: carla.token, ip: carla.ip, body: { body: "hi", clientId: "carla-0001" } })).status === 404);
+      const sent = await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "Salut ! Ton marché préféré ?", clientId: "camille-0001" } });
+      const again = await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "Salut ! Ton marché préféré ?", clientId: "camille-0001" } });
+      check("intros: a message is written once, even sent twice (clientId)", sent.status === 201 && again.json.message?.id === sent.json.message.id && (await sql("select count(*)::int as n from intro_messages where intro_id = $1", [yes.json.introId]))[0].n === 1);
+      check("intros: an empty message is refused (400)", (await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "  ", clientId: "camille-0002" } })).status === 400);
+      const cont = await as(`/api/intros/${yes.json.introId}/continue`, { method: "POST" });
+      check("intros: « continue » alone waits for the other (still OPEN), and is said once", cont.json.state === "OPEN" && (await as(`/api/intros/${yes.json.introId}/continue`, { method: "POST" })).json.code === "ALREADY_CONTINUED" && (await as(`/api/intros/${yes.json.introId}`)).json.intro.continuedByMe === true);
+      await sql("update intros set expires_at = now() - interval '1 minute' where id = $1", [yes.json.introId]);
+      check("intros: past its days, nobody writes in it any more (409 INTRO_CLOSED)", (await as(`/api/intros/${yes.json.introId}/messages`, { method: "POST", body: { body: "Encore là ?", clientId: "camille-0003" } })).json.code === "INTRO_CLOSED");
+      check("intros: no score, no similarity in any intro answer", !/"(score|similarity|affinity)"/.test(JSON.stringify([list.json, detail.json])));
+    }
     await sql("update rule_sets set active = false where domain = 'MATCHING' and version = 2");
     await sql("update rule_sets set active = true where domain = 'MATCHING' and version = 1");
   }

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { HttpError } from "./http";
 import { changedParams, checkRuleParams, parseRuleDomain, RuleDomain, ruleFields } from "./rule-sets";
 
-const matching = { batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 400, minAffinity: 0.55 };
+const matching = { batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 400, minAffinity: 0.55, introDays: 7 };
 const agent = { minUserTurns: 6, historyMessages: 60, messageMaxChars: 1200, requiredFacets: ["intent", "pace"], minFacets: 3 };
 
 const refusal = (fn: () => unknown): { status: number; code: unknown } => {
@@ -48,6 +48,7 @@ describe("an operator publishes a rule set (versioned, bounded, never a constant
       { key: "batchHours", min: 1, max: 336, step: 1 },
       { key: "candidatePool", min: 10, max: 2000, step: 10 },
       { key: "minAffinity", min: 0, max: 1, step: 0.01 },
+      { key: "introDays", min: 1, max: 30, step: 1 },
     ]);
     expect(ruleFields(RuleDomain.Agent).map((f) => f.key)).toEqual(["minUserTurns", "historyMessages", "messageMaxChars", "minFacets"]);
   });

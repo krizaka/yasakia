@@ -245,7 +245,8 @@
       "devBadge": "DEV · {version}",
       "talk": "Talk to your agent",
       "batch": "Your batch",
-      "rules": "Rules"
+      "rules": "Rules",
+      "myIntros": "Introductions"
     },
     "signIn": {
       "title": "Welcome back",
@@ -302,7 +303,14 @@
       "BATCH_ALREADY_OPEN": "You already have a batch to answer.",
       "RULES_OUT_OF_BOUNDS": "These values are outside what the code allows.",
       "RULES_UNCHANGED": "Nothing changed: this version is already the active one.",
-      "CONFLICT": "Someone published a version at the same time. Reload and try again."
+      "CONFLICT": "Someone published a version at the same time. Reload and try again.",
+      "BATCH_CLOSED": "This batch is closed.",
+      "BATCH_EXPIRED": "This batch has run out of time.",
+      "ALREADY_DECIDED": "You have already answered for this person.",
+      "DEBRIEF_NOT_DUE": "The debrief comes once everyone in the batch is answered.",
+      "INTRO_CLOSED": "This introduction is over — nobody can write in it any more.",
+      "INTRO_FROZEN": "This introduction is paused while a report is reviewed.",
+      "ALREADY_CONTINUED": "You already said you want to continue."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -842,7 +850,7 @@
       "openUntil": "Open until {date}.",
       "people": "{count} people",
       "noScore": "For each person, the agent says why you two — in words, both ways. There is no score, no rank, no swiping.",
-      "next": "Answering them and telling the agent how it went is the next step — in development.",
+      "next": "Answer each one: yes, tell me more, or pass. Once everyone is answered, three short questions before the next batch.",
       "someone": "Someone",
       "fictional": "A fictional person, for the development tests.",
       "fictionalBadge": "Fictional persona — dev only",
@@ -856,7 +864,77 @@
       "look": "Look for my first batch",
       "looking": "The agent is writing why you two…",
       "talkFirstTitle": "Talk first",
-      "talkFirstDescription": "The agent opens a batch once it knows you. Start with a few words about yourself."
+      "talkFirstDescription": "The agent opens a batch once it knows you. Start with a few words about yourself.",
+      "answer": {
+        "label": "Your answer for {name}",
+        "interested": "Interested",
+        "tellMeMore": "Tell me more",
+        "pass": "Pass",
+        "lookingFor": "Who they hope to meet",
+        "saidYes": "You said yes",
+        "passed": "You passed",
+        "toIntros": "Your introductions"
+      },
+      "debrief": {
+        "title": "Before the next batch",
+        "lead": "Three quick questions — two minutes. Your answers stay with your agent.",
+        "submit": "Send the debrief",
+        "text": "Anything to add?",
+        "textHint": "Optional — a few words for your agent.",
+        "rangTrue": {
+          "question": "Did the agent’s reasons ring true?",
+          "chips": {
+            "yes": "Yes",
+            "partly": "Partly",
+            "no": "Not really"
+          }
+        },
+        "mattered": {
+          "question": "What mattered most to you?",
+          "chips": {
+            "values": "Values",
+            "humour": "Humour",
+            "rhythm": "Rhythm of life",
+            "distance": "Distance",
+            "intent": "What they look for"
+          }
+        },
+        "next": {
+          "question": "For the next batch?",
+          "chips": {
+            "same": "More of the same",
+            "closer": "Closer to me",
+            "different": "Someone a bit different"
+          }
+        }
+      }
+    },
+    "intros": {
+      "title": "Introductions",
+      "lead": "Two people said yes to each other: a private room for seven days. Continue together, or let it fade.",
+      "listTitle": "Your introductions",
+      "someone": "Someone",
+      "emptyTitle": "No introduction yet",
+      "emptyDescription": "When someone you said yes to says yes too, your introduction opens here.",
+      "openUntil": "Open until {date}",
+      "with": "You and {name}",
+      "threadLabel": "Your conversation",
+      "openerTitle": "Your agent suggests a first line (only you see it)",
+      "noMessage": "Nobody has written yet.",
+      "placeholder": "Write a message",
+      "send": "Send",
+      "closed": "This introduction is over.",
+      "frozen": "Paused while a report is reviewed.",
+      "agentNeverReads": "Your agent never reads this conversation.",
+      "continueLead": "Want to keep talking after the seven days? It continues when you both say so.",
+      "continue": "Continue",
+      "waitingForThem": "You said you want to continue. Waiting for {name}.",
+      "states": {
+        "OPEN": "Open",
+        "CONTINUED": "Continued — you both said so",
+        "FADED": "Faded — the time ran out",
+        "CLOSED": "Closed"
+      }
     }
   }
 }

@@ -12,6 +12,7 @@ export const MatchingParams = z
     batchHours: z.number().int().min(1).max(24 * 14),
     candidatePool: z.number().int().min(10).max(2000),
     minAffinity: z.number().min(0).max(1),
+    introDays: z.number().int().min(1).max(30),
   })
   .strict()
   .refine((p) => p.batchMin <= p.batchMax, { message: "batchMin must not exceed batchMax" });

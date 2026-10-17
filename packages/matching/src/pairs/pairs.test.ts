@@ -28,7 +28,7 @@ function person(id: string, over: Partial<Person> = {}): Person {
   };
 }
 
-const params: MatchingParams = MatchingParams.parse({ batchMin: 2, batchMax: 3, batchHours: 72, candidatePool: 200, minAffinity: 0.5 });
+const params: MatchingParams = MatchingParams.parse({ batchMin: 2, batchMax: 3, batchHours: 72, candidatePool: 200, minAffinity: 0.5, introDays: 7 });
 
 describe("cosine", () => {
   it("is 1 for the same direction, 0 for orthogonal, and 0 for a zero vector", () => {
@@ -119,8 +119,8 @@ describe("selectBatch", () => {
 
 describe("MatchingParams", () => {
   it("is bounded and refuses unknown keys and batchMin above batchMax", () => {
-    expect(() => MatchingParams.parse({ batchMin: 5, batchMax: 3, batchHours: 72, candidatePool: 200, minAffinity: 0.5 })).toThrow();
-    expect(() => MatchingParams.parse({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 1.5 })).toThrow();
-    expect(() => MatchingParams.parse({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 0.5, extra: 1 })).toThrow();
+    expect(() => MatchingParams.parse({ batchMin: 5, batchMax: 3, batchHours: 72, candidatePool: 200, minAffinity: 0.5, introDays: 7 })).toThrow();
+    expect(() => MatchingParams.parse({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 1.5, introDays: 7 })).toThrow();
+    expect(() => MatchingParams.parse({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 0.5, introDays: 7, extra: 1 })).toThrow();
   });
 });

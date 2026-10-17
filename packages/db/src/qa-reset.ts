@@ -1,14 +1,14 @@
 /**
  * `npm run db:qa-reset` — gives the QA person's agent a blank page again, so the journey can be shown from its start
- * (a recording, a demo): the conversation, what the agent understood, the portrait and its vectors, the batches, the
+ * (a recording, a demo): the conversation, what the agent understood, the portrait and its vectors, the batches and their debriefs, the introductions, the
  * profile's basics and position. It touches **one** account, and only a QA address (`qa+…@`) — it can never reset a real
  * person — and never a production database. The account, its password and its sessions stay.
  */
-import { eq, sql } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 
 import { closeDb, db } from "./client";
 import { loadRootEnv } from "./load-env";
-import { accounts, agentSessions, batches, facetEmbeddings, facets, pairsSeen, profiles } from "./schema";
+import { accounts, agentSessions, batches, facetEmbeddings, facets, intros, pairsSeen, profiles } from "./schema";
 
 loadRootEnv(__dirname);
 
@@ -24,7 +24,8 @@ export async function resetQaAgent(email: string): Promise<boolean> {
   if (!account) return false;
   await db.transaction(async (tx) => {
     // The batches go first: their items point at other accounts, and the agent's session at none.
-    await tx.delete(batches).where(eq(batches.accountId, account.id));
+    await tx.delete(batches).where(eq(batches.accountId, account.id)); // their debriefs with them
+    await tx.delete(intros).where(or(eq(intros.accountA, account.id), eq(intros.accountB, account.id))); // and the introductions, messages included
     await tx.delete(pairsSeen).where(eq(pairsSeen.accountId, account.id)); // nobody is "already seen" on a blank page
     await tx.delete(facetEmbeddings).where(eq(facetEmbeddings.accountId, account.id));
     await tx.delete(facets).where(eq(facets.accountId, account.id));

@@ -74,6 +74,11 @@ function answerFor(prompt) {
   if (prompt.includes("You extract structured facts")) return { kind: "extract", text: `\`\`\`json\n${JSON.stringify(extraction(prompt))}\n\`\`\`` };
   if (prompt.includes("You write the portrait of a person")) return { kind: "portrait", text: JSON.stringify(portrait(prompt)) };
   if (prompt.includes("Write the closing message")) return { kind: "wrap", text: "I think I have a good picture of you. Tell me if I got something wrong; now I look for people who fit you, and for whom you fit too." };
+  if (prompt.includes("Suggest to each of them, privately")) {
+    const first = /FIRST is (\S+?)[ .]/.exec(prompt)?.[1] ?? "them";
+    const second = /SECOND is (\S+?)[ .]/.exec(prompt)?.[1] ?? "them";
+    return { kind: "opener", text: JSON.stringify({ forFirst: `Ask ${second} what their perfect Saturday looks like?`, forSecond: `Ask ${first} which market they would show you first?` }) };
+  }
   if (prompt.includes("Explain, in words only")) return { kind: "reasons", text: JSON.stringify(reasons(prompt)) };
   const turn = personLines(prompt).length;
   return { kind: "ask", text: turn ? `Thanks for telling me that (turn ${turn}). What else would you like me to know about you?` : "Hello, I am the Yasakia agent. We talk first, then I open a small batch of people who fit you both ways. What is your name?" };

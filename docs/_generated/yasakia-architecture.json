@@ -482,6 +482,18 @@
       "summary": "Opens the person's next batch — three to five people who fit both ways — once the agent has written their portrait; 409 `NO_FIT_YET` when nobody does."
     },
     {
+      "method": "POST",
+      "path": "/api/batches/{id}/debrief",
+      "access": "bearer · account",
+      "summary": "The debrief of my answered batch — three questions, chips and a few words — then the agent may open the next batch."
+    },
+    {
+      "method": "POST",
+      "path": "/api/batches/{id}/items/{itemId}/decision",
+      "access": "bearer · account",
+      "summary": "Answers one person of my batch: INTERESTED, PASS, or TELL_ME_MORE (once)."
+    },
+    {
       "method": "GET",
       "path": "/api/batches/current",
       "access": "bearer · account",
@@ -516,6 +528,30 @@
       "path": "/api/healthz",
       "access": "public",
       "summary": "Health of this instance: the database answers (503 when it does not) and whether the realtime bus hears the other instances."
+    },
+    {
+      "method": "GET",
+      "path": "/api/intros",
+      "access": "bearer · account",
+      "summary": "My introductions — the people who said yes to me as I said yes to them — the live ones first."
+    },
+    {
+      "method": "GET",
+      "path": "/api/intros/{id}",
+      "access": "bearer · account",
+      "summary": "One of my introductions: who, until when, the first line my agent whispered to me (mine only), and our messages."
+    },
+    {
+      "method": "POST",
+      "path": "/api/intros/{id}/continue",
+      "access": "bearer · account",
+      "summary": "« Continue »: once both said it, the introduction has no end."
+    },
+    {
+      "method": "POST",
+      "path": "/api/intros/{id}/messages",
+      "access": "bearer · account",
+      "summary": "Writes in an introduction while it is open (idempotent per `clientId`); the other person is told at once."
     },
     {
       "method": "DELETE",

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { AiFailure } from "../provider/provider.types";
-import { BatchReasons, Extraction, isSensitiveFacet, Portrait, Reasons, TurnRole } from "./agent.types";
+import { BatchReasons, Extraction, isSensitiveFacet, Openers, Portrait, Reasons, TurnRole } from "./agent.types";
 import { firstJsonObject, parseModel } from "./parse";
-import { askPrompt, extractPrompt, portraitPrompt, reasonsPrompt, wrapPrompt } from "./prompts";
+import { askPrompt, extractPrompt, openerPrompt, portraitPrompt, reasonsPrompt, wrapPrompt } from "./prompts";
 
 describe("firstJsonObject", () => {
   it("finds an object in a code fence or after a sentence, with braces inside strings", () => {
@@ -87,5 +87,18 @@ describe("the batch's reasons, one call", () => {
     const ok = parseModel('{"people":[{"index":1,"forYou":["Il aime les marchés."],"forThem":["Elle aime cuisiner."]},{"index":2,"forYou":["Il cuisine bien."],"forThem":["Elle est curieuse."]}]}', BatchReasons);
     expect(ok.people.map((p) => p.index)).toEqual([1, 2]);
     expect(() => parseModel('{"people":[{"index":1,"forYou":[],"forThem":["Elle aime cuisiner."]}]}', BatchReasons)).toThrow();
+  });
+});
+
+describe("the openers of an introduction, one call, each private to its person", () => {
+  it("names both people, each line in its reader's language, and parses two short lines", () => {
+    const prompt = openerPrompt({ first: { name: "Camille", portrait: "Elle aime les marchés.", language: "fr" }, second: { name: "Hugo", portrait: "He cooks.", language: "en" } });
+    expect(prompt).toContain("FIRST is Camille");
+    expect(prompt).toContain("SECOND is Hugo");
+    expect(prompt).toContain('"forFirst"');
+    expect(prompt).toMatch(/forFirst[^\n]*French/);
+    expect(prompt).toMatch(/forSecond[^\n]*English/);
+    expect(parseModel('{"forFirst":"Demande-lui sa recette préférée.","forSecond":"Ask her about Jean-Talon market."}', Openers).forFirst).toContain("recette");
+    expect(() => parseModel('{"forFirst":"","forSecond":"x"}', Openers)).toThrow();
   });
 });
