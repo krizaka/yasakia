@@ -8,7 +8,7 @@ import { eq, sql } from "drizzle-orm";
 
 import { closeDb, db } from "./client";
 import { loadRootEnv } from "./load-env";
-import { accounts, agentSessions, batches, facetEmbeddings, facets, profiles } from "./schema";
+import { accounts, agentSessions, batches, facetEmbeddings, facets, pairsSeen, profiles } from "./schema";
 
 loadRootEnv(__dirname);
 
@@ -25,6 +25,7 @@ export async function resetQaAgent(email: string): Promise<boolean> {
   await db.transaction(async (tx) => {
     // The batches go first: their items point at other accounts, and the agent's session at none.
     await tx.delete(batches).where(eq(batches.accountId, account.id));
+    await tx.delete(pairsSeen).where(eq(pairsSeen.accountId, account.id)); // nobody is "already seen" on a blank page
     await tx.delete(facetEmbeddings).where(eq(facetEmbeddings.accountId, account.id));
     await tx.delete(facets).where(eq(facets.accountId, account.id));
     await tx.execute(sql`delete from agent_messages where session_id in (select id from agent_sessions where account_id = ${account.id})`);
