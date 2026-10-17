@@ -14,3 +14,4 @@ export const i18n = createI18n<Messages, Locale>({ en, fr }, { defaultLocale: "e
 export const { getDictionary } = i18n;
 export const translator = (locale: Locale) => i18n.translator(locale);
 export const otherLocale = (locale: Locale): Locale => LOCALES.find((l) => l !== locale) ?? "en";
+export { format } from "@krizaka/i18n";

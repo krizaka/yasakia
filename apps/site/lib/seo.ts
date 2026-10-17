@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 import { getDictionary, type Locale } from "./i18n";
 import { indexable } from "./indexing";
-import { KRIZAKA_URL, type PageId, pagePath, REPO_URL, SITE_URL } from "./site";
+import { changelogPath, KRIZAKA_URL, type PageId, pagePath, REPO_URL, SITE_URL } from "./site";
 
 /** The Krizaka Organization, defined by www.krizaka.com: every JSON-LD node of the family points back to it. */
 export const ORG_ID = `${KRIZAKA_URL}/#organization`;
@@ -19,13 +19,14 @@ export const CRAWLERS = [
   "Claude-SearchBot", "Claude-User", "ClaudeBot", "anthropic-ai", "Applebot", "Applebot-Extended", "CCBot",
 ] as const;
 
-const url = (locale: Locale, page: PageId) => `${SITE_URL}${pagePath(locale, page)}`;
+const url = (locale: Locale, page: PageId | "changelog") => `${SITE_URL}${page === "changelog" ? changelogPath(locale) : pagePath(locale, page)}`;
 
 /** The metadata of one page in one language: its own canonical, both languages (hreflang, English is x-default), the cards. */
-export function pageMetadata(locale: Locale, page: PageId): Metadata {
+export function pageMetadata(locale: Locale, page: PageId | "changelog"): Metadata {
   const t = getDictionary(locale);
-  const title = page === "home" ? t.meta.siteName : `${page === "how-it-works" ? t.how.title : t.demo.title} — ${t.meta.siteName}`;
-  const description = t.meta.description;
+  const pageTitle = page === "how-it-works" ? t.how.title : page === "changelog" ? t.changelog.metaTitle : t.demo.title;
+  const title = page === "home" ? t.meta.siteName : `${pageTitle} — ${t.meta.siteName}`;
+  const description = page === "changelog" ? t.changelog.metaDescription : t.meta.description;
   return {
     ...(indexable() ? {} : { robots: { index: false, follow: false, noarchive: true } }),
     metadataBase: new URL(SITE_URL),

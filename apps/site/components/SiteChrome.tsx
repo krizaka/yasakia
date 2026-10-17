@@ -9,10 +9,10 @@ import { familyLabels } from "@krizaka/ui/sites";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
-import { type Locale, otherLocale, translator } from "@/lib/i18n";
+import { format, getDictionary, type Locale, otherLocale, translator } from "@/lib/i18n";
 import { indexable } from "@/lib/indexing";
 import { groupOf, NAV_GROUPS, signInHref } from "@/lib/nav";
-import { APP_VERSION, contactHref, type PageId, pagePath, PAGES, REPO_URL } from "@/lib/site";
+import { APP_UI_VERSION, APP_VERSION, changelogPath, contactHref, type PageId, pagePath, PAGES, REPO_URL } from "@/lib/site";
 
 /** The footer lists every page; the bar groups them (lib/nav.ts). */
 const SECTIONS = PAGES.filter((p) => p !== "home");
@@ -21,7 +21,7 @@ const ICONS = { home: <HomeIcon />, "how-it-works": <InfoIcon />, demo: <PlayIco
 
 /** The bar: the animated mark, the DEV badge · the sections of this site · the repository, the theme, the language and
     the one action. No family switcher: a deployed product is independent. Below md, one panel. */
-export function SiteHeader({ locale, current }: { locale: Locale; current: PageId }) {
+export function SiteHeader({ locale, current, switchHref }: { locale: Locale; current: PageId; switchHref?: string }) {
   const t = translator(locale);
   const other = otherLocale(locale);
   return (
@@ -51,7 +51,7 @@ export function SiteHeader({ locale, current }: { locale: Locale; current: PageI
             <ThemeToggle label={t("chrome.themeToggle")} variant="ghost" />
           </span>
           <Button asChild variant="outline" size="sm" className="hidden h-7 w-auto px-2 font-mono text-[11px] font-semibold tracking-wide md:inline-flex">
-            <Link href={pagePath(other, current)} hrefLang={other} lang={other}>
+            <Link href={switchHref ?? pagePath(other, current)} hrefLang={other} lang={other}>
               <span className="sr-only">{t("chrome.languageLabel")} · </span>
               {t("chrome.otherLanguage")}
             </Link>
@@ -78,7 +78,7 @@ export function SiteHeader({ locale, current }: { locale: Locale; current: PageI
               <a href={signInHref(locale)}>{t("chrome.signIn")}</a>
             </NavBar.MobileLink>
             <NavBar.MobileLink asChild>
-              <Link href={pagePath(other, current)} hrefLang={other} lang={other}>
+              <Link href={switchHref ?? pagePath(other, current)} hrefLang={other} lang={other}>
                 {t("chrome.otherLanguage")}
               </Link>
             </NavBar.MobileLink>
@@ -99,7 +99,12 @@ export function SiteHeader({ locale, current }: { locale: Locale; current: PageI
 export function SiteFooter({ locale }: { locale: Locale }) {
   const t = translator(locale);
   return (
-    <FamilyFooter current="yasakia" family={false} labels={familyLabels[locale]} aria-label={t("chrome.footerLabel")} version={APP_VERSION} env="dev" data-testid="app-version" legal={indexable() ? undefined : <span data-testid="dev-environment-notice">{t("chrome.devNotice")}</span>}>
+    <FamilyFooter current="yasakia" family={false} labels={familyLabels[locale]} aria-label={t("chrome.footerLabel")} env="dev" data-testid="app-version" legal={<>
+      <FamilyFooter.Link asChild>
+        <Link href={`${changelogPath(locale)}#${APP_VERSION}`}>{format(getDictionary(locale).changelog.footerVersion, { version: APP_VERSION })}{APP_UI_VERSION ? ` · Krizaka UI ${APP_UI_VERSION}` : ""}</Link>
+      </FamilyFooter.Link>
+      {indexable() ? null : <span data-testid="dev-environment-notice">{t("chrome.devNotice")}</span>}
+    </>}>
       <FamilyFooter.Column title="Yasakia">
         {SECTIONS.map((page) => (
           <FamilyFooter.Link key={page} asChild>
