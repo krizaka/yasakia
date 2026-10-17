@@ -331,6 +331,7 @@ with a message and, where safe, a `fix:`; written for Tsx and `.ts` is parsed as
 | `no-ambient-clock` | `new Date()` / `Date.now()` in domain code: the clock is injected |
 | `no-types-at-package-root` | `types.ts` at a package root (`<feature>/<feature>.types.ts`) |
 | `no-unjustified-numeric-export` | a numeric (or `…ToMilliseconds(n)`) `export const` in feature code without `// @fixed: <reason>` just above |
+| `no-hand-made-nav`, `no-hand-made-language-switch` | a navigation bar that is not `NavBar` of @krizaka/ui (own Radix NavigationMenu, a local `NavBar`/`TopNav`), a hand-made language switch (`hrefLang` in a component, a row of `aria-pressed={locale === …}` buttons): use `NavBar` and `NavBar.Language` (« Navigation in the family », ui.krizaka.com) |
 
 - **Run**: `npm run lint` runs everything (it includes `ast-grep test` and the ratchet). `npx ast-grep scan` lists the
   violations with their message; `npm run lint:sg:test` runs the rule tests.
