@@ -1,5 +1,5 @@
-import { DeviceFrame } from "@krizaka/ui/step-showcase";
 import { Section } from "@krizaka/ui/page";
+import { DeviceFrame } from "@krizaka/ui/step-showcase";
 
 import { ButtonLink } from "@/components/ButtonLink";
 import { format, getDictionary, type Locale } from "@/lib/i18n";

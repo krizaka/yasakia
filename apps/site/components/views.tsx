@@ -7,7 +7,7 @@ import Link from "next/link";
 import { CUES } from "@/lib/demo";
 import { type Locale, translator } from "@/lib/i18n";
 import { clip } from "@/lib/media";
-import { contactHref, pagePath, REPO_URL } from "@/lib/site";
+import { pagePath, REPO_URL } from "@/lib/site";
 
 import { ButtonLink } from "./ButtonLink";
 import { CaptionedVideo } from "./CaptionedVideo";
