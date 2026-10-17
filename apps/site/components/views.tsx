@@ -12,7 +12,6 @@ import { contactHref, pagePath, REPO_URL } from "@/lib/site";
 import { WHAT_WORKS } from "@/lib/what-works";
 
 import { ButtonLink } from "./ButtonLink";
-import { DevEnvironmentNotice } from "./DevEnvironmentNotice";
 import { SiteFooter, SiteHeader } from "./SiteChrome";
 
 function Status({ locale }: { locale: Locale }) {
@@ -88,7 +87,6 @@ export function HomeView({ locale }: { locale: Locale }) {
         </Section>
       </main>
       <SiteFooter locale={locale} />
-      <DevEnvironmentNotice locale={locale} />
     </>
   );
 }
@@ -145,7 +143,6 @@ export function HowView({ locale }: { locale: Locale }) {
         </HowItWorksPage>
       </main>
       <SiteFooter locale={locale} />
-      <DevEnvironmentNotice locale={locale} />
     </>
   );
 }
@@ -184,7 +181,6 @@ export function DemoView({ locale }: { locale: Locale }) {
         </Section>
       </main>
       <SiteFooter locale={locale} />
-      <DevEnvironmentNotice locale={locale} />
     </>
   );
 }

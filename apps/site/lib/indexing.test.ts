@@ -38,10 +38,12 @@ describe("APP_SEARCH_INDEXING — the public landing of a dev deployment", () =>
     expect(sitemap().length).toBeGreaterThan(0);
   });
 
-  it("the dev line exists in both languages and is rendered by every page view, after the footer", () => {
+  it("the dev line exists in both languages and ends the footer's signature row (one footer, no strip under it)", () => {
     expect(en.chrome.devNotice).toBe("Development environment — access by invitation");
     expect(fr.chrome.devNotice).toBe("Environnement de développement — accès sur invitation");
+    const chrome = readFileSync(new URL("../components/SiteChrome.tsx", import.meta.url), "utf8");
+    expect(chrome).toMatch(/legal=\{indexable\(\) \? undefined : <span data-testid="dev-environment-notice">/);
     const views = readFileSync(new URL("../components/views.tsx", import.meta.url), "utf8");
-    expect(views.match(/<DevEnvironmentNotice locale=\{locale\} \/>/g)).toHaveLength(3);
+    expect(views).not.toContain("DevEnvironmentNotice");
   });
 });

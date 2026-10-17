@@ -9,6 +9,7 @@ import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 
 import { type Locale, otherLocale, translator } from "@/lib/i18n";
+import { indexable } from "@/lib/indexing";
 import { APP_VERSION, contactHref, type PageId, pagePath, PAGES, REPO_URL } from "@/lib/site";
 
 /** This site's sections in the bar's centre (the home is the brand). */
@@ -81,7 +82,7 @@ export function SiteHeader({ locale, current }: { locale: Locale; current: PageI
 export function SiteFooter({ locale }: { locale: Locale }) {
   const t = translator(locale);
   return (
-    <FamilyFooter current="yasakia" family={false} labels={familyLabels[locale]} aria-label={t("chrome.footerLabel")} version={APP_VERSION} env="dev" data-testid="app-version">
+    <FamilyFooter current="yasakia" family={false} labels={familyLabels[locale]} aria-label={t("chrome.footerLabel")} version={APP_VERSION} env="dev" data-testid="app-version" legal={indexable() ? undefined : <span data-testid="dev-environment-notice">{t("chrome.devNotice")}</span>}>
       <FamilyFooter.Column title="Yasakia">
         {SECTIONS.map((page) => (
           <FamilyFooter.Link key={page} asChild>
