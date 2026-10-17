@@ -18,6 +18,7 @@ import { and, asc, desc, eq, sql } from "drizzle-orm";
 
 import { setLocation } from "./account";
 import { AgentState, BASIC_WORDS, basicsFrom, estimateTokens, MessageRole, missingBasics, readiness } from "./agent-rules";
+import { AnalyticsKind, recordAnalytics } from "./analytics";
 import { refuse } from "./http";
 import { agentRules } from "./rule-sets";
 
@@ -139,6 +140,7 @@ export async function sendMessage(ai: AiProvider, account: { id: string; locale:
     const said = (facets.find((f) => f.key === BASICS_SAID)?.value as string[] | undefined) ?? [];
     const reply = await chat(ai, account.id, "CHAT", askPrompt({ language: account.locale, turns, known: facets.map((f) => f.key).filter((k) => k !== BASICS_SAID), missingBasics: missingBasics(said).map((b) => BASIC_WORDS[b]) }));
     const [agentMessage] = await db.insert(agentMessages).values({ sessionId: session.id, role: MessageRole.Agent, content: reply }).returning();
+    await recordAnalytics(account.id, AnalyticsKind.Talk, now);
     return { message: toView(agentMessage), userMessageId: userMessage.id };
   } catch (error) {
     // The agent could not answer: the person's message is taken back so they can send it again.

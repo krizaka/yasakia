@@ -1,6 +1,7 @@
 import { purgeDeletedMedia } from "./account";
+import { drainAnalytics } from "./analytics";
 import { sweepBatches } from "./batches";
-import { setting } from "./env";
+import { analyticsConnection, setting } from "./env";
 import { sweepExports } from "./export";
 import { sweepIntros } from "./intros";
 import { sweepAbandonedUploads } from "./photos";
@@ -43,9 +44,20 @@ export function startJobs(): void {
       }),
     sweepEvery,
   );
+  // Orazaka's analytics (krizaka/yasakia#86): the outbox drains every APP_ANALYTICS_INTERVAL_SECONDS when connected.
+  const analyticsEvery = setting("APP_ANALYTICS_INTERVAL_SECONDS", 30, 5, 3600) * 1000;
+  const analytics = setInterval(
+    () =>
+      void tick("analytics", async () => {
+        const conn = analyticsConnection();
+        if (conn) await drainAnalytics(conn);
+      }),
+    analyticsEvery,
+  );
   purge.unref();
   sweep.unref();
-  holder.__yasakiaJobs = [purge, sweep];
+  analytics.unref();
+  holder.__yasakiaJobs = [purge, sweep, analytics];
 }
 
 /** Purges right away (after a deletion's response) instead of waiting for the next tick. */

@@ -3,6 +3,7 @@ import { and, eq, sql } from "drizzle-orm";
 
 import { applyBlockEffects } from "./access";
 import { ageOn } from "./age";
+import { recordErasure } from "./analytics";
 import { roundPosition } from "./geo";
 import { isUniqueViolation, refuse } from "./http";
 import { sendTemplate } from "./mail";
@@ -163,6 +164,8 @@ export async function deleteAccount(accountId: string): Promise<{ deletionId: st
     await tx.delete(accounts).where(eq(accounts.id, accountId));
     return { deletionId: deletion.id, email: account.email, locale: account.locale };
   });
+  // Orazaka forgets the person's pseudonym too (Loi 25), and no event of theirs still waiting here is sent.
+  await recordErasure(accountId);
   return result;
 }
 

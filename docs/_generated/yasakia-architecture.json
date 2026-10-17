@@ -58,6 +58,7 @@
         "agent_messages",
         "agent_sessions",
         "ai_calls",
+        "analytics_outbox",
         "audit_log",
         "auth_codes",
         "batch_items",
@@ -181,6 +182,11 @@
       "references": [
         "accounts"
       ]
+    },
+    {
+      "name": "analytics_outbox",
+      "columns": 8,
+      "references": []
     },
     {
       "name": "audit_log",
@@ -723,6 +729,10 @@
       "REASONS",
       "DEBRIEF",
       "OPENER"
+    ],
+    "analytics_outbox_kind": [
+      "EVENT",
+      "ERASURE"
     ],
     "batch_decision": [
       "INTERESTED",

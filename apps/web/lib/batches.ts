@@ -6,6 +6,7 @@ import { and, desc, eq, inArray, lte, sql } from "drizzle-orm";
 
 import { ageOn } from "./age";
 import { AgentState } from "./agent-rules";
+import { AnalyticsKind, recordAnalytics } from "./analytics";
 import { allDecided, BatchStatus, type DebriefAnswers, Decision, decisionRefusal } from "./batch-rules";
 import { isUniqueViolation, refuse } from "./http";
 import { openIntro } from "./intros";
@@ -184,6 +185,7 @@ export async function openBatch(ai: AiProvider, account: { id: string; locale: L
       if (!moved.length) tx.rollback();
       return batch.id;
     });
+    await recordAnalytics(account.id, AnalyticsKind.BatchOpen, now);
     await publishToAccount(account.id, { type: "batch.ready", batchId });
     return { batchId, people: picked.length, runs: [written.runRef] };
   } catch (error) {
@@ -291,6 +293,7 @@ export async function decide(ai: AiProvider, me: string, batchId: string, itemId
     const mutual = decision === Decision.Interested && !!other && (other.email.endsWith(PERSONA_DOMAIN) || other.yes);
     return { candidateId: item.candidateId, lookingFor: other?.seeking ?? null, mutual, debriefDue };
   });
+  await recordAnalytics(me, AnalyticsKind.BatchAnswer, now);
   const intro = outcome.mutual ? await openIntro(ai, me, outcome.candidateId, now) : null;
   return { decision, lookingFor: outcome.lookingFor, introId: intro?.introId ?? null, debriefDue: outcome.debriefDue };
 }

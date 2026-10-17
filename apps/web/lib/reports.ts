@@ -1,6 +1,7 @@
 import { accounts, db, intros, open, profilePhotos, reports, seal } from "@yasakia/db";
 import { and, desc, eq, sql } from "drizzle-orm";
 
+import { AnalyticsKind, recordAnalytics } from "./analytics";
 import { refuse } from "./http";
 
 /**
@@ -37,7 +38,7 @@ export async function fileReport(reporterId: string, input: { accountId: string;
       .limit(1);
     if (!intro) throw refuse(404, "NOT_FOUND", "Not found");
   }
-  return db.transaction(async (tx) => {
+  const filed = await db.transaction(async (tx) => {
     const id = crypto.randomUUID();
     const details = input.details?.trim();
     const [report] = await tx
@@ -47,6 +48,8 @@ export async function fileReport(reporterId: string, input: { accountId: string;
     if (input.introId) await tx.update(intros).set({ frozenAt: new Date() }).where(eq(intros.id, input.introId));
     return report;
   });
+  await recordAnalytics(reporterId, AnalyticsKind.ReportFiled, filed.createdAt);
+  return filed;
 }
 
 /** The reports for operators, urgent reasons first, details opened. */

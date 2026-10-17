@@ -246,7 +246,8 @@
       "talk": "Talk to your agent",
       "batch": "Your batch",
       "rules": "Rules",
-      "myIntros": "Introductions"
+      "myIntros": "Introductions",
+      "analytics": "Analytics"
     },
     "signIn": {
       "title": "Welcome back",
@@ -784,6 +785,34 @@
         "reasonHint": "A sentence for the audit log and the history.",
         "now": "Now: {value}",
         "published": "Version {version} is active. Changed: {changed}."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "The last {days} days, counted by the analytics engine from pseudonymous events — never a person.",
+        "people": "People active",
+        "vsBefore": "vs. the period before",
+        "hidden": "Fewer than {min}",
+        "kinds": {
+          "talk": "Turns with the agent",
+          "batch_open": "Batches opened",
+          "batch_answer": "Answers",
+          "intro_start": "Introductions",
+          "report_filed": "Reports filed"
+        },
+        "daily": "People active per day",
+        "day": "Day",
+        "funnel": "From a batch to an introduction",
+        "funnelHint": "People who opened a batch, answered, then were introduced within a week.",
+        "funnelEmpty": "The funnel appears once at least {min} people go from a batch to an answer.",
+        "cohorts": "Who comes back",
+        "cohortsEmpty": "Weekly cohorts appear once at least {min} people started the same week.",
+        "cohortLine": "Week of {week} · {size} people",
+        "offTitle": "Analytics are not connected",
+        "offBody": "Set the engine's address, the service key and the pseudonym key (AI_ENGINE_URL, AI_ENGINE_API_KEY, AI_PSEUDONYM_KEY).",
+        "unavailableTitle": "Analytics are out of reach for a moment",
+        "unavailableBody": "Nothing is lost: the events wait in the outbox and the figures come back on their own.",
+        "smallTitle": "Too few people to show yet",
+        "smallBody": "Figures appear once at least {min} people were active in the period — so no one can be singled out."
       }
     },
     "reset": {

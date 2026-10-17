@@ -79,6 +79,6 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
 | `GET` | `/api/v1/app-config` | public | `GET /api/v1/app-config?platform=ios|android&version=x.y.z` — public and cacheable (ETag, 304): the minimum and latest versions, the update mode, maintenance, the contract range, texts in the app's language (krizaka/.github#75). |
 
-## Database tables (26)
+## Database tables (27)
 
-See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.
+See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `analytics_outbox` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.
