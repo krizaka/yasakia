@@ -11,7 +11,9 @@ import { EmptyState } from "@krizaka/ui/empty-state";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
+import { BatchAnswer } from "@/components/console/BatchAnswer";
 import { ButtonLink } from "@/components/console/ButtonLink";
+import { DebriefForm } from "@/components/console/DebriefForm";
 import type { AgentDto } from "@/lib/agent-dto";
 import type { BatchView as BatchDto } from "@/lib/batches";
 import { errorKey } from "@/lib/client";
@@ -47,6 +49,10 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
     },
   });
   const batch = query.data;
+  const reread = async () => {
+    await client.invalidateQueries({ queryKey: keys.current() });
+    router.refresh();
+  };
   const date = useMemo(() => {
     const f = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
     return (iso: string) => f.format(new Date(iso));
@@ -57,6 +63,11 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
     <DashboardLayout headingAs="h2" title={say("shell.batch")} description={say("batch.lead")}>
       {batch ? (
         <>
+          {batch.status === "DEBRIEF_DUE" ? (
+            <Widget level={3} title={say("batch.debrief.title")} description={say("batch.debrief.lead")} span={3}>
+              <DebriefForm batchId={batch.id} onDone={reread} />
+            </Widget>
+          ) : null}
           <Widget level={3} title={say("batch.openTitle")} description={say("batch.openUntil", { date: date(batch.expiresAt) })} span={3}>
             <div className="flex flex-col gap-2 text-sm text-fg-secondary">
               <Badge tone="success" dot className="w-fit">
@@ -100,6 +111,7 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
                       </ul>
                     </div>
                   </div>
+                  <BatchAnswer batchId={batch.id} person={p} open={batch.status === "OPEN"} onAnswered={reread} />
                 </div>
               </div>
             </Widget>

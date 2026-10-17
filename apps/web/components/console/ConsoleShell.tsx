@@ -54,6 +54,8 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
                   ? "shell.talk"
                   : path.startsWith(`${home}/batch`)
                     ? "shell.batch"
+                    : path.startsWith(`${home}/intros`)
+                    ? "shell.myIntros"
                     : "shell.dashboard";
   const item = (to: string, label: string, icon: React.ReactNode, exact = false) => (
     <AppShell.Item asChild label={label} icon={icon} current={current(to, exact)}>
@@ -86,6 +88,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
             {item(home, say("shell.dashboard"), <HomeIcon />, true)}
             {item(`${home}/talk`, say("shell.talk"), <ChatIcon />)}
             {item(`${home}/batch`, say("shell.batch"), <BatchIcon />)}
+            {item(`${home}/intros`, say("shell.myIntros"), <IntroIcon />)}
             {item(`${home}/account`, say("shell.account"), <SettingsIcon />)}
           </>
         )}

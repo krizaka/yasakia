@@ -1,6 +1,8 @@
 import { purgeDeletedMedia } from "./account";
+import { sweepBatches } from "./batches";
 import { setting } from "./env";
 import { sweepExports } from "./export";
+import { sweepIntros } from "./intros";
 import { sweepAbandonedUploads } from "./photos";
 import { sweepRateLimits } from "./rate-limit";
 import { sweepAuthCodes } from "./sign-in";
@@ -9,7 +11,7 @@ import { sweepWebSessions } from "./web-session";
 /**
  * The background loops every instance runs (started by instrumentation.ts, never during the build): the purge of
  * deleted accounts' media (`FOR UPDATE SKIP LOCKED`, so instances share it), and the sweeps of what expired —
- * sign-in codes, abandoned uploads, exports, rate-limit windows. Each tick is independent; a failure is logged and the
+ * sign-in codes, abandoned uploads, exports, rate-limit windows, batches past their hours (→ debrief), intros past their days (→ faded). Each tick is independent; a failure is logged and the
  * next tick tries again. One timer per process (globalThis), whatever Next loads twice.
  */
 
@@ -36,6 +38,8 @@ export function startJobs(): void {
         await sweepExports();
         await sweepRateLimits();
         await sweepWebSessions();
+        await sweepBatches();
+        await sweepIntros();
       }),
     sweepEvery,
   );

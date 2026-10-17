@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 26 tables · 17 enums · 5 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 26 tables · 17 enums · 6 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -464,3 +464,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0002_console_accounts.sql`
 - `0003_password_reset_codes.sql`
 - `0004_rule_sets_and_1024_vectors.sql`
+- `0005_intro_days_rule.sql`

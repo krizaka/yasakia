@@ -245,7 +245,8 @@
       "devBadge": "DEV · {version}",
       "talk": "Parle à ton agent",
       "batch": "Ton lot",
-      "rules": "Règles"
+      "rules": "Règles",
+      "myIntros": "Présentations"
     },
     "signIn": {
       "title": "Content de te revoir",
@@ -302,7 +303,14 @@
       "BATCH_ALREADY_OPEN": "Tu as déjà un lot à répondre.",
       "RULES_OUT_OF_BOUNDS": "Ces valeurs sortent de ce que le code permet.",
       "RULES_UNCHANGED": "Rien n’a changé : cette version est déjà la version active.",
-      "CONFLICT": "Quelqu’un a publié une version au même moment. Rechargez et réessayez."
+      "CONFLICT": "Quelqu’un a publié une version au même moment. Rechargez et réessayez.",
+      "BATCH_CLOSED": "Ce lot est fermé.",
+      "BATCH_EXPIRED": "Le temps de ce lot est écoulé.",
+      "ALREADY_DECIDED": "Tu as déjà répondu pour cette personne.",
+      "DEBRIEF_NOT_DUE": "Le débrief vient quand tout le lot a sa réponse.",
+      "INTRO_CLOSED": "Cette présentation est terminée — plus personne ne peut y écrire.",
+      "INTRO_FROZEN": "Cette présentation est en pause pendant l’examen d’un signalement.",
+      "ALREADY_CONTINUED": "Tu as déjà dit que tu veux continuer."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -842,7 +850,7 @@
       "openUntil": "Ouvert jusqu’au {date}.",
       "people": "{count} personnes",
       "noScore": "Pour chaque personne, l’agent dit pourquoi vous deux — avec des mots, dans les deux sens. Pas de note, pas de classement, pas de swipe.",
-      "next": "Leur répondre et raconter à l’agent comment ça s’est passé, c’est l’étape suivante — en développement.",
+      "next": "Réponds à chacun : oui, dis-m’en plus, ou je passe. Quand tout le monde a sa réponse, trois petites questions avant le prochain lot.",
       "someone": "Quelqu’un",
       "fictional": "Une personne fictive, pour les tests de développement.",
       "fictionalBadge": "Personnage fictif — développement seulement",
@@ -856,7 +864,77 @@
       "look": "Chercher mon premier lot",
       "looking": "L’agent écrit pourquoi vous deux…",
       "talkFirstTitle": "Parle en premier",
-      "talkFirstDescription": "L’agent ouvre un lot quand il te connaît. Commence par quelques mots sur toi."
+      "talkFirstDescription": "L’agent ouvre un lot quand il te connaît. Commence par quelques mots sur toi.",
+      "answer": {
+        "label": "Ta réponse pour {name}",
+        "interested": "Intéressé·e",
+        "tellMeMore": "Dis-m’en plus",
+        "pass": "Je passe",
+        "lookingFor": "Qui cette personne espère rencontrer",
+        "saidYes": "Tu as dit oui",
+        "passed": "Tu es passé·e",
+        "toIntros": "Tes présentations"
+      },
+      "debrief": {
+        "title": "Avant le prochain lot",
+        "lead": "Trois questions rapides — deux minutes. Tes réponses restent avec ton agent.",
+        "submit": "Envoyer le débrief",
+        "text": "Autre chose à ajouter ?",
+        "textHint": "Facultatif — quelques mots pour ton agent.",
+        "rangTrue": {
+          "question": "Les raisons de l’agent sonnaient-elles juste ?",
+          "chips": {
+            "yes": "Oui",
+            "partly": "En partie",
+            "no": "Pas vraiment"
+          }
+        },
+        "mattered": {
+          "question": "Qu’est-ce qui comptait le plus pour toi ?",
+          "chips": {
+            "values": "Les valeurs",
+            "humour": "L’humour",
+            "rhythm": "Le rythme de vie",
+            "distance": "La distance",
+            "intent": "Ce que la personne cherche"
+          }
+        },
+        "next": {
+          "question": "Pour le prochain lot ?",
+          "chips": {
+            "same": "Dans la même veine",
+            "closer": "Plus près de chez moi",
+            "different": "Quelqu’un d’un peu différent"
+          }
+        }
+      }
+    },
+    "intros": {
+      "title": "Présentations",
+      "lead": "Deux personnes se sont dit oui : un espace privé pendant sept jours. Continuez ensemble, ou laissez s’éteindre.",
+      "listTitle": "Tes présentations",
+      "someone": "Quelqu’un",
+      "emptyTitle": "Aucune présentation pour l’instant",
+      "emptyDescription": "Quand une personne à qui tu as dit oui te dit oui aussi, votre présentation s’ouvre ici.",
+      "openUntil": "Ouverte jusqu’au {date}",
+      "with": "Toi et {name}",
+      "threadLabel": "Votre conversation",
+      "openerTitle": "Ton agent te suggère une première phrase (toi seul·e la vois)",
+      "noMessage": "Personne n’a encore écrit.",
+      "placeholder": "Écris un message",
+      "send": "Envoyer",
+      "closed": "Cette présentation est terminée.",
+      "frozen": "En pause pendant l’examen d’un signalement.",
+      "agentNeverReads": "Ton agent ne lit jamais cette conversation.",
+      "continueLead": "Envie de continuer après les sept jours ? Ça continue quand vous le dites tous les deux.",
+      "continue": "Continuer",
+      "waitingForThem": "Tu as dit que tu veux continuer. On attend {name}.",
+      "states": {
+        "OPEN": "Ouverte",
+        "CONTINUED": "Continuée — vous l’avez dit tous les deux",
+        "FADED": "Éteinte — le temps s’est écoulé",
+        "CLOSED": "Fermée"
+      }
     }
   }
 }
