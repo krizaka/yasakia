@@ -46,10 +46,10 @@ export type Extraction = z.infer<typeof Extraction>;
 
 /** The portrait: shown to the person in their language, embedded in English (the embedding model is English). */
 export const Portrait = z.object({
-  self: z.string().trim().min(10).max(900),
-  seeking: z.string().trim().min(10).max(900),
-  selfEn: z.string().trim().min(10).max(900),
-  seekingEn: z.string().trim().min(10).max(900),
+  self: z.string().trim().min(10).max(1500),
+  seeking: z.string().trim().min(10).max(1500),
+  selfEn: z.string().trim().min(10).max(1500),
+  seekingEn: z.string().trim().min(10).max(1500),
 });
 export type Portrait = z.infer<typeof Portrait>;
 

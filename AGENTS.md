@@ -29,8 +29,9 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 - **PY3, in increments** ([ADR-001](docs/adr/ADR-001-talk-first-agent-and-bilateral-matching.md)): **done** — the talk-first
   agent (`packages/ai`: port `AiProvider` and its one adapter, Orazaka; `apps/web/lib/agent*.ts`; `/app/{en|fr}/talk`; the
   extraction, the sealed facets, the portrait and its two 1024-d vectors), `packages/matching` (hard filters both ways,
-  the weaker direction, the batch), the versioned `rule_sets`. **Next** — the batch (candidates from pgvector, reasons in
-  words, `batches`/`batch_items`), the debrief, the introductions.
+  the weaker direction, the batch), the versioned `rule_sets`. **Done too** — the first batch (`/api/batches`: candidates from pgvector through the hard filters both ways, `packages/matching` ranks
+  by the weaker direction, the agent writes *why you two* both ways; `/app/{en|fr}/batch`; the fictional dev cast, `npm run db:qa-personas`).
+  **Next** — answering a batch, the debrief, the introductions.
 - **Allowed on GitHub**: Actions that lint, type-check, test (unit, realtime contract, end-to-end on PostgreSQL +
   pgvector), build, check the generated docs. Production is **fail-closed** (§3.F): never a placeholder secret, never a
   demo mode, never a fake profile.

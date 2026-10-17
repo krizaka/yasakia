@@ -9,6 +9,7 @@ import { DashboardLayout, Widget } from "@krizaka/ui/dashboard-layout";
 import { DescriptionList } from "@krizaka/ui/description-list";
 import { useEffect, useRef, useState } from "react";
 
+import { ButtonLink } from "@/components/console/ButtonLink";
 import type { AgentDto } from "@/lib/agent-dto";
 import { errorKey } from "@/lib/client";
 import { useSay } from "@/lib/i18n-client";
@@ -44,7 +45,7 @@ export function TalkView({ initial }: { initial: AgentDto }) {
   const agent = query.data;
 
   const send = useMutation({
-    mutationFn: (content: string) => krizakaFetch("/api/agent/messages", { method: "POST", json: { content } }),
+    mutationFn: (content: string) => krizakaFetch("/api/agent/messages", { method: "POST", json: { content, locale } }),
     onMutate: (content) => setPending(content),
     onSuccess: () => {
       setDraft("");
@@ -118,6 +119,9 @@ export function TalkView({ initial }: { initial: AgentDto }) {
               <p>{agent.portrait.seeking}</p>
             </div>
             <p className="text-fg-muted">{say("talk.portraitNext")}</p>
+            <ButtonLink href={`/app/${locale}/batch`} shape="cut" variant="primary" className="w-fit">
+              {say("batch.look")}
+            </ButtonLink>
           </div>
         </Widget>
       ) : (

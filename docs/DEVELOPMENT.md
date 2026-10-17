@@ -55,8 +55,14 @@ Never edit an applied migration: fix forward. Migration `0000_extensions` (hand-
   (18+ server-side), sign-in, tokens and their revocation, profile, rounded position, photos (signed upload, metadata
   stripped, signed view, who may see them), blocks, reports (encrypted; operators behind token + allow-list), push
   tokens, events over LISTEN/NOTIFY, export, suspension, deletion and the purge — and a final scan of every answer: no
-  raw media URL, no storage key, no score. Relationships that PY3's endpoints will create (a batch, an intro) are set in
-  SQL. A new feature adds its scenarios there.
+  raw media URL, no storage key, no score. The agent and the batch run against `e2e/orazaka-stub.mjs` (Orazaka's contract, no
+  model); people who finished talking are written straight into the tables (an intro, still, is set in SQL). A new feature adds
+  its scenarios there.
+- **The real journey** (`npm run dev:journey`, Playwright): the QA person signs in, talks to the agent, and — with
+  `--through batch` — opens the first batch, against a server wired to the real engine (dev.yasakia.com or a local server with
+  `AI_ENGINE_*`); it records a video and writes `evidence.json` with the engine's run ids. Before a recording: `npm run db:qa-reset`
+  (the QA person's agent starts from a blank page — QA addresses only, never production) and `npm run db:qa-personas` (the
+  fictional Montréal cast, `packages/db/personas/montreal.json`, embedded by the real engine — local and dev databases only).
 
 ## Rules a change keeps
 

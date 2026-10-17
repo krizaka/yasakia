@@ -458,6 +458,18 @@
       "summary": "Exchanges an e-mail code for a session token (`client: \"native\"`, sent back as `Authorization: Bearer`)."
     },
     {
+      "method": "POST",
+      "path": "/api/batches",
+      "access": "bearer · account",
+      "summary": "Opens the person's next batch — three to five people who fit both ways — once the agent has written their portrait; 409 `NO_FIT_YET` when nobody does."
+    },
+    {
+      "method": "GET",
+      "path": "/api/batches/current",
+      "access": "bearer · account",
+      "summary": "The batch the person has to answer: who is in it, why you two in words both ways, until when — never a score."
+    },
+    {
       "method": "GET",
       "path": "/api/blocks",
       "access": "bearer · account",

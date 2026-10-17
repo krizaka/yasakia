@@ -196,7 +196,8 @@
       "forgot": "Mot de passe oublié",
       "reset": "Choisir un nouveau mot de passe",
       "signUp": "Créer un compte",
-      "talk": "Parle à ton agent"
+      "talk": "Parle à ton agent",
+      "batch": "Ton lot"
     },
     "form": {
       "errors": {
@@ -242,7 +243,8 @@
       "health": "Santé",
       "adminBrand": "Admin",
       "devBadge": "DEV · {version}",
-      "talk": "Parle à ton agent"
+      "talk": "Parle à ton agent",
+      "batch": "Ton lot"
     },
     "signIn": {
       "title": "Content de te revoir",
@@ -292,7 +294,11 @@
       "CONVERSATION_CLOSED": "Ton portrait est déjà écrit. La conversation rouvre après ton premier lot.",
       "BUDGET_SPENT": "L’agent a dit tout ce qu’il pouvait pour l’instant.",
       "TURN_IN_PROGRESS": "L’agent répond encore. Un instant.",
-      "AI_UNAVAILABLE": "L’agent est injoignable un moment. Ton message n’est pas parti — réessaie."
+      "AI_UNAVAILABLE": "L’agent est injoignable un moment. Ton message n’est pas parti — réessaie.",
+      "NO_FIT_YET": "Personne ne te correspond encore dans les deux sens. L’agent continue de chercher — on n’invente personne pour remplir un lot.",
+      "NOT_READY": "L’agent n’a pas encore écrit ton portrait. Continue de lui parler.",
+      "PROFILE_INCOMPLETE": "L’agent a encore besoin de quelques repères : dis-lui qui tu es, qui tu veux rencontrer et où tu vis.",
+      "BATCH_ALREADY_OPEN": "Tu as déjà un lot à répondre."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -781,6 +787,28 @@
       "portraitSeeking": "Qui tu cherches",
       "portraitNext": "Ensuite : l’agent cherche un petit lot de personnes qui te correspondent dans les deux sens.",
       "dashboardAction": "Parle à ton agent"
+    },
+    "batch": {
+      "lead": "Un petit lot, jamais un catalogue : des personnes qui te correspondent, et pour qui tu corresponds aussi.",
+      "openTitle": "Ton lot est ouvert",
+      "openUntil": "Ouvert jusqu’au {date}.",
+      "people": "{count} personnes",
+      "noScore": "Pour chaque personne, l’agent dit pourquoi vous deux — avec des mots, dans les deux sens. Pas de note, pas de classement, pas de swipe.",
+      "next": "Leur répondre et raconter à l’agent comment ça s’est passé, c’est l’étape suivante — en développement.",
+      "someone": "Quelqu’un",
+      "fictional": "Une personne fictive, pour les tests de développement.",
+      "fictionalBadge": "Personnage fictif — développement seulement",
+      "inTheirWords": "Avec ses mots",
+      "whyYou": "Pourquoi vous deux",
+      "whyThem": "Et pourquoi toi, pour elle ou lui",
+      "emptyTitle": "Pas encore de lot",
+      "emptyDescription": "L’agent ouvre un lot de trois à cinq personnes qui te correspondent dans les deux sens. Il apparaîtra ici.",
+      "readyTitle": "Ton portrait est écrit",
+      "readyDescription": "L’agent peut maintenant chercher des personnes qui te correspondent — et pour qui tu corresponds aussi. Si moins de trois te conviennent, il te le dit et continue de chercher.",
+      "look": "Chercher mon premier lot",
+      "looking": "L’agent écrit pourquoi vous deux…",
+      "talkFirstTitle": "Parle en premier",
+      "talkFirstDescription": "L’agent ouvre un lot quand il te connaît. Commence par quelques mots sur toi."
     }
   }
 }

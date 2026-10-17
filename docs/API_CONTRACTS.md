@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (50)
+## Endpoints (52)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -39,6 +39,8 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/auth/request-code` | public | Sends a 6-digit sign-in code to an e-mail address — the same answer whether an account exists or not. |
 | `POST` | `/api/auth/sign-out` | public | Signs the web console out: this browser's session ends and its cookie is cleared (an unknown cookie is cleared too). |
 | `POST` | `/api/auth/verify` | public | Exchanges an e-mail code for a session token (`client: "native"`, sent back as `Authorization: Bearer`). |
+| `POST` | `/api/batches` | bearer · account | Opens the person's next batch — three to five people who fit both ways — once the agent has written their portrait; 409 `NO_FIT_YET` when nobody does. |
+| `GET` | `/api/batches/current` | bearer · account | The batch the person has to answer: who is in it, why you two in words both ways, until when — never a score. |
 | `GET` | `/api/blocks` | bearer · account | The people the account blocked (the settings list), oldest first. |
 | `POST` | `/api/blocks` | bearer · account | Blocks someone — immediate, invisible to them, mutual in effect: their intro closes and each leaves the other's current batch. |
 | `DELETE` | `/api/blocks/{id}` | bearer · account | Lifts one of the account's blocks (what it closed stays closed); another account's block is a 404. |
