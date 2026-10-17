@@ -626,6 +626,33 @@ let adaPhoto;
     }
   }
 
+  // The rule sets: read, publish a new version with a reason (bounded, audited), restore an old one — append-only.
+  {
+    const asAdmin = (path, init = {}) => web(path, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, ...init });
+    check("rules: refused to a person (403)", (await web("/api/admin/rule-sets", { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 403 && (await web("/api/admin/rule-sets/MATCHING", { method: "POST", cookie: user.cookie, ip: ADMIN_IP_HEADER, body: { params: {}, reason: "nope" } })).status === 403);
+    const before = await asAdmin("/api/admin/rule-sets");
+    const active = before.json.ruleSets?.MATCHING?.find((v) => v.active);
+    check("rules: both domains the app reads are listed, one active version each", before.status === 200 && !!active && before.json.ruleSets.AGENT?.filter((v) => v.active).length === 1, before.json);
+    check("rules: a value outside its bounds is refused (422)", (await asAdmin("/api/admin/rule-sets/MATCHING", { method: "POST", body: { params: { ...active.params, minAffinity: 2 }, reason: "out of bounds" } })).json.code === "RULES_OUT_OF_BOUNDS");
+    check("rules: a key the code does not read is refused (422)", (await asAdmin("/api/admin/rule-sets/MATCHING", { method: "POST", body: { params: { ...active.params, accentColor: "#10b981" }, reason: "a colour is not a rule" } })).json.code === "RULES_OUT_OF_BOUNDS");
+    check("rules: a domain the app does not read does not exist (404)", (await asAdmin("/api/admin/rule-sets/CUSTOMIZATION", { method: "POST", body: { params: {}, reason: "nothing" } })).status === 404);
+    check("rules: the active version again is refused (RULES_UNCHANGED)", (await asAdmin("/api/admin/rule-sets/MATCHING", { method: "POST", body: { params: active.params, reason: "same again" } })).json.code === "RULES_UNCHANGED");
+    const published = await asAdmin("/api/admin/rule-sets/MATCHING", { method: "POST", body: { params: { ...active.params, batchHours: active.params.batchHours + 1 }, reason: "e2e: one more hour" } });
+    const live = await sql("select version, params from rule_sets where domain = 'MATCHING' and active");
+    check("rules: a new version is published and active at once; it names what changed", published.status === 200 && published.json.version === active.version + 1 && published.json.changed.join() === "batchHours" && live.length === 1 && live[0].version === published.json.version, published.json);
+    const restored = await asAdmin("/api/admin/rule-sets/MATCHING/restore", { method: "POST", body: { version: active.version, reason: "e2e: back to where we were" } });
+    const back = await sql("select version, params from rule_sets where domain = 'MATCHING' and active");
+    check("rules: restoring publishes the old values as a new version (nothing erased)", restored.status === 200 && back[0].version === active.version + 2 && JSON.stringify(back[0].params) === JSON.stringify(active.params) && (await sql("select count(*)::int as n from rule_sets where domain = 'MATCHING'"))[0].n >= 3);
+    const logged = await asAdmin("/api/admin/audit?action=admin.rules_published&size=10");
+    check("rules: both publications are in the audit log, with the reason", logged.json.rows?.filter((r) => r.detail?.domain === "MATCHING").length >= 2 && logged.json.rows.some((r) => r.detail?.reason === "e2e: one more hour" && r.detail?.changed === "batchHours"));
+    for (const p of ["/app/en/admin/rules", "/app/fr/admin/rules"]) {
+      check(`pages: ${p} renders for an administrator and is a 404 for a person`, (await asAdmin(p)).status === 200 && (await web(p, { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 404);
+    }
+    // Leave the rule sets as the seed wrote them: the batch scenarios below publish their own version 2.
+    await sql("delete from rule_sets where domain = 'MATCHING' and version > $1", [active.version]);
+    await sql("update rule_sets set active = true where domain = 'MATCHING' and version = $1", [active.version]);
+  }
+
   // The console's pages.
   const page = (p, cookie, ip) => web(p, { cookie, ip });
   check("pages: the sign-in page is served (200) and not indexed", (await page("/app/en/sign-in")).status === 200 && (await page("/app/en/sign-in")).text.includes("noindex"));
