@@ -648,6 +648,9 @@ let adaPhoto;
     for (const p of ["/app/en/admin/rules", "/app/fr/admin/rules"]) {
       check(`pages: ${p} renders for an administrator and is a 404 for a person`, (await asAdmin(p)).status === 200 && (await web(p, { cookie: user.cookie, ip: ADMIN_IP_HEADER })).status === 404);
     }
+    // Leave the rule sets as the seed wrote them: the batch scenarios below publish their own version 2.
+    await sql("delete from rule_sets where domain = 'MATCHING' and version > $1", [active.version]);
+    await sql("update rule_sets set active = true where domain = 'MATCHING' and version = $1", [active.version]);
   }
 
   // The console's pages.
