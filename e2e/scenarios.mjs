@@ -22,6 +22,7 @@ import pg from "pg";
 import sharp from "sharp";
 
 import { readEnv, ROOT } from "../scripts/lib.mjs";
+import { vectorOf } from "./orazaka-stub.mjs";
 
 const fileEnv = readEnv();
 const env = (name, fallback) => process.env[name] || fileEnv[name] || fallback;
@@ -634,6 +635,9 @@ let adaPhoto;
   const talkEn = await page("/app/en/talk", user.cookie);
   const talkFr = await page("/app/fr/talk", user.cookie);
   check("pages: the talk page renders for a person in both languages, with its conversation log and composer, and not for a stranger", talkEn.status === 200 && talkFr.status === 200 && /role="log"/.test(talkEn.text) && /<textarea/.test(talkEn.text) && talkEn.text.includes("Talk to your agent") && talkFr.text.includes("Parle à ton agent") && (await page("/app/en/talk")).status === 307);
+  const batchEn = await page("/app/en/batch", user.cookie);
+  const batchFr = await page("/app/fr/batch", user.cookie);
+  check("pages: the batch page renders for a person in both languages (talk-first while nothing is written) and not for a stranger", batchEn.status === 200 && batchFr.status === 200 && batchEn.text.includes("Your batch") && batchFr.text.includes("Ton lot") && (await page("/app/en/batch")).status === 307);
   check("pages: the administration console is a 404 for a person", (await page("/app/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/app/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
   check("pages: ...and for an administrator on a wrong address", (await page("/app/en/admin/users", adminIn.cookie, "198.51.100.200")).status === 404);
   check("pages: ...and renders for an administrator on the allowed address", (await page("/app/en/admin/users", adminIn.cookie, ADMIN_IP_HEADER)).status === 200 && (await page(`/app/fr/admin/users/${someone.id}`, adminIn.cookie, ADMIN_IP_HEADER)).status === 200);
@@ -765,6 +769,93 @@ let adaPhoto;
 
   // The person's agent is theirs alone.
   check("agent: someone else's conversation is not readable — each person sees only their own", (await call("/api/agent", { token: carla.token, ip: carla.ip })).json.agent.messages.every((m) => !/Camille/.test(m.content)));
+
+  // ── The first batch: three to five people who fit both ways, and why you two ─────────────────────────────────────────
+  {
+    const vec = (text) => `[${vectorOf(text).join(",")}]`;
+    /** A person who finished talking to the agent, written straight into the tables (the engine's stand-in embeds their texts). */
+    async function seedPerson(slug, { gender = "MAN", seeking = ["WOMAN"], age = 34, ageMin = 28, ageMax = 40, intent = "LONG_TERM", radiusKm = 20, lat = 45.52, lng = -73.58, self = "", wants = "", name = slug, state = "WAITING_POOL", status = "ACTIVE" } = {}) {
+      const email = `persona+${slug}-${run}@personas.yasakia.test`;
+      const birth = `${2026 - age}-03-10`;
+      const [account] = await sql("insert into accounts (email, locale, birth_date, terms_accepted_at, consent_version, status) values ($1, 'en', $2, now(), '2026-10', $3) returning id", [email, birth, status]);
+      await sql("insert into profiles (account_id, display_name, gender, seeking_genders, age_min, age_max, intent, radius_km, lat, lng, geo_precision_m, onboarding_completed_at) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 1000, now())", [account.id, name, gender, seeking, ageMin, ageMax, intent, radiusKm, lat, lng]);
+      await sql("insert into agent_sessions (account_id, state, portrait) values ($1, $2, $3)", [account.id, state, JSON.stringify({ self: `${name}: ${self}`, seeking: wants, selfEn: self, seekingEn: wants })]);
+      await sql("insert into facet_embeddings (account_id, kind, vector, model) values ($1, 'SELF', $2::vector, 'stub'), ($1, 'SEEKING', $3::vector, 'stub')", [account.id, vec(self), vec(wants)]);
+      return { id: account.id, name };
+    }
+    // What Camille said (the stand-in's portrait is made of her own words): she hikes, cooks, values kindness and curiosity, hopes to meet someone curious who reads, cooks and listens.
+    const fitSelf = (extra) => `someone curious who reads, cooks and listens; ${extra}`;
+    const fitWants = "hike Mont Royal and cook with friends, kindness, curiosity and honesty, terrible puns, not always on the phone";
+    const good = [
+      await seedPerson("hugo", { name: "Hugo", self: fitSelf("hikes Mont Royal on Sundays"), wants: fitWants }),
+      await seedPerson("samuel", { name: "Samuel", age: 36, self: fitSelf("cooks for friends, loves terrible puns"), wants: fitWants }),
+      await seedPerson("karim", { name: "Karim", age: 31, self: fitSelf("loves markets and honesty"), wants: fitWants }),
+    ];
+    const refused = {
+      woman: await seedPerson("sophie", { name: "Sophie", gender: "WOMAN", seeking: ["MAN"], self: fitSelf("hikes"), wants: fitWants }), // she does not look for women... Camille looks for men
+      old: await seedPerson("olivier", { name: "Olivier", age: 55, ageMin: 30, ageMax: 60, self: fitSelf("reads"), wants: fitWants }), // outside 30-44
+      casual: await seedPerson("antoine", { name: "Antoine", intent: "CASUAL", self: fitSelf("free"), wants: fitWants }), // not what a long-term wish looks for
+      theyDont: await seedPerson("julien", { name: "Julien", seeking: ["MAN"], self: fitSelf("reads"), wants: fitWants }), // does not look for women
+      far: await seedPerson("alexandre", { name: "Alexandre", lat: 46.81, lng: -71.21, radiusKm: 500, self: fitSelf("guides"), wants: fitWants }), // Québec City, outside her 30 km
+      blocked: await seedPerson("bruno-blocked", { name: "Blocked", self: fitSelf("hikes"), wants: fitWants }),
+      taste: await seedPerson("jeremie", { name: "Jeremie", self: "nightclubs, techno, festivals, gaming until dawn", wants: "dancing nightlife festivals techno, anything but routine", }), // passes the filters, fits nothing she looks for
+      oneWay: await seedPerson("matthieu", { name: "Matthieu", self: fitSelf("reads, hikes"), wants: "nightclubs, techno, festivals, gaming until dawn" }), // fits what she looks for, but she is not what he looks for
+      paused: await seedPerson("paused", { name: "Paused", self: fitSelf("hikes"), wants: fitWants, status: "PAUSED" }),
+      notDone: await seedPerson("early", { name: "Early", self: fitSelf("hikes"), wants: fitWants, state: "ONBOARDING" }),
+    };
+    await sql("update profiles set onboarding_completed_at = null where account_id = $1", [refused.notDone.id]);
+    await sql("insert into blocks (blocker_id, blocked_id) values ($1, $2)", [camille.id, refused.blocked.id]);
+
+    // Not ready: a person still talking has no batch to ask for.
+    check("batch: before the portrait is written, asking for a batch is refused (409 NOT_READY)", (await call("/api/batches", { method: "POST", token: carla.token, ip: carla.ip })).json.code === "NOT_READY");
+    check("batch: no session, no batch (401), and none to read", (await call("/api/batches", { method: "POST" })).status === 401 && (await call("/api/batches/current")).status === 401);
+    check("batch: before one is opened, the current batch is null", (await call("/api/batches/current", { token: camille.token, ip: camille.ip })).json.batch === null);
+
+    // The rules are rows: version 2 of the matching rule set (a looser affinity, for the stand-in's bag of words) is published, version 1 stays as the audit trail.
+    await sql("update rule_sets set active = false where domain = 'MATCHING'");
+    await sql("insert into rule_sets (domain, version, active, params, reason) values ('MATCHING', 2, true, $1, 'e2e: the stand-in embeds bags of words, so its cosines are lower than a real model has')", [JSON.stringify({ batchMin: 3, batchMax: 5, batchHours: 72, candidatePool: 200, minAffinity: 0.35 })]);
+
+    check("batch: the language asked for is en or fr — anything else is refused (400), on the batch and on the talk", (await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "de" }, ip: camille.ip })).status === 400 && (await call("/api/agent/messages", { method: "POST", token: camille.token, body: { content: "hi", locale: "de" }, ip: camille.ip })).status === 400);
+    const opened = await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "en" }, ip: camille.ip });
+    check("batch: the agent opens a batch for her — 201", opened.status === 201 && opened.json.batch?.people >= 3, opened.json);
+    const current = await call("/api/batches/current", { token: camille.token, ip: camille.ip });
+    const names = (current.json.batch?.people ?? []).map((p) => p.name).sort();
+    check("batch: it is exactly the people who fit both ways — Hugo, Samuel and Karim", names.join() === "Hugo,Karim,Samuel", names);
+    check("batch: nobody the filters refuse is in it — not a woman, too old, casual, not looking for her, too far, blocked, paused, unfinished", Object.entries(refused).filter(([k]) => !["taste", "oneWay"].includes(k)).every(([, who]) => !names.includes(who.name)));
+    check("batch: …nor someone who fits only one way — a different taste, or one who is what she looks for but she is not what he looks for", !names.includes("Jeremie") && !names.includes("Matthieu"), names);
+    const people = current.json.batch.people;
+    check("batch: each person comes with why you two, in words, both ways — and a rank, never a number of fit", people.every((p) => p.reasons.forYou.length >= 1 && p.reasons.forThem.length >= 1 && p.rank >= 1 && !("score" in p) && !("similarity" in p) && !("affinity" in p)), people[0]);
+    check("batch: the people are marked fictional personas, and carry their portrait in their words", people.every((p) => p.fictional === true && p.about.length > 5), people[0]);
+    check("batch: it is open for the rule set's 72 hours", Math.abs(new Date(current.json.batch.expiresAt) - new Date(current.json.batch.openedAt) - 72 * 3600 * 1000) < 1000 && current.json.batch.status === "OPEN");
+    const rows = await sql("select (select count(*)::int from batch_items bi join batches b on b.id = bi.batch_id where b.account_id = $1) as items, (select count(*)::int from pairs_seen where account_id = $1) as seen, (select count(*)::int from ai_calls where account_id = $1 and purpose = 'REASONS' and ok and run_ref is not null) as reasons, (select state::text from agent_sessions where account_id = $1) as state, (select count(*)::int from rule_sets where domain = 'MATCHING') as versions", [camille.id]);
+    check("batch: three items, three pairs now seen, three REASONS calls with their run ids, the agent is BATCH_OPEN, and both versions of the rule set remain", rows[0].items === 3 && rows[0].seen === 3 && rows[0].reasons === 3 && rows[0].state === "BATCH_OPEN" && rows[0].versions === 2, rows[0]);
+    check("batch: a second batch cannot be asked for while this one is open (409 BATCH_ALREADY_OPEN)", (await call("/api/batches", { method: "POST", token: camille.token, ip: camille.ip })).json.code === "BATCH_ALREADY_OPEN");
+    check("batch: the batch is hers alone — someone else reads none", (await call("/api/batches/current", { token: carla.token, ip: carla.ip })).json.batch === null);
+    await sql("update batch_items set withdrawn_at = now() where candidate_id = $1", [good[0].id]);
+    check("batch: someone withdrawn (a block, a deletion) is gone from it", (await call("/api/batches/current", { token: camille.token, ip: camille.ip })).json.batch.people.length === 2);
+
+    // Nobody fits: the person waits, and nobody is made up.
+    const lonely = await signUp("lonely", { birthDate: "1990-02-02" });
+    await sql("update accounts set status = 'ACTIVE' where id = $1", [lonely.id]);
+    await sql("insert into profiles (account_id) values ($1) on conflict do nothing", [lonely.id]);
+    await sql("update profiles set display_name = 'Lonely', gender = 'WOMAN', seeking_genders = '{WOMAN}', age_min = 18, age_max = 99, intent = 'NOT_SURE', radius_km = 5, lat = -33.86, lng = 151.2, onboarding_completed_at = now() where account_id = $1", [lonely.id]);
+    await sql("insert into agent_sessions (account_id, state, portrait) values ($1, 'WAITING_POOL', $2) on conflict (account_id) do update set state = 'WAITING_POOL', portrait = excluded.portrait", [lonely.id, JSON.stringify({ self: "x", seeking: "y" })]);
+    await sql("insert into facet_embeddings (account_id, kind, vector, model) values ($1, 'SELF', $2::vector, 'stub'), ($1, 'SEEKING', $2::vector, 'stub') on conflict (account_id, kind) do nothing", [lonely.id, vec("nothing alike anywhere")]);
+    const none = await call("/api/batches", { method: "POST", token: lonely.token, ip: lonely.ip });
+    check("batch: when fewer than three fit both ways it is a 409 NO_FIT_YET — the person stays in WAITING_POOL, nobody is invented", none.status === 409 && none.json.code === "NO_FIT_YET" && (await sql("select state::text from agent_sessions where account_id = $1", [lonely.id]))[0].state === "WAITING_POOL", none.json);
+    check("batch: an engine out of reach is a 503 AI_UNAVAILABLE and leaves no half-batch", await (async () => {
+      await sql("update agent_sessions set state = 'WAITING_POOL' where account_id = $1", [camille.id]);
+      await sql("delete from batches where account_id = $1", [camille.id]);
+      await sql("delete from pairs_seen where account_id = $1", [camille.id]);
+      await control("down");
+      const down = await call("/api/batches", { method: "POST", token: camille.token, ip: camille.ip });
+      await control("up");
+      const left = (await sql("select count(*)::int as n from batches where account_id = $1", [camille.id]))[0].n;
+      return down.status === 503 && down.json.code === "AI_UNAVAILABLE" && left === 0 && (await sql("select state::text from agent_sessions where account_id = $1", [camille.id]))[0].state === "WAITING_POOL";
+    })());
+    await sql("update rule_sets set active = false where domain = 'MATCHING' and version = 2");
+    await sql("update rule_sets set active = true where domain = 'MATCHING' and version = 1");
+  }
 
   // The QA person's journey, as the console makes it (cookie session, same origin): sign in, talk, portrait — then a blank page again.
   {

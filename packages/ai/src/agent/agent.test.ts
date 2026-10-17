@@ -64,3 +64,17 @@ describe("prompts", () => {
     expect(p).toMatch(/You are an AI/);
   });
 });
+
+describe("parseModel failures", () => {
+  it("say where the answer does not fit — paths and rules, never the person's words", () => {
+    try {
+      parseModel('{"self":"short","seeking":"someone who listens carefully","selfEn":"x","seekingEn":"y"}', Portrait);
+      throw new Error("should not parse");
+    } catch (error) {
+      const message = (error as Error).message;
+      expect(message).toContain("self: too_small");
+      expect(message).not.toContain("someone who listens carefully");
+    }
+    expect(() => parseModel("no braces here", Portrait)).toThrow(/no JSON object/);
+  });
+});

@@ -167,7 +167,7 @@ export async function understand(ai: AiProvider, account: { id: string; locale: 
       await understandOnce(ai, account, sourceMessageId, now);
     } while (again.has(account.id));
   } catch (error) {
-    console.error(`[agent] understanding failed: ${error instanceof AiUnavailableError ? error.code : (error as Error).name}`);
+    console.error(`[agent] understanding failed: ${error instanceof AiUnavailableError ? `${error.code} — ${error.message}` : (error as Error).name}`);
   } finally {
     running.delete(account.id);
     again.delete(account.id);
@@ -179,7 +179,7 @@ async function understandOnce(ai: AiProvider, account: { id: string; locale: Lan
   const session = await ensureSession(account.id);
   if (session.state !== AgentState.Onboarding) return;
   const turns = await transcript(session.id, params.historyMessages);
-  const extraction = await withOneRetry(async () => parseModel(await chat(ai, account.id, "EXTRACT", extractPrompt({ turns })), Extraction));
+  const extraction = await withRetries(async () => parseModel(await chat(ai, account.id, "EXTRACT", extractPrompt({ turns })), Extraction));
 
   const update = basicsFrom(extraction);
   if (Object.keys(update.profile).length) await db.update(profiles).set({ ...update.profile, intent: update.profile.intent as never, updatedAt: now }).where(eq(profiles.accountId, account.id));
@@ -200,12 +200,16 @@ const SENSITIVE = new Set(["dealbreakers", "beliefs"]);
 /** An agent-derived position is a city's centre: it says so in its precision. */
 const CITY_PRECISION_M = 10_000; // @fixed: a city-level position is coarser than the 1 km grid of a phone's
 
-async function withOneRetry<T>(run: () => Promise<T>): Promise<T> {
-  try {
-    return await run();
-  } catch (error) {
-    if (error instanceof AiUnavailableError && error.code === "bad_response") return run();
-    throw error;
+/** A model sometimes answers a shape that does not fit: ask again, up to {@link ATTEMPTS} times, then give up (the next message tries again). */
+const ATTEMPTS = 3; // @fixed: how many times a model is asked again before giving up — a robustness setting of the adapter, not a business parameter
+
+async function withRetries<T>(run: () => Promise<T>): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await run();
+    } catch (error) {
+      if (!(error instanceof AiUnavailableError && error.code === "bad_response") || attempt >= ATTEMPTS) throw error;
+    }
   }
 }
 
@@ -213,7 +217,7 @@ async function withOneRetry<T>(run: () => Promise<T>): Promise<T> {
 async function finalize(ai: AiProvider, account: { id: string; locale: Language }, sessionId: string, turns: Turn[], now: Date): Promise<void> {
   const facets = await readFacets(db, account.id);
   const understood = Object.fromEntries(facets.filter((f) => f.key !== BASICS_SAID && !f.sensitive).map((f) => [f.key, f.value]));
-  const portrait = await withOneRetry(async () => parseModel(await chat(ai, account.id, "PORTRAIT", portraitPrompt({ language: account.locale, turns, facets: understood })), Portrait));
+  const portrait = await withRetries(async () => parseModel(await chat(ai, account.id, "PORTRAIT", portraitPrompt({ language: account.locale, turns, facets: understood })), Portrait));
 
   const embedded = await ai.embed([portrait.selfEn, portrait.seekingEn]);
   await recordCall(account.id, { model: embedded.model, purpose: "EMBED", tokensIn: embedded.promptTokens, tokensOut: 0, ms: embedded.ms, ok: true, runRef: embedded.runId });

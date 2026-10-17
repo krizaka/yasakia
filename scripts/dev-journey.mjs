@@ -126,7 +126,30 @@ await page.getByText(locale === "fr" ? "Ton portrait" : "Your portrait", { exact
 await page.waitForTimeout(2500);
 await shot(page, "05-portrait");
 
-const agent = await page.evaluate(async (b) => (await (await fetch(`${b}/api/agent`, { credentials: "same-origin" })).json()).agent, "");
+let batch = null;
+if (through === "batch") {
+  step("open the first batch");
+  await page.goto(`${base}/app/${locale}/batch`);
+  await shot(page, "06-batch-ready");
+  const asked = page.waitForResponse((r) => r.url().endsWith("/api/batches") && r.request().method() === "POST", { timeout: 180_000 });
+  await page.getByRole("button", { name: locale === "fr" ? "Chercher mon premier lot" : "Look for my first batch" }).click();
+  const response = await asked;
+  batch = { status: response.status(), ...(await response.json()) };
+  evidence.batchRuns = batch.batch?.runs ?? [];
+  evidence.batchStatus = batch.status;
+  step(`batch: HTTP ${batch.status}`, { runs: evidence.batchRuns });
+  if (response.ok()) {
+    await page.getByText(locale === "fr" ? "Pourquoi vous deux" : "Why you two", { exact: true }).first().waitFor({ timeout: 60_000 });
+    await page.waitForTimeout(2500);
+    await shot(page, "07-batch");
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(1500);
+    await shot(page, "08-batch-reasons");
+    evidence.batchPeople = await page.locator("h2, h3").allTextContents();
+  }
+}
+
+const agent = await page.evaluate(async () => (await (await fetch("/api/agent", { credentials: "same-origin" })).json()).agent);
 evidence.state = agent?.state;
 evidence.engineRuns = agent?.evidence ?? {};
 evidence.messages = agent?.messages?.length;
@@ -139,4 +162,3 @@ if (video) fs.renameSync(path.join(out, video), path.join(out, "journey.webm"));
 await browser.close();
 fs.writeFileSync(path.join(out, "evidence.json"), `${JSON.stringify(evidence, null, 2)}\n`);
 console.log(`✓ ${evidence.state} — ${evidence.messages} messages, facets: ${evidence.facets?.join(", ")} — evidence in ${path.join(out, "evidence.json")}`);
-if (through === "batch") console.log("(the batch step comes with the batch endpoints)");

@@ -1,0 +1,381 @@
+{
+  "_note": "Fictional adults for dev and QA only (the Montréal cast). Not real people, not photos. Seeded by `npm run db:qa-personas` on a local or dev database — never production.",
+  "region": "Montréal",
+  "personas": [
+    {
+      "slug": "hugo",
+      "displayName": "Hugo",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1989,
+      "ageMin": 28,
+      "ageMax": 40,
+      "intent": "LONG_TERM",
+      "radiusKm": 30,
+      "lat": 45.52,
+      "lng": -73.58,
+      "locale": "fr",
+      "portrait": {
+        "self": "Libraire de métier, curieux, il passe ses samedis au marché Jean-Talon et ses dimanches en randonnée sur le mont Royal. Il aime cuisiner pour des amis et lire de tout, du polar à l’essai.",
+        "seeking": "Quelqu’un de curieux, drôle et gentil, qui aime les longues conversations, la cuisine et le plein air.",
+        "selfEn": "A bookseller by trade, curious, who spends Saturdays at Jean-Talon market and Sundays hiking Mont Royal. He loves cooking for friends and reads everything from crime novels to essays.",
+        "seekingEn": "Someone curious, funny and kind who enjoys long conversations, cooking and the outdoors."
+      },
+      "facets": {
+        "story": "Libraire, curieux, marché Jean-Talon et randonnée",
+        "passions": [
+          "lire",
+          "cuisiner pour des amis",
+          "randonnée"
+        ],
+        "values": [
+          "curiosité",
+          "gentillesse",
+          "honnêteté"
+        ],
+        "humour": "les jeux de mots, même les nuls",
+        "weekend": "marché le samedi, mont Royal le dimanche",
+        "seeking": "quelqu’un de curieux et gentil qui aime cuisiner"
+      }
+    },
+    {
+      "slug": "samuel",
+      "displayName": "Samuel",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1991,
+      "ageMin": 27,
+      "ageMax": 38,
+      "intent": "LONG_TERM",
+      "radiusKm": 25,
+      "lat": 45.53,
+      "lng": -73.6,
+      "locale": "fr",
+      "portrait": {
+        "self": "Enseignant au primaire, à vélo à longueur d’année. Il cuisine des soupers pour huit, joue de la guitare et croit qu’un bon rire règle la moitié des problèmes.",
+        "seeking": "Une personne chaleureuse et curieuse, qui sait écouter, qui aime les amis, la bonne bouffe et les balades à vélo.",
+        "selfEn": "A primary-school teacher who cycles all year round. He cooks dinners for eight, plays guitar and believes a good laugh solves half of life's problems.",
+        "seekingEn": "A warm, curious person who knows how to listen and who loves friends, good food and bike rides."
+      },
+      "facets": {
+        "story": "Enseignant, vélo toute l’année, guitare",
+        "passions": [
+          "vélo",
+          "cuisiner pour des amis",
+          "guitare"
+        ],
+        "values": [
+          "écoute",
+          "humour",
+          "loyauté"
+        ],
+        "humour": "rire de lui-même",
+        "weekend": "souper pour huit amis, balade à vélo",
+        "seeking": "chaleureuse, curieuse, qui sait écouter"
+      }
+    },
+    {
+      "slug": "etienne",
+      "displayName": "Étienne",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1986,
+      "ageMin": 30,
+      "ageMax": 42,
+      "intent": "OPEN_TO_LONG_TERM",
+      "radiusKm": 20,
+      "lat": 45.51,
+      "lng": -73.56,
+      "locale": "fr",
+      "portrait": {
+        "self": "Traducteur, il lit beaucoup et écoute plus qu’il ne parle. Il cuisine des plats simples, aime les petites expositions et les promenades sans but dans le Mile End.",
+        "seeking": "Quelqu’un de réfléchi, avec de l’humour, qui aime lire, cuisiner et prendre le temps.",
+        "selfEn": "A translator who reads a lot and listens more than he talks. He cooks simple dishes and enjoys small exhibitions and aimless walks in the Mile End.",
+        "seekingEn": "Someone thoughtful, with humour, who likes reading, cooking and taking their time."
+      },
+      "facets": {
+        "story": "Traducteur, lecteur, Mile End",
+        "passions": [
+          "lire",
+          "cuisine simple",
+          "expositions"
+        ],
+        "values": [
+          "réflexion",
+          "humour",
+          "patience"
+        ],
+        "humour": "pince-sans-rire",
+        "weekend": "promenade dans le Mile End, un livre, un souper à deux",
+        "seeking": "réfléchie, drôle, qui prend le temps"
+      }
+    },
+    {
+      "slug": "karim",
+      "displayName": "Karim",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1990,
+      "ageMin": 28,
+      "ageMax": 40,
+      "intent": "LONG_TERM",
+      "radiusKm": 35,
+      "lat": 45.46,
+      "lng": -73.62,
+      "locale": "fr",
+      "portrait": {
+        "self": "Cuisinier dans un petit restaurant, il adore les marchés et les histoires de famille. Il fait de la randonnée dès que la neige fond et lit des romans policiers.",
+        "seeking": "Une personne généreuse, curieuse du monde, qui aime manger, voyager léger et rire fort.",
+        "selfEn": "A cook in a small restaurant who loves markets and family stories. He hikes as soon as the snow melts and reads crime novels.",
+        "seekingEn": "A generous person, curious about the world, who loves eating, travelling light and laughing loudly."
+      },
+      "facets": {
+        "story": "Cuisinier, marchés, randonnée",
+        "passions": [
+          "cuisine",
+          "randonnée",
+          "romans policiers"
+        ],
+        "values": [
+          "générosité",
+          "famille",
+          "curiosité"
+        ],
+        "humour": "rire fort",
+        "weekend": "marché, puis randonnée",
+        "seeking": "généreuse, curieuse, qui aime manger"
+      }
+    },
+    {
+      "slug": "mathieu",
+      "displayName": "Mathieu",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1984,
+      "ageMin": 29,
+      "ageMax": 41,
+      "intent": "LONG_TERM",
+      "radiusKm": 40,
+      "lat": 45.56,
+      "lng": -73.71,
+      "locale": "fr",
+      "portrait": {
+        "self": "Ingénieur civil à Laval, grand marcheur, il lit des biographies et cuisine le dimanche pour la semaine. Un peu timide au début, bavard ensuite.",
+        "seeking": "Quelqu’un de sincère et de curieux, qui aime la nature, les livres et les soupers à la maison.",
+        "selfEn": "A civil engineer in Laval and a keen walker who reads biographies and cooks on Sundays for the week. A little shy at first, talkative afterwards.",
+        "seekingEn": "Someone sincere and curious who loves nature, books and dinners at home."
+      },
+      "facets": {
+        "story": "Ingénieur civil à Laval, marcheur, biographies",
+        "passions": [
+          "marche",
+          "biographies",
+          "cuisine du dimanche"
+        ],
+        "values": [
+          "sincérité",
+          "curiosité",
+          "calme"
+        ],
+        "humour": "timide puis bavard",
+        "weekend": "grande marche puis cuisine du dimanche",
+        "seeking": "sincère, curieuse, aime la nature et les livres"
+      }
+    },
+    {
+      "slug": "jeremie",
+      "displayName": "Jérémie",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1992,
+      "ageMin": 27,
+      "ageMax": 40,
+      "intent": "LONG_TERM",
+      "radiusKm": 30,
+      "lat": 45.52,
+      "lng": -73.57,
+      "locale": "fr",
+      "portrait": {
+        "self": "Développeur de jeux vidéo, il sort tard, adore la musique électronique et les festivals. Il mange au resto presque tous les soirs et passe ses fins de semaine devant ses écrans ou en soirée.",
+        "seeking": "Quelqu’un d’énergique qui aime sortir, danser et veiller tard, sans trop de routine.",
+        "selfEn": "A video-game developer who goes out late, loves electronic music and festivals. He eats out almost every night and spends his weekends in front of his screens or at parties.",
+        "seekingEn": "Someone energetic who likes going out, dancing and staying up late, without much routine."
+      },
+      "facets": {
+        "story": "Développeur de jeux vidéo, musique électronique, sorties tardives",
+        "passions": [
+          "festivals",
+          "musique électronique",
+          "jeux vidéo"
+        ],
+        "values": [
+          "énergie",
+          "spontanéité"
+        ],
+        "humour": "ironique",
+        "weekend": "festival ou soirée jusqu’à l’aube",
+        "seeking": "énergique, qui aime danser et veiller tard"
+      }
+    },
+    {
+      "slug": "olivier",
+      "displayName": "Olivier",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1973,
+      "ageMin": 35,
+      "ageMax": 50,
+      "intent": "LONG_TERM",
+      "radiusKm": 30,
+      "lat": 45.5,
+      "lng": -73.57,
+      "locale": "fr",
+      "portrait": {
+        "self": "Architecte, grand lecteur, il cuisine, marche et collectionne les cartes anciennes. Il cherche une relation stable après un long mariage.",
+        "seeking": "Une femme curieuse et posée, qui aime les livres, la cuisine et les marches.",
+        "selfEn": "An architect and avid reader who cooks, walks and collects old maps. He is looking for a stable relationship after a long marriage.",
+        "seekingEn": "A curious, calm woman who loves books, cooking and walking."
+      },
+      "facets": {
+        "story": "Architecte, lecteur, cartes anciennes",
+        "passions": [
+          "lire",
+          "cuisine",
+          "marche"
+        ],
+        "values": [
+          "stabilité",
+          "curiosité"
+        ],
+        "humour": "discret",
+        "weekend": "marche puis cartes anciennes",
+        "seeking": "curieuse et posée"
+      }
+    },
+    {
+      "slug": "antoine",
+      "displayName": "Antoine",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1990,
+      "ageMin": 26,
+      "ageMax": 38,
+      "intent": "CASUAL",
+      "radiusKm": 30,
+      "lat": 45.51,
+      "lng": -73.58,
+      "locale": "fr",
+      "portrait": {
+        "self": "Photographe de mariage, curieux, il cuisine et lit, mais ne cherche rien de sérieux pour l’instant : il veut des rencontres légères, sans engagement.",
+        "seeking": "Quelqu’un de curieux et libre, pour des rencontres légères et sans pression.",
+        "selfEn": "A wedding photographer, curious, who cooks and reads but is not looking for anything serious right now: he wants light, no-commitment dates.",
+        "seekingEn": "Someone curious and free, for light dates without pressure."
+      },
+      "facets": {
+        "story": "Photographe de mariage, curieux",
+        "passions": [
+          "cuisine",
+          "lecture",
+          "photographie"
+        ],
+        "values": [
+          "liberté",
+          "légèreté"
+        ],
+        "humour": "léger",
+        "weekend": "sorties spontanées",
+        "seeking": "curieuse et libre, sans pression"
+      }
+    },
+    {
+      "slug": "julien",
+      "displayName": "Julien",
+      "gender": "MAN",
+      "seekingGenders": [
+        "MAN"
+      ],
+      "birthYear": 1989,
+      "ageMin": 28,
+      "ageMax": 42,
+      "intent": "LONG_TERM",
+      "radiusKm": 30,
+      "lat": 45.52,
+      "lng": -73.59,
+      "locale": "fr",
+      "portrait": {
+        "self": "Infirmier, grand cuisinier, il lit des romans et marche sur le mont Royal. Il cherche une relation sérieuse avec un homme.",
+        "seeking": "Un homme curieux, bienveillant, qui aime les livres, la cuisine et les marches.",
+        "selfEn": "A nurse and a great cook who reads novels and walks Mont Royal. He is looking for a serious relationship with a man.",
+        "seekingEn": "A curious, kind man who loves books, cooking and walks."
+      },
+      "facets": {
+        "story": "Infirmier, cuisinier, lecteur",
+        "passions": [
+          "cuisine",
+          "romans",
+          "marche"
+        ],
+        "values": [
+          "bienveillance",
+          "curiosité"
+        ],
+        "humour": "doux",
+        "weekend": "mont Royal puis souper",
+        "seeking": "un homme curieux et bienveillant"
+      }
+    },
+    {
+      "slug": "alexandre",
+      "displayName": "Alexandre",
+      "gender": "MAN",
+      "seekingGenders": [
+        "WOMAN"
+      ],
+      "birthYear": 1988,
+      "ageMin": 28,
+      "ageMax": 40,
+      "intent": "LONG_TERM",
+      "radiusKm": 30,
+      "lat": 46.81,
+      "lng": -71.21,
+      "locale": "fr",
+      "portrait": {
+        "self": "Guide de plein air à Québec, il lit, cuisine sur feu de camp et rêve d’un chalet. Curieux et gentil.",
+        "seeking": "Une femme curieuse qui aime le plein air, les livres et la cuisine.",
+        "selfEn": "An outdoor guide in Québec City who reads, cooks over a campfire and dreams of a cabin. Curious and kind.",
+        "seekingEn": "A curious woman who loves the outdoors, books and cooking."
+      },
+      "facets": {
+        "story": "Guide de plein air à Québec, lecteur",
+        "passions": [
+          "plein air",
+          "lecture",
+          "cuisine sur feu"
+        ],
+        "values": [
+          "curiosité",
+          "gentillesse"
+        ],
+        "humour": "doux",
+        "weekend": "plein air",
+        "seeking": "curieuse, aime le plein air"
+      }
+    }
+  ]
+}

@@ -43,7 +43,8 @@
     "sg:ratchet:update": "node scripts/sg-ratchet.mjs --update",
     "sg:fix": "node scripts/sg-fix.mjs",
     "db:qa-reset": "npm run qa-reset --workspace=packages/db",
-    "dev:journey": "node scripts/dev-journey.mjs"
+    "dev:journey": "node scripts/dev-journey.mjs",
+    "db:qa-personas": "tsx apps/web/scripts/qa-personas.ts"
   },
   "keywords": [
     "dating-app",

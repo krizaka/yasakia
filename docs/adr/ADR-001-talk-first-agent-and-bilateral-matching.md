@@ -71,6 +71,14 @@ reason → rollback) is follow-up work; until then a version is published by SQL
 `facet_embeddings.vector` goes from 768 (a local model never used) to **1024**, Orazaka's models' dimension. No row
 existed on any deployment; the migration clears the table first.
 
+### 7. Calibration on the dev cast (real embeddings, 2026-10-16)
+
+With GTE Large (English) the cosines between a *seeking* text and a *self* text sit between 0.50 and 0.80, whatever the
+fit: the model compresses. On the Montréal cast (10 fictional adults, `packages/db/personas/montreal.json`) the weaker
+direction for the QA persona Camille ranged from 0.73 (Mathieu, Hugo) to 0.50 (Samuel) and 0.495 (Jérémie, who fits
+the filters and nothing she looks for): `minAffinity` 0.50 keeps the five who fit and drops the one who does not. It is a
+**rule-set value**, not a constant: BGE-M3 will spread the scores and the value is republished (a new version, with its reason).
+
 ## Consequences
 
 - A person sees the agent's reply at once; what it understood appears a few seconds later (the page looks again for 45 s).

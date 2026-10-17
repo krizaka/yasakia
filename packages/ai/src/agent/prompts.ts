@@ -99,7 +99,7 @@ export function reasonsPrompt({ language, you, them }: { language: Language; you
       '{"forYou": [string, ...], "forThem": [string, ...]}',
       `"forYou": 1 to 3 short sentences, addressed to ${you.name} ("tu"/"you"), on why ${them.name} may suit them.`,
       `"forThem": 1 to 3 short sentences on why ${you.name} may suit ${them.name}, written about ${you.name} in the third person (it is what ${them.name} will read).`,
-      `Write in ${LANGUAGE_NAME[language]}.`,
+      `Write every sentence in ${LANGUAGE_NAME[language]} only (never mix languages), in plain text: no markdown, no asterisks, no emojis.`,
     ].join("\n"),
   ].join("\n\n");
 }

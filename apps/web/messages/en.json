@@ -196,7 +196,8 @@
       "forgot": "Forgot password",
       "reset": "Choose a new password",
       "signUp": "Create an account",
-      "talk": "Talk to your agent"
+      "talk": "Talk to your agent",
+      "batch": "Your batch"
     },
     "form": {
       "errors": {
@@ -242,7 +243,8 @@
       "health": "Health",
       "adminBrand": "Admin",
       "devBadge": "DEV · {version}",
-      "talk": "Talk to your agent"
+      "talk": "Talk to your agent",
+      "batch": "Your batch"
     },
     "signIn": {
       "title": "Welcome back",
@@ -292,7 +294,11 @@
       "CONVERSATION_CLOSED": "Your portrait is already written. The conversation reopens after your first batch.",
       "BUDGET_SPENT": "The agent has said all it can for now.",
       "TURN_IN_PROGRESS": "The agent is still answering. One moment.",
-      "AI_UNAVAILABLE": "The agent is out of reach for a moment. Your message was not sent — try again."
+      "AI_UNAVAILABLE": "The agent is out of reach for a moment. Your message was not sent — try again.",
+      "NO_FIT_YET": "Nobody fits you both ways yet. The agent keeps looking — nobody is made up to fill a batch.",
+      "NOT_READY": "The agent has not written your portrait yet. Keep talking.",
+      "PROFILE_INCOMPLETE": "The agent still needs a few basics: tell it who you are, who you want to meet and where you live.",
+      "BATCH_ALREADY_OPEN": "You already have a batch to answer."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -781,6 +787,28 @@
       "portraitSeeking": "Who you are looking for",
       "portraitNext": "Next: the agent looks for a small batch of people who fit both ways.",
       "dashboardAction": "Talk to your agent"
+    },
+    "batch": {
+      "lead": "A small batch, never a catalogue: people who fit you, and for whom you fit too.",
+      "openTitle": "Your batch is open",
+      "openUntil": "Open until {date}.",
+      "people": "{count} people",
+      "noScore": "For each person, the agent says why you two — in words, both ways. There is no score, no rank, no swiping.",
+      "next": "Answering them and telling the agent how it went is the next step — in development.",
+      "someone": "Someone",
+      "fictional": "A fictional person, for the development tests.",
+      "fictionalBadge": "Fictional persona — dev only",
+      "inTheirWords": "In their words",
+      "whyYou": "Why you two",
+      "whyThem": "And why you, for them",
+      "emptyTitle": "No batch yet",
+      "emptyDescription": "The agent opens a batch of three to five people who fit you both ways. It will appear here.",
+      "readyTitle": "Your portrait is written",
+      "readyDescription": "The agent can now look for people who fit you — and for whom you fit too. If fewer than three do, it tells you and keeps looking.",
+      "look": "Look for my first batch",
+      "looking": "The agent is writing why you two…",
+      "talkFirstTitle": "Talk first",
+      "talkFirstDescription": "The agent opens a batch once it knows you. Start with a few words about yourself."
     }
   }
 }
