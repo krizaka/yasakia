@@ -50,6 +50,7 @@ services:
       # The agent runs on Orazaka's dev edge with Yasakia's service key (svc_yasakia, a SECRET set with `doctl apps update`, never printed).
       - { key: AI_ENGINE_URL, scope: RUN_TIME, value: "https://dev.orazaka.com/edge" }
       - { key: AI_ENGINE_API_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: AI_PSEUDONYM_KEY, scope: RUN_TIME, type: SECRET }
 jobs:
   - name: migrate
     kind: PRE_DEPLOY
