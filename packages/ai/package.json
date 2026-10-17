@@ -1,0 +1,19 @@
+{
+  "name": "@yasakia/ai",
+  "version": "0.1.0",
+  "description": "Yasakia's way to AI: a port (chat, embed) and its Orazaka adapter, the agent's prompts and facet schemas as data, and the parsing of what the models answer. AI is consumed over HTTP, through Orazaka only.",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.5.4"
+  }
+}

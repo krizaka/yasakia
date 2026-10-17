@@ -2,7 +2,7 @@
   "name": "yasakia-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "Yasakia — the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
+  "description": "Yasakia \u2014 the dating app where you talk first: the API, the packages (db, media), the docs and the legal pages.",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -41,7 +41,9 @@
     "lint:sg": "node scripts/sg-ratchet.mjs",
     "lint:sg:test": "ast-grep test --skip-snapshot-tests",
     "sg:ratchet:update": "node scripts/sg-ratchet.mjs --update",
-    "sg:fix": "node scripts/sg-fix.mjs"
+    "sg:fix": "node scripts/sg-fix.mjs",
+    "db:qa-reset": "npm run qa-reset --workspace=packages/db",
+    "dev:journey": "node scripts/dev-journey.mjs"
   },
   "keywords": [
     "dating-app",
@@ -58,6 +60,7 @@
     "@ast-grep/cli": "0.51.0",
     "@krizaka/i18n": "^0.1.0",
     "pg": "^8.12.0",
+    "playwright-core": "^1.64.1",
     "sharp": "^0.35.5",
     "tsx": "^4.19.0",
     "typescript": "^5.5.4",

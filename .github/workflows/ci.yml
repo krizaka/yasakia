@@ -111,6 +111,9 @@ jobs:
       # The web console: sign-up open on this server (the scenarios sign people up); one address may open the console.
       AUTH_SIGNUP_ENABLED: "true"
       AUTH_ALLOWED_IPS: 203.0.113.7
+      # The agent talks to a stand-in for Orazaka's edge (e2e/orazaka-stub.mjs): same contract, no model.
+      AI_ENGINE_URL: http://127.0.0.1:4599/edge
+      AI_ENGINE_API_KEY: oz_e2e_only_stub_key
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -132,10 +135,11 @@ jobs:
           echo "QA_USER_PASSWORD=$(openssl rand -base64 18 | tr -d '/+=')" >> "$GITHUB_ENV"
           echo "QA_ADMIN_PASSWORD=$(openssl rand -base64 18 | tr -d '/+=')" >> "$GITHUB_ENV"
       - run: npm run db:qa-accounts
-      - name: Start the API (development server) — and a second one with sign-up closed
+      - name: Start the Orazaka stand-in, the API (development server) — and a second one with sign-up closed and no AI
         run: |
+          node e2e/orazaka-stub.mjs 4599 > orazaka-stub.log 2>&1 &
           npm run dev > web.log 2>&1 &
-          (cd apps/web && AUTH_SIGNUP_ENABLED= NEXT_DIST_DIR=.next-closed NEXT_PUBLIC_APP_URL=http://localhost:3101 npx next dev --port 3101 > ../../web-closed.log 2>&1 &)
+          (cd apps/web && AUTH_SIGNUP_ENABLED= AI_ENGINE_URL= AI_ENGINE_API_KEY= NEXT_DIST_DIR=.next-closed NEXT_PUBLIC_APP_URL=http://localhost:3101 npx next dev --port 3101 > ../../web-closed.log 2>&1 &)
           for i in $(seq 1 90); do curl -sf http://localhost:3000/api/healthz && break; sleep 2; done
           for i in $(seq 1 90); do curl -sf http://localhost:3101/api/healthz && break; sleep 2; done
       - name: Scenarios
@@ -143,5 +147,6 @@ jobs:
         env:
           APP_URL: http://localhost:3000
           CLOSED_URL: http://localhost:3101
+          ORAZAKA_STUB_URL: http://127.0.0.1:4599
       - if: failure()
         run: tail -200 web.log

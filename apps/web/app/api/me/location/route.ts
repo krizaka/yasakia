@@ -16,6 +16,6 @@ export async function PUT(req: Request) {
     const me = await requireUser(req);
     await limitAction("location", req, me.id, { perSubject: [60, 3600] });
     const body = await readJson(req, Body);
-    return ok({ location: await setLocation(me.id, body.lat, body.lng) });
+    return ok({ location: await setLocation(me.id, body.lat, body.lng, new Date()) });
   });
 }

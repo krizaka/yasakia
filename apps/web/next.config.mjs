@@ -72,7 +72,7 @@ const nextConfig = {
     NEXT_PUBLIC_APP_VERSION: appVersion,
     NEXT_PUBLIC_APP_BASE_PATH: basePath,
   },
-  transpilePackages: ["@yasakia/db", "@yasakia/media"],
+  transpilePackages: ["@yasakia/ai", "@yasakia/db", "@yasakia/matching", "@yasakia/media"],
   // Native and driver modules stay Node modules, required at run time: sharp (images), pg (the pool, LISTEN), ioredis
   // (@krizaka/realtime/redis — it connects only with REALTIME_BUS=redis).
   serverExternalPackages: ["sharp", "pg", "ioredis"],

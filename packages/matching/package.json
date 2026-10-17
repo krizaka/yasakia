@@ -1,0 +1,19 @@
+{
+  "name": "@yasakia/matching",
+  "version": "0.1.0",
+  "description": "Bilateral matching, pure and tested: the hard filters both ways, the pair affinity (the weaker of the two directions), the batch of three to five.",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.5.4"
+  }
+}

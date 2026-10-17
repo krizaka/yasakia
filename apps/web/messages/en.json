@@ -195,7 +195,8 @@
       "audit": "Audit log",
       "forgot": "Forgot password",
       "reset": "Choose a new password",
-      "signUp": "Create an account"
+      "signUp": "Create an account",
+      "talk": "Talk to your agent"
     },
     "form": {
       "errors": {
@@ -240,7 +241,8 @@
       "intros": "Introductions",
       "health": "Health",
       "adminBrand": "Admin",
-      "devBadge": "DEV · {version}"
+      "devBadge": "DEV · {version}",
+      "talk": "Talk to your agent"
     },
     "signIn": {
       "title": "Welcome back",
@@ -285,7 +287,12 @@
       "network": "No connection. Check your network and try again.",
       "CODE_INVALID": "This code is not valid any more. Ask for a new one.",
       "LAST_ADMIN": "The last administrator keeps the role.",
-      "CONFIRM_MISMATCH": "The e-mail typed does not match the account."
+      "CONFIRM_MISMATCH": "The e-mail typed does not match the account.",
+      "MESSAGE_LENGTH": "A message is between one word and a few lines.",
+      "CONVERSATION_CLOSED": "Your portrait is already written. The conversation reopens after your first batch.",
+      "BUDGET_SPENT": "The agent has said all it can for now.",
+      "TURN_IN_PROGRESS": "The agent is still answering. One moment.",
+      "AI_UNAVAILABLE": "The agent is out of reach for a moment. Your message was not sent — try again."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -306,9 +313,9 @@
         "DEBRIEF_DUE": "A debrief is due"
       },
       "agentHint": {
-        "ONBOARDING": "Talk with the agent in the app.",
+        "ONBOARDING": "Talk with your agent — it is the first step.",
         "DISCOVERY": "A few more questions and it can start.",
-        "WAITING_POOL": "Only mutual matches are shown.",
+        "WAITING_POOL": "Your portrait is written. Only mutual fits are shown.",
         "BATCH_READY": "Open the app to meet them.",
         "BATCH_OPEN": "Take your time.",
         "DEBRIEF_DUE": "Tell the agent how it went."
@@ -733,6 +740,47 @@
       "closedTitle": "Sign-up is closed.",
       "closed": "Yasakia is in development; accounts are created by our team.",
       "contact": "Talk to us"
+    },
+    "talk": {
+      "lead": "You talk first. Your agent gets to know you in your own words, one question at a time — no form, no swipe.",
+      "threadLabel": "Your conversation with the agent",
+      "agent": "Agent",
+      "placeholder": "Write to your agent…",
+      "send": "Send",
+      "typing": "Your agent is writing…",
+      "empty": "Say hello — the agent starts from what you tell it.",
+      "closed": "Your portrait is written. The conversation reopens after your first batch.",
+      "understoodTitle": "What the agent understood",
+      "understoodDescription": "In your words, nothing more. Tell the agent if it got something wrong.",
+      "understoodEmpty": "Nothing yet. It listens.",
+      "sealed": "Sealed — only you can read this.",
+      "facets": {
+        "story": "Who you are",
+        "passions": "What you love",
+        "values": "What matters to you",
+        "humour": "What makes you laugh",
+        "weekend": "A good weekend",
+        "seeking": "Who you hope to meet",
+        "dealbreakers": "What you cannot live with",
+        "beliefs": "Your convictions"
+      },
+      "progressTitle": "Getting to know you",
+      "progressMessages": "{count} messages so far — the agent wants at least {min}.",
+      "stillToLearn": "Still to learn",
+      "basics": {
+        "gender": "Who you are",
+        "seekingGenders": "Who you want to meet",
+        "ageRange": "Their ages",
+        "intent": "What you are looking for",
+        "place": "Where you live"
+      },
+      "allLearned": "The basics are all there.",
+      "portraitTitle": "Your portrait",
+      "portraitDescription": "What the agent will use to find people who fit you — and for whom you fit too. Words, never a score.",
+      "portraitSelf": "Who you are",
+      "portraitSeeking": "Who you are looking for",
+      "portraitNext": "Next: the agent looks for a small batch of people who fit both ways.",
+      "dashboardAction": "Talk to your agent"
     }
   }
 }

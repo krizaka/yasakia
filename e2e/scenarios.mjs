@@ -14,6 +14,7 @@
  * OPERATOR_ALLOWED_IPS=203.0.113.7, MEDIA_STORAGE_PROVIDER=local + MEDIA_STORAGE_LOCAL_DIR, APP_ACCOUNT_PURGE_INTERVAL_SECONDS=1.
  * Time is moved and relationships (a batch, an intro) are set in SQL — the endpoints that create them come with PY3.
  */
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -630,6 +631,9 @@ let adaPhoto;
   check("pages: a form submitted without JavaScript never puts a password in the address (method=post)", (await page("/app/en/sign-in")).text.includes('method="post"'));
   check("pages: the home without a session goes to sign-in", (await page("/app/en")).status === 307 && (await page("/app/en")).headers.get("location")?.endsWith("/app/en/sign-in"));
   check("pages: the home, the account render for a person", (await page("/app/en", user.cookie)).status === 200 && (await page("/app/fr/account", user.cookie)).status === 200);
+  const talkEn = await page("/app/en/talk", user.cookie);
+  const talkFr = await page("/app/fr/talk", user.cookie);
+  check("pages: the talk page renders for a person in both languages, with its conversation log and composer, and not for a stranger", talkEn.status === 200 && talkFr.status === 200 && /role="log"/.test(talkEn.text) && /<textarea/.test(talkEn.text) && talkEn.text.includes("Talk to your agent") && talkFr.text.includes("Parle à ton agent") && (await page("/app/en/talk")).status === 307);
   check("pages: the administration console is a 404 for a person", (await page("/app/en/admin/users", user.cookie, ADMIN_IP_HEADER)).status === 404 && (await page("/app/en/admin/audit", user.cookie, ADMIN_IP_HEADER)).status === 404);
   check("pages: ...and for an administrator on a wrong address", (await page("/app/en/admin/users", adminIn.cookie, "198.51.100.200")).status === 404);
   check("pages: ...and renders for an administrator on the allowed address", (await page("/app/en/admin/users", adminIn.cookie, ADMIN_IP_HEADER)).status === 200 && (await page(`/app/fr/admin/users/${someone.id}`, adminIn.cookie, ADMIN_IP_HEADER)).status === 200);
@@ -662,6 +666,140 @@ let adaPhoto;
     check(`the public landing ${p} is served by the same app, in ${lang}`, r.status === 200 && (await r.text()).includes(`lang="${lang}"`));
   }
   check("the landing keeps its robots.txt, sitemap.xml and llms.txt", (await fetch(`${B}/robots.txt`)).status === 200 && (await fetch(`${B}/sitemap.xml`)).status === 200 && (await fetch(`${B}/llms.txt`)).status === 200);
+}
+
+// ── The agent: talk first (PY3) — a conversation, what it understood, the portrait, its two vectors ─────────
+{
+  const STUB = env("ORAZAKA_STUB_URL", "http://127.0.0.1:4599");
+  const CLOSED = env("CLOSED_URL", "");
+  const runsOfStub = async () => (await fetch(`${STUB}/__control/runs`)).json();
+  const control = (what) => fetch(`${STUB}/__control/${what}`, { method: "POST" });
+  const count = async (purpose, id) => Number((await sql("select count(*)::int as n from ai_calls where purpose = $1 and account_id = $2", [purpose, id]))[0].n);
+  const waitFor = async (fn, ms = 15000) => {
+    for (let t = 0; t < ms; t += 100) {
+      const v = await fn();
+      if (v) return v;
+      await sleep(100);
+    }
+    return null;
+  };
+
+  check("agent: no session, no agent (401)", (await call("/api/agent")).status === 401 && (await call("/api/agent/messages", { method: "POST", body: { content: "hi" } })).status === 401);
+
+  const camille = await signUp("camille", { birthDate: "1990-06-02" });
+  const first = await call("/api/agent", { token: camille.token, ip: camille.ip });
+  check("agent: a new person starts onboarding, with every basic still to learn and nothing understood", first.status === 200 && first.json.agent.state === "ONBOARDING" && first.json.agent.messages.length === 0 && first.json.agent.missingBasics.length === 5 && first.json.agent.facets.length === 0 && first.json.agent.portrait === null, first.json);
+
+  const say = (content) => call("/api/agent/messages", { method: "POST", token: camille.token, body: { content }, ip: camille.ip });
+  check("agent: an empty message and a huge one are refused (400)", (await say("   ")).status === 400 && (await say("x".repeat(5000))).status === 400);
+  check("agent: unknown fields are refused", (await call("/api/agent/messages", { method: "POST", token: camille.token, body: { content: "hi", role: "AGENT" }, ip: camille.ip })).status === 400);
+
+  const talk = [
+    "My name is Camille. I am a woman and I live in Montréal.",
+    "I am looking for men between 30 and 44 within 30 km, for a long-term relationship.",
+    "On weekends I hike Mont Royal and cook with friends. I value kindness, curiosity and honesty.",
+    "I laugh at terrible puns. I cannot stand people who are always on their phone, or late.",
+    "I hope to meet someone curious who reads, cooks and listens.",
+  ];
+  const sent = [];
+  for (const [i, line] of talk.entries()) {
+    const r = await say(line);
+    sent.push(r);
+    check(`agent: message ${i + 1} is answered by the agent`, r.status === 200 && r.json.message?.role === "AGENT" && r.json.message.content.length > 10, r.json);
+    // The understanding of a turn runs after its answer: wait for it before the next word, as a person typing would.
+    await waitFor(async () => (await count("EXTRACT", camille.id)) >= i + 1);
+    if (i === 0) {
+      const view = await call("/api/agent", { token: camille.token, ip: camille.ip });
+      check("agent: after one message it knows her name and city, and still asks for the rest", view.json.agent.missingBasics.includes("intent") && !view.json.agent.missingBasics.includes("gender") && !view.json.agent.missingBasics.includes("place") && view.json.agent.state === "ONBOARDING", view.json.agent);
+    }
+  }
+
+  const done = await waitFor(async () => {
+    const v = await call("/api/agent", { token: camille.token, ip: camille.ip });
+    return v.json.agent.state === "WAITING_POOL" ? v : null;
+  });
+  check("agent: after five messages the portrait is written and the agent waits for people to fit (WAITING_POOL)", !!done, (await call("/api/agent", { token: camille.token, ip: camille.ip })).json.agent);
+  const agent = done?.json.agent;
+  check("agent: the portrait is in words, both ways, and the closing message is the last word", agent?.portrait?.self.length > 20 && agent.portrait.seeking.length > 10 && agent.messages.at(-1).role === "AGENT" && /good picture/.test(agent.messages.at(-1).content), agent?.messages?.at(-1));
+  check("agent: what it understood is hers — story, weekend, values, humour, seeking, and the sealed dealbreakers", ["story", "weekend", "values", "humour", "seeking", "dealbreakers"].every((k) => agent?.facets.some((f) => f.key === k)), agent?.facets.map((f) => f.key));
+  check("agent: no score, no similarity anywhere in the agent's answers", !/"(score|similarity)"/i.test(JSON.stringify(done?.json ?? {})));
+
+  const profile = (await sql("select gender::text, seeking_genders::text[] as seeking, age_min, age_max, intent::text, radius_km, lat, lng, geo_precision_m, display_name, onboarding_completed_at from profiles where account_id = $1", [camille.id]))[0];
+  check("agent: the basics she said are her filters — woman, looks for men 30 to 44, long-term, 30 km, Montréal, name Camille", profile.gender === "WOMAN" && profile.seeking?.join() === "MAN" && profile.age_min === 30 && profile.age_max === 44 && profile.intent === "LONG_TERM" && profile.radius_km === 30 && Math.abs(profile.lat - 45.5) < 0.2 && Math.abs(profile.lng + 73.57) < 0.2 && profile.display_name === "Camille" && !!profile.onboarding_completed_at, profile);
+  check("agent: a city's centre says so in its precision (10 km), never the phone's 1 km", profile.geo_precision_m === 10000, profile.geo_precision_m);
+  const sealed = await sql("select key, value is null as no_clear, value_sealed is not null as sealed from facets where account_id = $1 and sensitive", [camille.id]);
+  check("agent: sensitive facets (dealbreakers) are sealed at rest — no clear value", sealed.length >= 1 && sealed.every((r) => r.no_clear && r.sealed), sealed);
+  const vectors = await sql("select kind::text, vector_dims(vector) as dims, model from facet_embeddings where account_id = $1 order by kind", [camille.id]);
+  check("agent: two vectors per person (SELF, SEEKING), 1024 dimensions, with the model that made them", vectors.map((v) => v.kind).join() === "SEEKING,SELF" && vectors.every((v) => v.dims === 1024 && v.model === "gte-large-en-v1.5"), vectors);
+  const calls = await sql("select purpose::text, count(*)::int as n, bool_and(ok) as ok from ai_calls where account_id = $1 group by purpose", [camille.id]);
+  const by = Object.fromEntries(calls.map((c) => [c.purpose, c]));
+  check("agent: every call to a model is on the cost dashboard — chat, extract, portrait, embed — through Orazaka", by.CHAT?.n >= 6 && by.EXTRACT?.n >= 5 && by.PORTRAIT?.n === 1 && by.EMBED?.n === 1 && calls.every((c) => c.ok), calls);
+  const runs = await runsOfStub();
+  check("agent: the stand-in saw those calls — one conversation id per turn, forgotten after each, one embedding run", runs.chats.length >= 12 && new Set(runs.chats.map((c) => c.id)).size === runs.chats.length && (await waitFor(async () => (await runsOfStub()).forgotten.length >= runs.chats.length)) && runs.embeddings.length >= 1, { chats: runs.chats.length });
+
+  const late = await say("One more thing.");
+  check("agent: once the portrait is written the conversation is closed (409 CONVERSATION_CLOSED)", late.status === 409 && late.json.code === "CONVERSATION_CLOSED", late.json);
+
+  // The engine goes down: the agent says so (503) and the person's message is taken back — nothing half-written.
+  const bruno = await signUp("bruno", { birthDate: "1988-03-09" });
+  await control("down");
+  const sayB = (content) => call("/api/agent/messages", { method: "POST", token: bruno.token, body: { content }, ip: bruno.ip });
+  const downed = await sayB("Hello, my name is Bruno.");
+  const leftover = await sql("select count(*)::int as n from agent_messages m join agent_sessions s on s.id = m.session_id where s.account_id = $1", [bruno.id]);
+  check("agent: with the engine down, a message is a 503 AI_UNAVAILABLE and leaves no half-turn behind", downed.status === 503 && downed.json.code === "AI_UNAVAILABLE" && !/oz_|stub|127\.0\.0\.1/.test(JSON.stringify(downed.json)) && leftover[0].n === 0, { status: downed.status, json: downed.json, leftover });
+  await control("up");
+  check("agent: …and it answers again when the engine is back", (await sayB("Hello, my name is Bruno.")).status === 200);
+
+  // Not configured: fail closed, never a stand-in.
+  if (CLOSED) {
+    const noAi = await fetch(`${CLOSED}/api/agent/messages`, { method: "POST", headers: { Authorization: `Bearer ${bruno.token}`, "Content-Type": "application/json", "X-Forwarded-For": bruno.ip }, body: JSON.stringify({ content: "Hello" }) });
+    check("agent: without AI_ENGINE_URL the agent answers 503 — no demo mode, no fake reply", noAi.status === 503, noAi.status);
+  }
+
+  // One turn at a time.
+  const carla = await signUp("carla", { birthDate: "1991-01-20" });
+  const turnA = call("/api/agent/messages", { method: "POST", token: carla.token, body: { content: "My name is Carla." }, ip: carla.ip });
+  const turnB = call("/api/agent/messages", { method: "POST", token: carla.token, body: { content: "And I am a woman." }, ip: carla.ip });
+  const both = await Promise.all([turnA, turnB]);
+  check("agent: two messages at once — one is answered, the other is told to wait (409 TURN_IN_PROGRESS)", both.map((r) => r.status).sort().join() === "200,409" && both.some((r) => r.json.code === "TURN_IN_PROGRESS"), both.map((r) => [r.status, r.json.code]));
+
+  // The person's agent is theirs alone.
+  check("agent: someone else's conversation is not readable — each person sees only their own", (await call("/api/agent", { token: carla.token, ip: carla.ip })).json.agent.messages.every((m) => !/Camille/.test(m.content)));
+
+  // The QA person's journey, as the console makes it (cookie session, same origin): sign in, talk, portrait — then a blank page again.
+  {
+    const qaEmail = "qa+user@yasakia.com";
+    const qaPassword = env("QA_USER_PASSWORD", "");
+    const asBrowser = async (pathname, { method = "GET", cookie, body } = {}) => {
+      const res = await fetch(B + pathname, { method, redirect: "manual", headers: { ...(cookie ? { Cookie: cookie } : {}), ...(method !== "GET" ? { Origin: B } : {}), ...(body !== undefined ? { "Content-Type": "application/json" } : {}), "X-Forwarded-For": freshIp() }, body: body !== undefined ? JSON.stringify(body) : undefined });
+      const text = await res.text();
+      let json = {};
+      try { json = JSON.parse(text); } catch {}
+      return { status: res.status, json, headers: res.headers };
+    };
+    const login = await asBrowser("/api/auth/password", { method: "POST", body: { email: qaEmail, password: qaPassword } });
+    const cookie = /(yasakia_session=[^;]+)/.exec(login.headers.get("set-cookie") ?? "")?.[1];
+    check("QA journey: the QA person signs in with the password the operator provisioned (dev has no e-mail, so no code)", login.status === 200 && !!cookie, login.status);
+    const qa = (await sql("select id from accounts where email = $1", [qaEmail]))[0];
+    for (const [i, line] of talk.entries()) {
+      const r = await asBrowser("/api/agent/messages", { method: "POST", cookie, body: { content: line } });
+      if (r.status !== 200) check(`QA journey: message ${i + 1} is answered`, false, r.json);
+      await waitFor(async () => (await count("EXTRACT", qa.id)) >= i + 1);
+    }
+    const qaDone = await waitFor(async () => {
+      const v = await asBrowser("/api/agent", { cookie });
+      return v.json.agent?.state === "WAITING_POOL" ? v : null;
+    });
+    check("QA journey: the same journey works from the browser's cookie session — portrait written", !!qaDone && qaDone.json.agent.portrait?.self.length > 20 && Object.keys(qaDone.json.agent.evidence).length >= 3, qaDone?.json);
+    check("QA journey: the owner is shown where the engine's runs can be found (one id per purpose, no score)", ["CHAT", "EXTRACT", "PORTRAIT", "EMBED"].every((p) => typeof qaDone?.json.agent.evidence[p] === "string"), qaDone?.json.agent?.evidence);
+
+    // `npm run db:qa-reset`: a blank page again — and only for a QA address.
+    const reset = spawnSync("npx", ["tsx", "packages/db/src/qa-reset.ts"], { cwd: ROOT, env: { ...process.env, DATABASE_URL: env("DATABASE_URL", ""), QA_USER_EMAIL: qaEmail }, encoding: "utf8" });
+    const after = await asBrowser("/api/agent", { cookie });
+    check("QA journey: db:qa-reset gives the QA person's agent a blank page — no talk, nothing understood, no portrait, no vectors", reset.status === 0 && after.json.agent.state === "ONBOARDING" && after.json.agent.messages.length === 0 && after.json.agent.facets.length === 0 && after.json.agent.portrait === null && (await sql("select 1 from facet_embeddings where account_id = $1", [qa.id])).length === 0, { out: reset.stdout, err: reset.stderr, agent: after.json.agent });
+    const refused = spawnSync("npx", ["tsx", "packages/db/src/qa-reset.ts"], { cwd: ROOT, env: { ...process.env, DATABASE_URL: env("DATABASE_URL", ""), QA_USER_EMAIL: `camille-${run}@example.test` }, encoding: "utf8" });
+    check("QA journey: db:qa-reset refuses an address that is not a QA address", refused.status === 1 && /not a QA address/.test(refused.stderr), refused.stderr);
+  }
 }
 
 // ── No raw media URL, no storage key, no score in any answer ───────────────────────────────────────

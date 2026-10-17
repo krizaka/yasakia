@@ -13,7 +13,7 @@ This repository is Yasakia's **API** (Next.js route handlers), its **packages** 
 three **web pages** (privacy, terms, account deletion). The app for iOS and Android is
 [`krizaka/yasakia-mobile`](https://github.com/krizaka/yasakia-mobile). Yasakia is the third open-source product of
 [Krizaka](https://krizaka.com), built on the same foundations as Orochia and on the shared `@krizaka/*` bricks; its AI
-will run on Orazaka.
+runs on Orazaka, and nowhere else.
 
 ## Start
 
@@ -26,6 +26,7 @@ Then [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md): sign up the way the app
 
 ## What is inside
 
+- **The agent you talk to first** — one question at a time, in your language, through Orazaka; what it understood is shown in your own words (the sensitive part sealed), then a portrait written in words and embedded in two vectors (who you are, who you look for). [ADR-001](docs/adr/ADR-001-talk-first-agent-and-bilateral-matching.md). The matching it will feed is pure and tested (`packages/matching`): hard filters both ways, then the weaker of the two directions.
 - **Accounts** — sign-in with a code by e-mail or a password, "forgot password" with a 6-digit code by e-mail (the same answer for every address), a password change that ends the other web sessions, a profile with Krizaka's default picture; registration is closed by configuration (`AUTH_SIGNUP_ENABLED`).
 - **Native sessions** by e-mail code — no password; 18+ checked by the server; stateless tokens re-checked against the
   account on every request.

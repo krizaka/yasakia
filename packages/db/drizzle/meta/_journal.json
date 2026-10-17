@@ -29,6 +29,13 @@
       "when": 1792077463205,
       "tag": "0003_password_reset_codes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792199830532,
+      "tag": "0004_rule_sets_and_1024_vectors",
+      "breakpoints": true
     }
   ]
 }

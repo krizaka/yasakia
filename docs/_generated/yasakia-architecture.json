@@ -75,6 +75,7 @@
         "push_tokens",
         "rate_limit_buckets",
         "reports",
+        "rule_sets",
         "web_sessions"
       ]
     },
@@ -176,7 +177,7 @@
     },
     {
       "name": "ai_calls",
-      "columns": 10,
+      "columns": 11,
       "references": [
         "accounts"
       ]
@@ -299,6 +300,11 @@
       ]
     },
     {
+      "name": "rule_sets",
+      "columns": 7,
+      "references": []
+    },
+    {
       "name": "web_sessions",
       "columns": 9,
       "references": [
@@ -396,6 +402,18 @@
       "path": "/api/admin/users/{id}/suspend",
       "access": "public",
       "summary": "Suspends an account: it cannot sign in and every session of the app and the browser ends at once; the reason is logged."
+    },
+    {
+      "method": "GET",
+      "path": "/api/agent",
+      "access": "bearer · account",
+      "summary": "The person's agent: the conversation, what it understood in their own words, the portrait once written, what it still has to learn."
+    },
+    {
+      "method": "POST",
+      "path": "/api/agent/messages",
+      "access": "bearer · account",
+      "summary": "Says something to the agent and gets its answer; what the agent understood of it follows (extraction, then the portrait when it knows enough)."
     },
     {
       "method": "POST",

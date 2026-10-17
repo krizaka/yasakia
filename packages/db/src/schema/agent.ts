@@ -5,11 +5,12 @@ import { accounts } from "./accounts";
 import { agentMessageRoleEnum, agentStateEnum, aiCallPurposeEnum, embeddingKindEnum } from "./enums";
 
 /**
- * The dimension of `facet_embeddings.vector`, fixed by the migration (768: nomic-embed-text, the default local model).
- * A model of another dimension is a new migration and `npm run ai:reindex` (PY3); `facet_embeddings.model` records the
- * model of each vector.
+ * The dimension of `facet_embeddings.vector`, fixed by the migration (1024: Orazaka's embedding models — GTE Large today,
+ * BGE-M3 planned — answer 1024). A model of another dimension is a new migration and a re-embedding of every portrait;
+ * `facet_embeddings.model` records the model of each vector (ADR-001).
  */
-export const EMBEDDING_DIMENSIONS = 768;
+// @fixed: a technical fact — the dimension of the vectors the column stores, fixed by the migration.
+export const EMBEDDING_DIMENSIONS = 1024;
 
 /** One per account: where it stands in the loop (§1.2) and what its agent may still spend. */
 export const agentSessions = pgTable("agent_sessions", {
@@ -110,7 +111,32 @@ export const aiCalls = pgTable(
     tokensOut: integer("tokens_out").default(0).notNull(),
     latencyMs: integer("latency_ms").default(0).notNull(),
     ok: boolean("ok").default(true).notNull(),
+    /** The engine's id of the run (the conversation id of a chat turn, the `runId` of an embedding): the line in Orazaka's logs. */
+    runRef: varchar("run_ref", { length: 80 }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [index("ai_calls_created_idx").on(t.createdAt), index("ai_calls_account_idx").on(t.accountId)],
+);
+
+/**
+ * The parameters that steer the agent and the matching, as **versioned rows** (org rule: a parameter a business owner
+ * could want to change is data, never a constant). One row per (domain, version); at most one is active per domain.
+ * Version 1 is seeded by the migration; a new version is published with a reason, the old rows stay (the audit trail
+ * and the way back). Bounds are checked when a row is read (`packages/matching`, `apps/web/lib/rule-sets.ts`).
+ */
+export const ruleSets = pgTable(
+  "rule_sets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    domain: varchar("domain", { length: 20 }).notNull(),
+    version: integer("version").notNull(),
+    active: boolean("active").default(false).notNull(),
+    params: jsonb("params").$type<Record<string, unknown>>().notNull(),
+    reason: text("reason").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("rule_sets_domain_version_idx").on(t.domain, t.version),
+    uniqueIndex("rule_sets_one_active_idx").on(t.domain).where(sql`${t.active}`),
+  ],
 );
