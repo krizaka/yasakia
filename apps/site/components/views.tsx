@@ -97,7 +97,7 @@ export function HomeView({ locale }: { locale: Locale }) {
 export function HowView({ locale }: { locale: Locale }) {
   const t = translator(locale);
   const steps = ["talk", "batch", "both", "debrief"] as const;
-  const privacy = ["position", "photos", "encrypted", "control", "honest"] as const;
+  const privacy = ["position", "photos", "realPeople", "typed", "media", "encrypted", "control", "honest"] as const;
   const stack = ["db", "ui", "ai"] as const;
   return (
     <>
