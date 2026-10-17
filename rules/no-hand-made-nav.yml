@@ -17,7 +17,7 @@ rule:
       has:
         field: name
         kind: identifier
-        regex: ^(NavBar|Navbar|TopNav|TopNavBar|SiteNav)$
+        regex: ^(NavBar|Navbar|TopNav|SiteNav)$
 ignores:
   - "**/node_modules/**"
   - "**/.next/**"
