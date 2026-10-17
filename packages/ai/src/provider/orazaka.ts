@@ -1,3 +1,4 @@
+import { type MessageJudgeInput, MessageJudgeReport, type MessageJudgeResult } from "./message-judge.types";
 import { type PhotoCheckInput, PhotoCheckReport, type PhotoCheckResult, RunStatus } from "./photo-check.types";
 import { AiFailure, type AiProvider, AiUnavailableError, type ChatInput, type ChatResult, type EmbedResult, MAX_EMBED_BATCH } from "./provider.types";
 
@@ -12,7 +13,9 @@ export interface OrazakaOptions {
   embedTimeoutMs: number;
   /** How long a whole photo check (uploads, the Studio run, its answer) may take, in milliseconds. Default 180 000. */
   photoCheckTimeoutMs?: number;
-  /** How often the run is asked about, in milliseconds. Default 2 000. */
+  /** How long judging one message may take, in milliseconds. Default 30 000. */
+  messageJudgeTimeoutMs?: number;
+  /** How often a run is asked about, in milliseconds. Default 2 000. */
   photoCheckPollMs?: number;
   fetchImpl?: typeof fetch;
   /** The clock, injected (milliseconds). */
@@ -64,6 +67,33 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
   const refusal = (response: Response) => failure(response.status >= 500 ? AiFailure.Unreachable : AiFailure.Refused, `Orazaka answered ${response.status}`);
 
   /**
+   * Runs one of Orazaka's Studios (`POST /api/v1/studios/{key}/runs`) and asks about the run until it ends, within `deadline`.
+   * Returns the run's id (the proof of use) and the JSON its `report` output carries. The engine's own words (a model's error, a
+   * stack) stay in its logs: the product only learns that the engine was out of reach, or answered off-contract.
+   */
+  async function runStudio(studio: string, inputs: Record<string, unknown>, deadline: number, signal?: AbortSignal): Promise<{ runId: string; report: unknown }> {
+    const pollEvery = options.photoCheckPollMs ?? 2_000; // @fixed: a poll every two seconds is gentle on the engine and quick for the person
+    const left = () => Math.max(1, deadline - now());
+    const started = await call(`/api/v1/studios/${encodeURIComponent(studio)}/runs`, { method: "POST", body: JSON.stringify({ inputs }) }, left(), signal);
+    if (!started.ok) return refusal(started);
+    const first = await readRun(started);
+    let current = first;
+    while (current.status === RunStatus.Running || current.status === RunStatus.Pending || current.status === RunStatus.Waiting) {
+      if (now() >= deadline) return failure(AiFailure.Unreachable, `Orazaka's ${studio} run did not finish in time`);
+      await new Promise((resolve) => setTimeout(resolve, pollEvery));
+      const polled = await call(`/api/v1/studios/runs/${encodeURIComponent(first.id)}`, { method: "GET" }, left(), signal);
+      if (!polled.ok) return refusal(polled);
+      current = await readRun(polled);
+    }
+    if (current.status !== RunStatus.Succeeded) return failure(AiFailure.Unreachable, `Orazaka's ${studio} run ended ${current.status}`);
+    try {
+      return { runId: first.id, report: JSON.parse(String(current.outputs.find((o) => o.key === "report")?.value)) };
+    } catch {
+      return failure(AiFailure.BadResponse, `Orazaka's ${studio} run answered something that is not the contract`);
+    }
+  }
+
+  /**
    * The photo check: the thumbnails are uploaded as assets (the vision step reads them by id) and also travel as bytes (the face
    * worker reads those), the `profile-photo-check` Studio is run, and the run is asked about until it ends. The engine's own words
    * (a model's error, a stack) stay in its logs: the product only learns that the check was out of reach.
@@ -71,7 +101,6 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
   async function runPhotoCheck({ photos, counts, compareFaces, signal }: PhotoCheckInput, assetIds: string[]): Promise<PhotoCheckResult> {
     const start = now();
     const deadline = start + (options.photoCheckTimeoutMs ?? 180_000); // @fixed: three minutes for a vision model reading up to six photos on a small machine
-    const pollEvery = options.photoCheckPollMs ?? 2_000; // @fixed: a poll every two seconds is gentle on the engine and quick for the person
     const left = () => Math.max(1, deadline - now());
     for (const photo of photos) {
       const form = new FormData();
@@ -82,34 +111,22 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
       if (typeof id !== "string" || !id) return failure(AiFailure.BadResponse, "Orazaka answered an upload without an asset id");
       assetIds.push(id);
     }
-    const started = await call(
-      "/api/v1/studios/profile-photo-check/runs",
-      { method: "POST", body: JSON.stringify({ inputs: { photos: assetIds, photosBase64: photos.map((p) => p.toString("base64")), compareFaces, ...counts } }) },
-      left(),
-      signal,
-    );
-    if (!started.ok) return refusal(started);
-    const first = await readRun(started);
-    let current = first;
-    while (current.status === RunStatus.Running || current.status === RunStatus.Pending || current.status === RunStatus.Waiting) {
-      if (now() >= deadline) return failure(AiFailure.Unreachable, "Orazaka's photo check did not finish in time");
-      await new Promise((resolve) => setTimeout(resolve, pollEvery));
-      const polled = await call(`/api/v1/studios/runs/${encodeURIComponent(first.id)}`, { method: "GET" }, left(), signal);
-      if (!polled.ok) return refusal(polled);
-      current = await readRun(polled);
-    }
-    if (current.status !== RunStatus.Succeeded) return failure(AiFailure.Unreachable, `Orazaka's photo check ended ${current.status}`);
-    const value = current.outputs.find((o) => o.key === "report")?.value;
-    let report: PhotoCheckReport;
-    try {
-      report = PhotoCheckReport.parse(JSON.parse(String(value)));
-    } catch {
-      return failure(AiFailure.BadResponse, "Orazaka's photo check answered something that is not the contract");
-    }
-    return { runId: first.id, report, ms: now() - start };
+    const run = await runStudio("profile-photo-check", { photos: assetIds, photosBase64: photos.map((p) => p.toString("base64")), compareFaces, ...counts }, deadline, signal);
+    const parsed = PhotoCheckReport.safeParse(run.report);
+    if (!parsed.success) return failure(AiFailure.BadResponse, "Orazaka's photo check answered something that is not the contract");
+    return { runId: run.runId, report: parsed.data, ms: now() - start };
   }
 
   return {
+    async judgeMessage({ text, locale, signal }: MessageJudgeInput): Promise<MessageJudgeResult> {
+      if (!text.trim()) throw new Error("judgeMessage takes a non-blank text");
+      const start = now();
+      const run = await runStudio("message-authenticity", { text, locale }, start + (options.messageJudgeTimeoutMs ?? 30_000), signal); // @fixed: a classifier answers in seconds; the signal never waits longer
+      const parsed = MessageJudgeReport.safeParse(run.report);
+      if (!parsed.success) return failure(AiFailure.BadResponse, "Orazaka's message check answered something that is not the contract");
+      return { runId: run.runId, report: parsed.data, ms: now() - start };
+    },
+
     async checkPhotos(input: PhotoCheckInput): Promise<PhotoCheckResult> {
       if (input.photos.length < 1 || input.photos.length > MAX_CHECK_PHOTOS) throw new Error(`checkPhotos takes 1 to ${MAX_CHECK_PHOTOS} photos`);
       const assetIds: string[] = [];

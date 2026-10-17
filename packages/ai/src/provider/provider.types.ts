@@ -3,6 +3,7 @@
  * embeddings. The one adapter is Orazaka's (`orazaka.ts`); Yasakia never calls a model provider.
  */
 
+import type { MessageJudgeInput, MessageJudgeResult } from "./message-judge.types";
 import type { PhotoCheckInput, PhotoCheckResult } from "./photo-check.types";
 
 export const AiFailure = {
@@ -61,6 +62,11 @@ export interface AiProvider {
    * text or contact over the picture, no screenshot) and returns its verdict as codes.
    */
   checkPhotos(input: PhotoCheckInput): Promise<PhotoCheckResult>;
+  /**
+   * Reads a message's text with Orazaka's `message-authenticity` Studio and returns a coarse level — the engine JUDGES a message, it
+   * never writes one.
+   */
+  judgeMessage(input: MessageJudgeInput): Promise<MessageJudgeResult>;
 }
 
 // @fixed: Orazaka's limit per request (EmbeddingClientImpl.MAX_BATCH).

@@ -3,8 +3,10 @@ import { addDays } from "date-fns";
 import { and, asc, eq, lte, or, sql } from "drizzle-orm";
 
 import { AnalyticsKind, recordAnalytics } from "./analytics";
+import type { AuthenticitySignal, MessageSignals } from "./authenticity-rules";
 import { refuse } from "./http";
 import { afterContinue, continueRefusal, IntroState, orderedPair, type Side, sideOf, writeRefusal } from "./intro-rules";
+import { recordPendingSignal, signalsOf } from "./message-signals";
 import { PERSONA_DOMAIN } from "./personas";
 import { publishToAccount } from "./realtime";
 import { matchingRules } from "./rule-sets";
@@ -87,6 +89,8 @@ export interface IntroMessageView {
   mine: boolean;
   body: string;
   createdAt: string;
+  /** The authenticity signal — one of four words, null while it is being read. A signal, never a verdict; it never held a message back. */
+  signal: AuthenticitySignal | null;
 }
 
 export interface IntroDetail {
@@ -105,6 +109,7 @@ export async function introDetail(me: string, introId: string): Promise<IntroDet
   const { intro, side } = await mine(me, introId);
   const other = await card(side === "A" ? intro.accountB : intro.accountA);
   const rows = await db.select().from(introMessages).where(eq(introMessages.introId, intro.id)).orderBy(asc(introMessages.createdAt)).limit(500);
+  const signals = await signalsOf(rows.map((m) => m.id));
   return {
     id: intro.id,
     state: intro.state,
@@ -114,19 +119,22 @@ export async function introDetail(me: string, introId: string): Promise<IntroDet
     continuedByMe: (side === "A" ? intro.continuedByAAt : intro.continuedByBAt) !== null,
     continuedByThem: (side === "A" ? intro.continuedByBAt : intro.continuedByAAt) !== null,
     them: { name: other.name, about: other.about, fictional: other.fictional },
-    messages: rows.map((m) => ({ id: m.id, mine: m.senderId === me, body: m.body, createdAt: m.createdAt.toISOString() })),
+    messages: rows.map((m) => ({ id: m.id, mine: m.senderId === me, body: m.body, createdAt: m.createdAt.toISOString(), signal: signals.get(m.id) ?? null })),
   };
 }
 
 /** Writes in an intro — idempotent per `clientId` (a retry never doubles a message); the other is told at once. */
-export async function sendIntroMessage(me: string, introId: string, body: string, clientId: string, now: Date): Promise<IntroMessageView> {
+export async function sendIntroMessage(me: string, introId: string, body: string, clientId: string, now: Date, signals?: MessageSignals): Promise<IntroMessageView> {
   const { intro, side } = await mine(me, introId);
   const refused = writeRefusal(intro, now);
   if (refused) throw refuse(409, refused, "This introduction is not open for messages");
   const [created] = await db.insert(introMessages).values({ introId: intro.id, senderId: me, body, clientId, createdAt: now }).onConflictDoNothing().returning();
   const row = created ?? (await db.select().from(introMessages).where(and(eq(introMessages.introId, intro.id), eq(introMessages.senderId, me), eq(introMessages.clientId, clientId))).limit(1))[0];
-  if (created) await publishToAccount(side === "A" ? intro.accountB : intro.accountA, { type: "intro.message", introId: intro.id, messageId: created.id });
-  return { id: row.id, mine: true, body: row.body, createdAt: row.createdAt.toISOString() };
+  if (created) {
+    await recordPendingSignal(created.id, signals);
+    await publishToAccount(side === "A" ? intro.accountB : intro.accountA, { type: "intro.message", introId: intro.id, messageId: created.id });
+  }
+  return { id: row.id, mine: true, body: row.body, createdAt: row.createdAt.toISOString(), signal: null };
 }
 
 /** « Continue »: the intro has no end once both said it. */

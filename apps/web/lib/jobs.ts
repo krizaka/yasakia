@@ -4,6 +4,7 @@ import { sweepBatches } from "./batches";
 import { analyticsConnection, photoCheckConfig, setting } from "./env";
 import { sweepExports } from "./export";
 import { sweepIntros } from "./intros";
+import { finalizeStaleSignals } from "./message-signals";
 import { sweepPhotoChecks } from "./photo-check";
 import { processQueue } from "./photo-check-runner";
 import { sweepAbandonedUploads } from "./photos";
@@ -46,6 +47,7 @@ export function startJobs(): void {
         await sweepBatches();
         await sweepIntros();
         await sweepPhotoChecks();
+        await finalizeStaleSignals();
       }),
     sweepEvery,
   );

@@ -8,7 +8,9 @@ import { MessageBubble, MessageComposer } from "@krizaka/ui/chat";
 import { DashboardLayout, Widget } from "@krizaka/ui/dashboard-layout";
 import { useEffect, useRef, useState } from "react";
 
+import { AuthenticityMark } from "@/components/console/AuthenticityMark";
 import { errorKey } from "@/lib/client";
+import { ComposerTracker } from "@/lib/composer-signals";
 import { useSay } from "@/lib/i18n-client";
 import type { IntroDetail } from "@/lib/intros";
 
@@ -25,6 +27,8 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
   const client = useQueryClient();
   const [draft, setDraft] = useState("");
   const end = useRef<HTMLDivElement>(null);
+  // How the message arrives, as counters only (typing time, characters typed and pasted, deletions) — see lib/composer-signals.ts.
+  const tracker = useRef(new ComposerTracker());
   const live = initial.state === "OPEN" || initial.state === "CONTINUED";
   const query = useQuery({
     queryKey: keys.detail(initial.id),
@@ -35,8 +39,9 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
   const intro = query.data;
   const reread = () => client.invalidateQueries({ queryKey: keys.detail(intro.id) });
   const send = useMutation({
-    mutationFn: (body: string) => krizakaFetch(`/api/intros/${intro.id}/messages`, { method: "POST", json: { body, clientId: crypto.randomUUID() } }),
+    mutationFn: (body: string) => krizakaFetch(`/api/intros/${intro.id}/messages`, { method: "POST", json: { body, clientId: crypto.randomUUID(), signals: tracker.current.snapshot(performance.now()) } }),
     onSuccess: async () => {
+      tracker.current.reset();
       setDraft("");
       await reread();
     },
@@ -64,12 +69,15 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
           <div role="log" aria-live="polite" aria-label={say("intros.threadLabel")} className="flex max-h-[28rem] min-h-48 flex-col gap-2 overflow-y-auto pr-1">
             {intro.messages.length === 0 ? <p className="text-sm text-fg-muted">{say("intros.noMessage")}</p> : null}
             {intro.messages.map((m) => (
-              <MessageBubble key={m.id} mine={m.mine} text={m.body} time={time.format(new Date(m.createdAt))} />
+              <div key={m.id} className={m.mine ? "flex flex-col items-end gap-1" : "flex flex-col items-start gap-1"}>
+                <AuthenticityMark signal={m.signal} />
+                <MessageBubble mine={m.mine} text={m.body} time={time.format(new Date(m.createdAt))} />
+              </div>
             ))}
             <div ref={end} />
           </div>
           {send.isError ? <Alert tone="danger" title={say(`errors.${errorKey(send.error)}`)} /> : null}
-          <MessageComposer value={draft} onValueChange={setDraft} onSend={submit} placeholder={say("intros.placeholder")} sendLabel={say("intros.send")} disabledReason={writable ? undefined : intro.frozen ? say("intros.frozen") : say("intros.closed")} maxLength={2000} />
+          <MessageComposer value={draft} onValueChange={setDraft} onSend={submit} placeholder={say("intros.placeholder")} sendLabel={say("intros.send")} inputProps={{ onBeforeInput: (e) => tracker.current.input((e.nativeEvent as InputEvent).inputType ?? "insertText", (e.nativeEvent as InputEvent).data?.length ?? 1, performance.now()), onPaste: (e) => tracker.current.input("insertFromPaste", e.clipboardData.getData("text").length, performance.now()), onKeyDown: (e) => { if (e.key === "Backspace" || e.key === "Delete") tracker.current.input("deleteContentBackward", 0, performance.now()); } }} disabledReason={writable ? undefined : intro.frozen ? say("intros.frozen") : say("intros.closed")} maxLength={2000} />
         </div>
       </Widget>
       <Widget level={3} title={name} description={intro.them.fictional ? say("batch.fictional") : undefined} span={1}>

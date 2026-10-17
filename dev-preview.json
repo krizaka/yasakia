@@ -37,7 +37,7 @@
     },
     "journey.authenticity-signal": {
       "evidence": null,
-      "gap": "Not built: no signal on messages yet, no calibration set, no false-positive rate.",
+      "gap": "Built and tested in CI (signal on every message, counters, rules, calibration documented: 0/80 false « HIGH » per language, 3/80 EN and 10/80 FR generated texts recognised); not yet seen running on dev (needs the pack installed and its worker connected).",
       "issue": "https://github.com/krizaka/yasakia/issues/112"
     },
     "journey.media-messages": {
