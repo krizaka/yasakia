@@ -1,0 +1,117 @@
+{
+  "$schema": "https://raw.githubusercontent.com/krizaka/.github/main/docs/standards/dev-preview.schema.json",
+  "version": 1,
+  "product": "yasakia",
+  "index": "off",
+  "criteria": {
+    "site.healthy": {
+      "evidence": "https://dev.yasakia.com/api/healthz",
+      "checked": "2026-10-16"
+    },
+    "site.signup-closed": {
+      "evidence": null,
+      "gap": "Sign-in is passwordless (/api/auth/request-code, /verify); nothing proves that an unknown address cannot create an account on dev.",
+      "issue": "https://github.com/krizaka/yasakia/issues/50"
+    },
+    "site.qa-signin": {
+      "evidence": null,
+      "gap": "QA accounts exist but the code-based sign-in has no proven QA path (fixed QA code on dev only).",
+      "issue": "https://github.com/krizaka/yasakia/issues/52"
+    },
+    "journey.core": {
+      "evidence": null,
+      "gap": "No recorded run of the core journey (profile → agent → bilateral match → intro) with request ids.",
+      "issue": "https://github.com/krizaka/yasakia/issues/54"
+    },
+    "journey.ai-via-orazaka": {
+      "evidence": null,
+      "gap": "The brain (agent, matching) is « planned » on Orazaka; nothing wired.",
+      "issue": "https://github.com/krizaka/yasakia/issues/3"
+    },
+    "ui.krizaka-ui": {
+      "evidence": null,
+      "gap": "No CI crawl; the dev home shows no <footer> at / (it redirects to a locale/app path): check the real entry.",
+      "issue": "https://github.com/krizaka/yasakia/issues/56"
+    },
+    "ui.themes-devices": {
+      "evidence": null,
+      "gap": "No CI crawl; the dev home shows no <footer> at / (it redirects to a locale/app path): check the real entry.",
+      "issue": "https://github.com/krizaka/yasakia/issues/56"
+    },
+    "ux.ia-review": {
+      "evidence": null,
+      "gap": "No UX/IA review.",
+      "issue": "https://github.com/krizaka/yasakia/issues/58"
+    },
+    "mobile.build": {
+      "evidence": null,
+      "gap": "The mobile app is a separate paused repo (last push 2026-10-12); nothing is built or recorded.",
+      "issue": "https://github.com/krizaka/yasakia/issues/59"
+    },
+    "mobile.ux-review": {
+      "evidence": null,
+      "gap": "No UX/IA review of the mobile app.",
+      "issue": "https://github.com/krizaka/yasakia/issues/60"
+    },
+    "quality.ci-green": {
+      "evidence": "https://github.com/krizaka/yasakia/actions?query=branch%3Amain",
+      "checked": "2026-10-16"
+    },
+    "quality.tests": {
+      "evidence": "https://github.com/krizaka/yasakia/actions?query=branch%3Amain",
+      "checked": "2026-10-16"
+    },
+    "security.alerts": {
+      "evidence": "https://github.com/krizaka/yasakia/security",
+      "checked": "2026-10-16"
+    },
+    "docs.current": {
+      "evidence": null,
+      "gap": "README/AGENTS/docs not checked.",
+      "issue": "https://github.com/krizaka/yasakia/issues/62"
+    },
+    "seo.family": {
+      "evidence": null,
+      "gap": "node scripts/check-seo-family.mjs --base https://dev.yasakia.com --host https://dev.yasakia.com --index off fails (empty sitemap / no Sitemap: line wh…",
+      "issue": "https://github.com/krizaka/yasakia/issues/65"
+    },
+    "ops.cost": {
+      "evidence": null,
+      "gap": "The organisation's cloud total is ≈ 106 USD/month (> 100 USD target, INFRA-COST 2026-10-16); ops.cost cannot be evidenced for any product until it is …",
+      "issue": "https://github.com/krizaka/.github/issues/79"
+    },
+    "admin.gated": {
+      "evidence": null,
+      "gap": "No test proves the host/IP gate and the 404 on the public host (dev.yasakia.com/admin answers 307).",
+      "issue": "https://github.com/krizaka/yasakia/issues/67"
+    },
+    "admin.noindex": {
+      "evidence": "https://admin.yasakia.com/robots.txt",
+      "checked": "2026-10-16"
+    },
+    "admin.operator-tasks": {
+      "evidence": null,
+      "gap": "Admin API exists (reports, intros, health, audit); tasks not proven end to end (reports triage, intros).",
+      "issue": "https://github.com/krizaka/yasakia/issues/69"
+    },
+    "admin.audit-log": {
+      "evidence": null,
+      "gap": "Audit route exists; not proven for every action.",
+      "issue": "https://github.com/krizaka/yasakia/issues/70"
+    },
+    "admin.shell": {
+      "evidence": null,
+      "gap": "Admin shell/themes unverified.",
+      "issue": "https://github.com/krizaka/yasakia/issues/72"
+    },
+    "admin.ux-review": {
+      "evidence": null,
+      "gap": "No UX/IA review of the console.",
+      "issue": "https://github.com/krizaka/yasakia/issues/73"
+    },
+    "admin.ci": {
+      "evidence": "https://github.com/krizaka/yasakia/actions?query=branch%3Amain",
+      "checked": "2026-10-16"
+    }
+  }
+}
