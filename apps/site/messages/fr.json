@@ -121,7 +121,7 @@
     "steps": {
       "talk": {
         "title": "1 · Vous parlez",
-        "text": "Un agent IA apprend à vous connaître, une question à la fois, dans votre langue. Il tourne sur Orazaka, l'IA souveraine de Krizaka."
+        "text": "Un agent IA apprend à vous connaître, une question à la fois, dans votre langue."
       },
       "batch": {
         "title": "2 · Un petit lot s'ouvre",
@@ -170,7 +170,7 @@
         "talk": "Camille — une personne de test, une adulte fictive — ouvre la conversation. Elle parle en premier.",
         "first": "Elle dit qui elle est et où elle vit. L’agent répond par une question, pas par un formulaire.",
         "understood": "Un samedi parfait, ce qui compte pour elle. L’agent note ce qu’elle a dit, et rien de plus.",
-        "portrait": "Son portrait est écrit, en mots, à partir de ce qu’elle a dit — et vectorisé par Orazaka.",
+        "portrait": "Son portrait est écrit, en mots, à partir de ce qu’elle a dit — et vectorisé, pour pouvoir être comparé aux autres.",
         "look": "Elle demande son premier lot : des personnes qui lui correspondent, et pour qui elle correspond aussi.",
         "shown": "Cinq personnes, chacune avec pourquoi vous deux — en mots, dans les deux sens. Pas de note, pas de swipe. Une distribution fictive faite pour les tests.",
         "answer": "« Dis-m’en plus » ouvre qui l’une d’elles espère rencontrer, dans ses propres mots.",
