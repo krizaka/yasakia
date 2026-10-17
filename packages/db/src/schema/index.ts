@@ -6,3 +6,5 @@ export * from "./matching";
 export * from "./intros";
 export * from "./safety";
 export * from "./privacy";
+export * from "./geofencing";
+export * from "./telemetry";

@@ -14,7 +14,8 @@ import { revokeWebSessions } from "./web-session";
  */
 
 export const USER_STATUSES = ["ACTIVE", "PAUSED", "SUSPENDED"] as const;
-export const USER_ROLES = ["USER", "ADMIN"] as const;
+export const USER_ROLES = ["USER", "MODERATOR", "ADMIN", "SUPER_ADMIN"] as const;
+export type UserRole = (typeof USER_ROLES)[number];
 export const USER_SORTS = ["email", "createdAt", "lastSeenAt", "status"] as const;
 export type UserSort = (typeof USER_SORTS)[number];
 
@@ -149,14 +150,14 @@ export async function restoreUser(targetId: string, actor: AdminActor, headers: 
 }
 
 /** What an operator may do to whom — pure, so the routes and the tests share it. Returns the refusal code, or null. */
-export function adminActionRefusal(action: "revoke" | "role" | "delete", actorId: string | null, target: { id: string; role: "USER" | "ADMIN" }, admins: number, nextRole?: "USER" | "ADMIN"): "SELF" | "TARGET_IS_ADMIN" | "LAST_ADMIN" | null {
+export function adminActionRefusal(action: "revoke" | "role" | "delete", actorId: string | null, target: { id: string; role: UserRole }, admins: number, nextRole?: UserRole): "SELF" | "TARGET_IS_ADMIN" | "LAST_ADMIN" | null {
   if (actorId === target.id) return "SELF";
   if (action === "role" && target.role === "ADMIN" && nextRole === "USER" && admins <= 1) return "LAST_ADMIN";
   if (action === "delete" && target.role === "ADMIN") return "TARGET_IS_ADMIN";
   return null;
 }
 
-async function target(targetId: string): Promise<{ id: string; role: "USER" | "ADMIN"; email: string }> {
+async function target(targetId: string): Promise<{ id: string; role: UserRole; email: string }> {
   const [row] = await db.select({ id: accounts.id, role: accounts.role, email: accounts.email }).from(accounts).where(eq(accounts.id, targetId)).limit(1);
   if (!row) throw refuse(404, "NOT_FOUND", "Not found");
   return row;

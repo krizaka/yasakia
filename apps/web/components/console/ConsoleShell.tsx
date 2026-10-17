@@ -1,6 +1,6 @@
 "use client";
 
-import { BatchIcon, ChatIcon, ClockIcon, FlagIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
+import { BatchIcon, ChatIcon, ClockIcon, FlagIcon, GoalIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, StudioIcon, UsersIcon } from "@krizaka/icons";
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
@@ -34,25 +34,29 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
     },
   });
   const current = (to: string, exact = false) => (exact ? path === to : path === to || path.startsWith(`${to}/`));
-  const titleKey = path.startsWith(`${home}/admin/audit`)
-    ? "shell.audit"
-    : path.startsWith(`${home}/admin/users`)
-      ? "shell.users"
-      : path.startsWith(`${home}/admin/reports`)
-        ? "shell.reports"
-        : path.startsWith(`${home}/admin/intros`)
-          ? "shell.intros"
-          : path.startsWith(`${home}/admin/health`)
-            ? "shell.health"
-            : path.startsWith(`${home}/admin`)
-              ? "shell.overview"
-              : path.startsWith(`${home}/account`)
-                ? "shell.account"
-                : path.startsWith(`${home}/talk`)
-                  ? "shell.talk"
-                  : path.startsWith(`${home}/batch`)
-                    ? "shell.batch"
-                    : "shell.dashboard";
+  const titleKey = path.startsWith(`${home}/admin/customization`)
+    ? "shell.customization"
+    : path.startsWith(`${home}/admin/analytics`)
+      ? "shell.analytics"
+      : path.startsWith(`${home}/admin/audit`)
+        ? "shell.audit"
+        : path.startsWith(`${home}/admin/users`)
+          ? "shell.users"
+          : path.startsWith(`${home}/admin/reports`)
+            ? "shell.reports"
+            : path.startsWith(`${home}/admin/intros`)
+              ? "shell.intros"
+              : path.startsWith(`${home}/admin/health`)
+                ? "shell.health"
+                : path.startsWith(`${home}/admin`)
+                  ? "shell.overview"
+                  : path.startsWith(`${home}/account`)
+                    ? "shell.account"
+                    : path.startsWith(`${home}/talk`)
+                      ? "shell.talk"
+                      : path.startsWith(`${home}/batch`)
+                        ? "shell.batch"
+                        : "shell.dashboard";
   const item = (to: string, label: string, icon: React.ReactNode, exact = false) => (
     <AppShell.Item asChild label={label} icon={icon} current={current(to, exact)}>
       <Link href={to}>{label}</Link>
@@ -91,6 +95,8 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
           <>
             <AppShell.Group>{say("shell.groupAdmin")}</AppShell.Group>
             {item(`${home}/admin`, say("shell.overview"), <ShieldIcon />, true)}
+            {item(`${home}/admin/customization`, say("shell.customization"), <StudioIcon />)}
+            {item(`${home}/admin/analytics`, say("shell.analytics"), <GoalIcon />)}
             {item(`${home}/admin/users`, say("shell.users"), <UsersIcon />)}
             {item(`${home}/admin/reports`, say("shell.reports"), <FlagIcon />)}
             {item(`${home}/admin/intros`, say("shell.intros"), <IntroIcon />)}

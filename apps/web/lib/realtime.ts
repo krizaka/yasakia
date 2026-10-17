@@ -18,15 +18,20 @@ import { type RealtimeConfig, realtimeConfig } from "./env";
 export type YasakiaEvent =
   | { type: "batch.ready"; batchId: string }
   | { type: "intro.opened"; introId: string }
-  | { type: "intro.message"; introId: string; messageId: string };
+  | { type: "intro.message"; introId: string; messageId: string }
+  | { type: "config.updated"; domain: string; version: number }
+  | { type: "location.nearby"; count: number };
 
-export const EVENT_TYPES = ["batch.ready", "intro.opened", "intro.message"] as const satisfies readonly YasakiaEvent["type"][];
+export const EVENT_TYPES = ["batch.ready", "intro.opened", "intro.message", "config.updated", "location.nearby"] as const satisfies readonly YasakiaEvent["type"][];
 
 /** The NOTIFY channel and the Redis prefix of Yasakia — keep them: two versions share them during a deploy. */
 export const CHANNEL = "yasakia_events";
 
 /** One account's topic: its events, wherever they come from. */
 export const accountTopic = (accountId: string) => `account:${accountId}`;
+
+/** Broadcast topic for system-wide announcements (e.g. dynamic config invalidation). */
+export const broadcastTopic = () => "broadcast:all";
 
 /** Whether a received payload is one of Yasakia's events (anything else on the bus is ignored). */
 export function isYasakiaEvent(value: unknown): value is YasakiaEvent {
@@ -39,6 +44,10 @@ export function isYasakiaEvent(value: unknown): value is YasakiaEvent {
       return typeof event.introId === "string";
     case "intro.message":
       return typeof event.introId === "string" && typeof event.messageId === "string";
+    case "config.updated":
+      return typeof event.domain === "string" && typeof event.version === "number";
+    case "location.nearby":
+      return typeof event.count === "number";
     default:
       return false;
   }
@@ -81,9 +90,25 @@ export async function publishToAccount(accountId: string, event: YasakiaEvent): 
   }
 }
 
+/** Broadcasts an event to all connected listeners across all instances. */
+export async function publishBroadcast(event: YasakiaEvent): Promise<void> {
+  try {
+    await realtimeBus().publish(broadcastTopic(), event);
+  } catch (error) {
+    console.warn(`[realtime] broadcast ${event.type} failed`, (error as Error).message);
+  }
+}
+
 /** Subscribes to an account's events on this instance; returns the unsubscribe function. */
 export function subscribeToAccount(accountId: string, onEvent: (event: YasakiaEvent) => void): () => void {
   return realtimeBus().subscribe(accountTopic(accountId), (event) => {
+    if (isYasakiaEvent(event)) onEvent(event);
+  });
+}
+
+/** Subscribes to broadcast events across instances. */
+export function subscribeToBroadcast(onEvent: (event: YasakiaEvent) => void): () => void {
+  return realtimeBus().subscribe(broadcastTopic(), (event) => {
     if (isYasakiaEvent(event)) onEvent(event);
   });
 }

@@ -1,4 +1,4 @@
-import { accountCredentials, accounts, db } from "@yasakia/db";
+import { accountCredentials, type AccountRole, accounts, db } from "@yasakia/db";
 import { eq } from "drizzle-orm";
 
 import { audit } from "./audit";
@@ -13,7 +13,7 @@ import { revokeWebSessions } from "./web-session";
  */
 
 export interface PasswordSignInResult {
-  account: { id: string; email: string; locale: "en" | "fr"; role: "USER" | "ADMIN" };
+  account: { id: string; email: string; locale: "en" | "fr"; role: AccountRole };
 }
 
 export async function checkPassword(email: string, password: string, headers: Headers): Promise<PasswordSignInResult> {

@@ -58,6 +58,7 @@
         "agent_messages",
         "agent_sessions",
         "ai_calls",
+        "analytics_events",
         "audit_log",
         "auth_codes",
         "batch_items",
@@ -66,6 +67,7 @@
         "debriefs",
         "facet_embeddings",
         "facets",
+        "geofence_zones",
         "intro_messages",
         "intros",
         "pairs_seen",
@@ -76,6 +78,7 @@
         "rate_limit_buckets",
         "reports",
         "rule_sets",
+        "user_trajectories",
         "web_sessions"
       ]
     },
@@ -183,6 +186,11 @@
       ]
     },
     {
+      "name": "analytics_events",
+      "columns": 6,
+      "references": []
+    },
+    {
       "name": "audit_log",
       "columns": 8,
       "references": [
@@ -238,6 +246,11 @@
         "accounts",
         "agent_messages"
       ]
+    },
+    {
+      "name": "geofence_zones",
+      "columns": 12,
+      "references": []
     },
     {
       "name": "intro_messages",
@@ -305,6 +318,13 @@
       "references": []
     },
     {
+      "name": "user_trajectories",
+      "columns": 6,
+      "references": [
+        "accounts"
+      ]
+    },
+    {
       "name": "web_sessions",
       "columns": 9,
       "references": [
@@ -315,9 +335,39 @@
   "apiEndpoints": [
     {
       "method": "GET",
+      "path": "/api/admin/analytics",
+      "access": "public",
+      "summary": "Returns aggregated behavioral, funnel, matching, and geospatial telemetry powered by Orazaka Data Analysis and local high-velocity clustering."
+    },
+    {
+      "method": "GET",
       "path": "/api/admin/audit",
       "access": "public",
       "summary": "The audit log for the console — sign-ins, password changes, suspensions, restorations, deletions — searched, filtered and paged on the server."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/customization",
+      "access": "public",
+      "summary": "Reads the active dynamic configuration for the Admin Customization Studio."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/admin/customization",
+      "access": "public",
+      "summary": "Updates the dynamic customization without redeploying code."
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/geofencing",
+      "access": "public",
+      "summary": "Lists all administrative geofencing zones."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/geofencing",
+      "access": "public",
+      "summary": "Creates a new geofenced zone."
     },
     {
       "method": "GET",
@@ -489,6 +539,12 @@
     },
     {
       "method": "GET",
+      "path": "/api/config/client",
+      "access": "public",
+      "summary": "Public client configuration endpoint: returns active design tokens, branding, matching thresholds, and feature flags dynamically for both Web and Mobile apps."
+    },
+    {
+      "method": "GET",
       "path": "/api/events",
       "access": "bearer · account",
       "summary": "The account's live events as Server-Sent Events — `batch.ready`, `intro.opened`, `intro.message` (ids only: the app fetches what changed) — with a heartbeat every 15 s, ending every 5 minutes (the app reconnects at once)."
@@ -629,7 +685,9 @@
   "enums": {
     "account_role": [
       "USER",
-      "ADMIN"
+      "MODERATOR",
+      "ADMIN",
+      "SUPER_ADMIN"
     ],
     "account_status": [
       "ACTIVE",

@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 26 tables · 17 enums · 5 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 29 tables · 17 enums · 6 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -28,7 +28,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | :--- | :--- | :--- |
 | `account_credentials` | `accounts` (`account_id`) | — |
 | `account_exports` | `accounts` (`account_id`) | — |
-| `accounts` | — | `account_credentials` · `account_exports` · `agent_sessions` · `ai_calls` · `audit_log` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `reports` · `web_sessions` |
+| `accounts` | — | `account_credentials` · `account_exports` · `agent_sessions` · `ai_calls` · `audit_log` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `profile_photos` · `profiles` · `push_tokens` · `reports` · `user_trajectories` · `web_sessions` |
 | `agent_messages` | `agent_sessions` (`session_id`) | `facets` |
 | `agent_sessions` | `accounts` (`account_id`) | `agent_messages` |
 | `ai_calls` | `accounts` (`account_id`) | — |
@@ -46,6 +46,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `profiles` | `accounts` (`account_id`) | — |
 | `push_tokens` | `accounts` (`account_id`) | — |
 | `reports` | `accounts` (`reporter_id`) · `accounts` (`reported_id`) | — |
+| `user_trajectories` | `accounts` (`account_id`) | — |
 | `web_sessions` | `accounts` (`account_id`) | — |
 
 ## Tables
@@ -152,6 +153,19 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
 **Indexes:** `ai_calls_created_idx` (created_at) · `ai_calls_account_idx` (account_id)
+
+### `analytics_events`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `account_id_pseudonym` | varchar(64) | no |  |  |
+| `event_type` | varchar(60) | no |  |  |
+| `properties` | jsonb | no | `{}` |  |
+| `geohash` | varchar(12) | yes |  |  |
+| `occurred_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `analytics_events_type_idx` (event_type, occurred_at) · `analytics_events_pseudonym_idx` (account_id_pseudonym, occurred_at) · `analytics_events_geohash_idx` (geohash)
 
 ### `audit_log`
 
@@ -264,6 +278,25 @@ Every foreign key, read from the schema: what each table points to (through whic
 **Indexes:** `facets_account_key_idx` (unique, account_id, key)
 
 **Checks:** `facets_one_value` (`(value is null) <> (value_sealed is null)`) · `facets_sealed_when_sensitive` (`not sensitive or value is null`)
+
+### `geofence_zones`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `name` | varchar(80) | no |  |  |
+| `slug` | varchar(50) | no |  | unique |
+| `active` | boolean | no | `true` |  |
+| `center_lat` | double precision | no |  |  |
+| `center_lng` | double precision | no |  |  |
+| `radius_km` | smallint | no | `50` |  |
+| `polygon` | jsonb | yes |  |  |
+| `min_age` | smallint | no | `18` |  |
+| `metadata` | jsonb | no | `{}` |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+| `updated_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `geofence_zones_active_idx` (active) · `geofence_zones_earth_idx` (gist, ll_to_earth(center_lat, center_lng))
 
 ### `intro_messages`
 
@@ -419,6 +452,19 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 **Indexes:** `rule_sets_domain_version_idx` (unique, domain, version) · `rule_sets_one_active_idx` (unique, domain, where active)
 
+### `user_trajectories`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `account_id` | uuid | no |  | → `accounts.id` (on delete cascade) |
+| `lat` | double precision | no |  |  |
+| `lng` | double precision | no |  |  |
+| `geo_precision_m` | integer | no | `1000` |  |
+| `recorded_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `user_trajectories_account_idx` (account_id, recorded_at) · `user_trajectories_earth_idx` (gist, ll_to_earth(lat, lng))
+
 ### `web_sessions`
 
 | Column | Type | Null | Default | Notes |
@@ -439,7 +485,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 
 | Enum | Values |
 | :--- | :--- |
-| `account_role` | `USER`, `ADMIN` |
+| `account_role` | `USER`, `MODERATOR`, `ADMIN`, `SUPER_ADMIN` |
 | `account_status` | `ACTIVE`, `PAUSED`, `SUSPENDED` |
 | `agent_message_role` | `USER`, `AGENT`, `SYSTEM` |
 | `agent_state` | `ONBOARDING`, `DISCOVERY`, `WAITING_POOL`, `BATCH_READY`, `BATCH_OPEN`, `DEBRIEF_DUE` |
@@ -464,3 +510,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0002_console_accounts.sql`
 - `0003_password_reset_codes.sql`
 - `0004_rule_sets_and_1024_vectors.sql`
+- `0005_postgis_geofencing_analytics_and_rbac.sql`

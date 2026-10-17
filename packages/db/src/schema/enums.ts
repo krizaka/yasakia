@@ -1,8 +1,9 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
 /** ACTIVE · PAUSED (no longer shown to anyone; open batches and intros stay open) · SUSPENDED (by an operator: cannot sign in). */
-/** USER (the person) · ADMIN (may open the administration console — behind the IP allow-list and a session). */
-export const accountRoleEnum = pgEnum("account_role", ["USER", "ADMIN"]);
+/** USER (the person) · MODERATOR · ADMIN · SUPER_ADMIN (may configure app, tokens, rules). */
+export const accountRoleEnum = pgEnum("account_role", ["USER", "MODERATOR", "ADMIN", "SUPER_ADMIN"]);
+export type AccountRole = (typeof accountRoleEnum.enumValues)[number];
 
 export const accountStatusEnum = pgEnum("account_status", ["ACTIVE", "PAUSED", "SUSPENDED"]);
 

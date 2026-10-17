@@ -28,14 +28,31 @@ export interface AdminActor {
   label: string;
 }
 
+export const ADMIN_ROLES = ["ADMIN", "SUPER_ADMIN"] as const;
+export const MODERATOR_ROLES = ["MODERATOR", "ADMIN", "SUPER_ADMIN"] as const;
+
+export const isAdminRole = (r: string): boolean => (ADMIN_ROLES as readonly string[]).includes(r);
+export const isModeratorRole = (r: string): boolean => (MODERATOR_ROLES as readonly string[]).includes(r);
+
 export async function requireConsoleAdmin(req: Request): Promise<AuthedAccount> {
   const me = await requireUser(req);
-  if (me.via !== "cookie" || me.role !== "ADMIN") throw new HttpError(403, "Administrators only", { code: "FORBIDDEN" });
+  if (me.via !== "cookie" || !isAdminRole(me.role)) {
+    throw new HttpError(403, "Administrators only", { code: "FORBIDDEN" });
+  }
   if (!ipAllowedForConsole(req.headers)) throw new HttpError(403, "This address may not use the console", { code: "IP_NOT_ALLOWED" });
   return me;
 }
 
-/** An administrator signed in on the console, or the operator token (and its own address allow-list, as `/api/admin/reports`). */
+export async function requireConsoleModerator(req: Request): Promise<AuthedAccount> {
+  const me = await requireUser(req);
+  if (me.via !== "cookie" || !isModeratorRole(me.role)) {
+    throw new HttpError(403, "Moderators and administrators only", { code: "FORBIDDEN" });
+  }
+  if (!ipAllowedForConsole(req.headers)) throw new HttpError(403, "This address may not use the console", { code: "IP_NOT_ALLOWED" });
+  return me;
+}
+
+/** An administrator signed in on the console, or the operator service token (and its own address allow-list, as `/api/admin/reports`). */
 export async function requireAdminActor(req: Request): Promise<AdminActor> {
   const header = req.headers.get("authorization") ?? "";
   const expected = adminToken();
@@ -64,6 +81,13 @@ export async function pageSession(): Promise<WebSessionContext | null> {
 /** The page's administrator — session, role and address — or null (the caller answers 404). */
 export async function pageAdmin(): Promise<WebSessionContext | null> {
   const session = await pageSession();
-  if (!session || session.account.role !== "ADMIN") return null;
+  if (!session || !isAdminRole(session.account.role)) return null;
+  return ipAllowedForConsole(await headers()) ? session : null;
+}
+
+/** Checks if current web session has one of the allowed roles and IP access. */
+export async function pageRole(allowedRoles: readonly string[]): Promise<WebSessionContext | null> {
+  const session = await pageSession();
+  if (!session || !allowedRoles.includes(session.account.role)) return null;
   return ipAllowedForConsole(await headers()) ? session : null;
 }

@@ -36,6 +36,13 @@
       "when": 1792199830532,
       "tag": "0004_rule_sets_and_1024_vectors",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792212211134,
+      "tag": "0005_postgis_geofencing_analytics_and_rbac",
+      "breakpoints": true
     }
   ]
 }

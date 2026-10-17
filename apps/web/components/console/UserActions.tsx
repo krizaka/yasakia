@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
 
+import type { UserRole } from "@/lib/admin-users";
 import { errorKey } from "@/lib/client";
 import { useSay } from "@/lib/i18n-client";
 
@@ -19,7 +20,7 @@ const suspension = createKrizakaForm({
 });
 
 /** Suspend (with a reason, in a dialog) or restore (two presses) one account; the page refreshes from the server after. */
-export function UserActions({ id, status, role }: { id: string; status: "ACTIVE" | "PAUSED" | "SUSPENDED"; role: "USER" | "ADMIN" }) {
+export function UserActions({ id, status, role }: { id: string; status: "ACTIVE" | "PAUSED" | "SUSPENDED"; role: UserRole }) {
   const { say, locale } = useSay();
   const router = useRouter();
   const [open, setOpen] = useState(false);

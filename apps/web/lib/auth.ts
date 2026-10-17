@@ -1,4 +1,4 @@
-import { accounts, db } from "@yasakia/db";
+import { type AccountRole, accounts, db } from "@yasakia/db";
 import { eq } from "drizzle-orm";
 
 import { sessionSecret } from "./env";
@@ -11,7 +11,7 @@ export interface AuthedAccount {
   email: string;
   status: "ACTIVE" | "PAUSED";
   locale: "en" | "fr";
-  role: "USER" | "ADMIN";
+  role: AccountRole;
   /** How the request proved who it is: the app's bearer token, or the web console's session cookie. */
   via: "bearer" | "cookie";
   /** The web session (cookie only). */

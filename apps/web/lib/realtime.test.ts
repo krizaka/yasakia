@@ -32,9 +32,18 @@ describe("the realtime door knows typed events only", () => {
     expect(got).toEqual([]);
   });
 
-  it("names the three events of the foundations", () => {
-    expect(EVENT_TYPES).toEqual(["batch.ready", "intro.opened", "intro.message"]);
+  it("names the events of the foundations and real-time operations", () => {
+    expect(EVENT_TYPES).toEqual([
+      "batch.ready",
+      "intro.opened",
+      "intro.message",
+      "config.updated",
+      "location.nearby",
+    ]);
     expect(isYasakiaEvent({ type: "intro.opened", introId: "i" })).toBe(true);
     expect(isYasakiaEvent({ type: "intro.opened" })).toBe(false);
+    expect(isYasakiaEvent({ type: "config.updated", domain: "CUSTOMIZATION", version: 2 })).toBe(true);
+    expect(isYasakiaEvent({ type: "config.updated", version: 2 })).toBe(false);
+    expect(isYasakiaEvent({ type: "location.nearby", count: 3 })).toBe(true);
   });
 });

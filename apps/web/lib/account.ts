@@ -1,9 +1,10 @@
-import { accountDeletions, accounts, agentSessions, auditLog, blocks, db, profilePhotos, profiles } from "@yasakia/db";
+import { accountDeletions, accounts, agentSessions, auditLog, blocks, db, profilePhotos, profiles, userTrajectories } from "@yasakia/db";
 import { and, eq, sql } from "drizzle-orm";
 
 import { applyBlockEffects } from "./access";
 import { ageOn } from "./age";
 import { roundPosition } from "./geo";
+import { recordActiveUserLocation } from "./geo-redis";
 import { isUniqueViolation, refuse } from "./http";
 import { sendTemplate } from "./mail";
 import { mediaStorage } from "./media";
@@ -92,6 +93,16 @@ export async function setLocation(accountId: string, lat: number, lng: number, n
     .update(profiles)
     .set({ lat: rounded.lat, lng: rounded.lng, geoPrecisionM: rounded.precisionM, locationUpdatedAt: now, updatedAt: now })
     .where(eq(profiles.accountId, accountId));
+
+  // Store coarse trajectory history for geospatial heatmap and proximity analytics (swallows errors)
+  void db
+    .insert(userTrajectories)
+    .values({ accountId, lat: rounded.lat, lng: rounded.lng, geoPrecisionM: rounded.precisionM, recordedAt: now })
+    .catch((err) => console.warn("[account] user_trajectories insert failed:", (err as Error).message));
+
+  // High-velocity Redis GEO proximity cache update
+  void recordActiveUserLocation(accountId, rounded.lat, rounded.lng).catch(() => undefined);
+
   return rounded;
 }
 

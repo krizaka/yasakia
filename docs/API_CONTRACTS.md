@@ -11,11 +11,16 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (52)
+## Endpoints (58)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
+| `GET` | `/api/admin/analytics` | public | Returns aggregated behavioral, funnel, matching, and geospatial telemetry powered by Orazaka Data Analysis and local high-velocity clustering. |
 | `GET` | `/api/admin/audit` | public | The audit log for the console — sign-ins, password changes, suspensions, restorations, deletions — searched, filtered and paged on the server. |
+| `GET` | `/api/admin/customization` | public | Reads the active dynamic configuration for the Admin Customization Studio. |
+| `PUT` | `/api/admin/customization` | public | Updates the dynamic customization without redeploying code. |
+| `GET` | `/api/admin/geofencing` | public | Lists all administrative geofencing zones. |
+| `POST` | `/api/admin/geofencing` | public | Creates a new geofenced zone. |
 | `GET` | `/api/admin/health` | public | The instance's health for the console: database, realtime bus, version, environment, uptime, whether sign-up is open. |
 | `GET` | `/api/admin/intros` | public | The introductions overview for the console — state, dates, message counts; never who said what — filtered and paged on the server. |
 | `GET` | `/api/admin/overview` | public | The console's overview: accounts by status, the moderation queue, introductions by state, open batches — counts only. |
@@ -44,6 +49,7 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `GET` | `/api/blocks` | bearer · account | The people the account blocked (the settings list), oldest first. |
 | `POST` | `/api/blocks` | bearer · account | Blocks someone — immediate, invisible to them, mutual in effect: their intro closes and each leaves the other's current batch. |
 | `DELETE` | `/api/blocks/{id}` | bearer · account | Lifts one of the account's blocks (what it closed stays closed); another account's block is a 404. |
+| `GET` | `/api/config/client` | public | Public client configuration endpoint: returns active design tokens, branding, matching thresholds, and feature flags dynamically for both Web and Mobile apps. |
 | `GET` | `/api/events` | bearer · account | The account's live events as Server-Sent Events — `batch.ready`, `intro.opened`, `intro.message` (ids only: the app fetches what changed) — with a heartbeat every 15 s, ending every 5 minutes (the app reconnects at once). |
 | `GET` | `/api/healthz` | public | Health of this instance: the database answers (503 when it does not) and whether the realtime bus hears the other instances. |
 | `DELETE` | `/api/me` | bearer · account | Deletes the account for good, at once — every row that is theirs, in one transaction; the photos are purged from storage right after (retried until done, 30 days at most) and a confirmation e-mail leaves. |
@@ -68,6 +74,6 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/reports` | bearer · account | Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it. |
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
 
-## Database tables (26)
+## Database tables (29)
 
-See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.
+See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `analytics_events` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `geofence_zones` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `user_trajectories` · `web_sessions`.

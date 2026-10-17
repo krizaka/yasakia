@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { accounts, db, webSessions } from "@yasakia/db";
+import { type AccountRole, accounts, db, webSessions } from "@yasakia/db";
 import { and, desc, eq, gt, isNull, lt, ne, or } from "drizzle-orm";
 
 import { basePath, isProduction } from "./env";
@@ -22,7 +22,7 @@ const newToken = () => `yw1.${crypto.randomBytes(32).toString("base64url")}`;
 
 export interface WebSessionContext {
   sessionId: string;
-  account: { id: string; email: string; status: "ACTIVE" | "PAUSED"; locale: "en" | "fr"; role: "USER" | "ADMIN" };
+  account: { id: string; email: string; status: "ACTIVE" | "PAUSED"; locale: "en" | "fr"; role: AccountRole };
 }
 
 /** The cookie's value out of a `Cookie` header. */

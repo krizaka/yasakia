@@ -8,11 +8,12 @@ import { Field, Input } from "@krizaka/ui/field";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import type { UserRole } from "@/lib/admin-users";
 import { errorKey } from "@/lib/client";
 import { useSay } from "@/lib/i18n-client";
 
 /** The rest of what an operator does to an account: end its sessions, change its role, erase it (Law 25). Never on yourself. */
-export function AccountActions({ id, email, role, self }: { id: string; email: string; role: "USER" | "ADMIN"; self: boolean }) {
+export function AccountActions({ id, email, role, self }: { id: string; email: string; role: UserRole; self: boolean }) {
   const { say, locale } = useSay();
   const router = useRouter();
   const [note, setNote] = useState<string | null>(null);
