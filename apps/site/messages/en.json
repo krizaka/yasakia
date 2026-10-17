@@ -121,7 +121,7 @@
     "steps": {
       "talk": {
         "title": "1 · You talk",
-        "text": "An AI agent gets to know you, one question at a time, in your language. It runs on Orazaka, Krizaka's sovereign AI."
+        "text": "An AI agent gets to know you, one question at a time, in your language."
       },
       "batch": {
         "title": "2 · A small batch opens",
@@ -170,7 +170,7 @@
         "talk": "Camille — a test persona, a fictional adult — opens the talk. She speaks first.",
         "first": "She says who she is and where she lives. The agent answers with a question, not a form.",
         "understood": "A perfect Saturday, what matters to her. The agent writes down what she said, and nothing more.",
-        "portrait": "Her portrait is written, in words, from what she said — and embedded by Orazaka.",
+        "portrait": "Her portrait is written, in words, from what she said — and embedded, so it can be compared with the others.",
         "look": "She asks for her first batch: people who fit her, and for whom she fits too.",
         "shown": "Five people, each with why you two — in words, both ways. No score, no swiping. A fictional cast made for tests.",
         "answer": "« Tell me more » opens who one of them hopes to meet, in their own words.",
