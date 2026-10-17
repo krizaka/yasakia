@@ -1182,7 +1182,8 @@ let adaPhoto;
         const badKey = (await sql("select storage_key from intro_media where message_id = $1", [bad.id]))[0].storage_key;
         const badMine = (await seenBy(mia)).find((m) => m.id === bad.id);
         check("media: a refused photo is deleted (bytes gone), and only its sender learns why — in codes, never the engine's words", !stored(badKey) && badMine?.media.status === "REJECTED" && badMine.media.codes.join() === "SEXUAL_CONTENT");
-        check("media: …the other person never saw it, and it has no URL (404) for anyone", !(await seenBy(noa)).some((m) => m.id === bad.id) && (await asMia(`${room}/media/${bad.id}`)).status === 404 && (await asNoa(`${room}/media/${bad.id}`)).status === 404);
+        const rejSeen = (await seenBy(noa)).some((m) => m.id === bad.id), rejMia = await asMia(`${room}/media/${bad.id}`), rejNoa = await asNoa(`${room}/media/${bad.id}`);
+        check("media: …the other person never saw it, and it has no URL (404) for anyone", !rejSeen && rejMia.status === 404 && rejNoa.status === 404, { rejSeen, mia: [rejMia.status, rejMia.json?.code], noa: [rejNoa.status, rejNoa.json?.code] });
 
         await safety("UNREADABLE");
         const held = await send(mia, "PHOTO", "image/jpeg", photo);
