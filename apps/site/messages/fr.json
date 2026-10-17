@@ -10,7 +10,8 @@
     "nav": {
       "home": "Accueil",
       "how-it-works": "Comment ça marche",
-      "demo": "Démo"
+      "demo": "Démo",
+      "product": "Produit"
     },
     "languageLabel": "Langue",
     "otherLanguage": "English",
@@ -20,7 +21,22 @@
     "contact": "Nous écrire",
     "menu": "Menu",
     "footerLabel": "Pied de page",
-    "devNotice": "Environnement de développement — accès sur invitation"
+    "devNotice": "Environnement de développement — accès sur invitation",
+    "menu_product": {
+      "home": {
+        "title": "Vue d’ensemble",
+        "text": "Ce qu’est Yasakia : tu parles en premier, puis un petit lot."
+      },
+      "how-it-works": {
+        "title": "Comment ça marche",
+        "text": "La boucle en quatre étapes, et ce qui reste privé."
+      },
+      "demo": {
+        "title": "Démo",
+        "text": "Le vrai parcours, enregistré sur le site de développement."
+      }
+    },
+    "signIn": "Se connecter (sur invitation)"
   },
   "status": {
     "label": "En développement",
@@ -73,9 +89,25 @@
           "title": "Connexion par code par courriel ou mot de passe",
           "text": "Un code à 6 chiffres arrive par courriel, ou connecte-toi avec un mot de passe. Un mot de passe oublié se réinitialise par code, et les autres sessions prennent fin."
         },
-        "batches": {
-          "title": "Des lots de trois à cinq personnes",
-          "text": "La logique des lots est en construction ; elle n’est pas encore publiée."
+        "talk": {
+          "title": "Un agent à qui tu parles en premier",
+          "text": "Une question à la fois, dans ta langue, avec tes mots — pas de formulaire, pas de swipe. Ce qu’il a compris t’est montré, la partie sensible scellée."
+        },
+        "portrait": {
+          "title": "Un portrait en mots, jamais une note",
+          "text": "Quand il en sait assez, l’agent écrit qui tu es et qui tu cherches, et encode les deux. Tu peux le lire."
+        },
+        "batch": {
+          "title": "Ton premier lot, trois à cinq personnes",
+          "text": "Des personnes qui te correspondent et pour qui tu corresponds aussi — la plus faible des deux directions décide —, chacune avec pourquoi vous deux, en mots. Moins de trois : tu attends, on n’invente personne."
+        },
+        "debrief": {
+          "title": "Répondre à un lot et le bilan",
+          "text": "Dire comment ça s’est passé pour que le lot suivant te convienne mieux est en construction ; ce n’est pas encore publié."
+        },
+        "intros": {
+          "title": "Les présentations",
+          "text": "Sept jours pour se parler quand vous dites oui tous les deux : en construction ; ce n’est pas encore publié."
         }
       },
       "working": "Fonctionne",
@@ -123,12 +155,35 @@
   },
   "demo": {
     "title": "Démo",
-    "eyebrow": "Ce qui tourne déjà",
-    "lead": "L'appli n'est pas sortie. Voici le seul enregistrement qui existe : les composants natifs de Krizaka UI, les briques dont les écrans de Yasakia sont faits, sur un téléphone.",
-    "videoLabel": "Un téléphone qui exécute des composants natifs de Krizaka UI : un paquet de cartes, un sélecteur de tags et un sélecteur de lieu.",
-    "noteTitle": "Lire cet enregistrement honnêtement",
-    "note": "C'est une démo de composants, pas l'appli. Le portrait est généré pour la démo — ce n'est pas une personne et Yasakia n'a aucun membre. Le paquet de cartes montré ici est une brique ; Yasakia elle-même n'a pas de swipe.",
-    "nextTitle": "Quand l'appli sortira",
-    "nextText": "Son propre enregistrement, fait sur l'application réelle, remplacera celui-ci. D'ici là : le code est public."
+    "eyebrow": "Le vrai parcours",
+    "lead": "Enregistré sur le site de développement, avec le vrai moteur : une personne de test parle à l’agent jusqu’à ce qu’il écrive son portrait, puis ouvre son premier lot. Ni une animation ni une maquette — et pas retouché : seulement coupé à ces deux moments et accéléré pendant que l’agent réfléchit.",
+    "talkTitle": "1 · Tu parles en premier",
+    "talkLead": "L’agent apprend à la connaître, une question à la fois. Il note ce qu’elle a dit — rien de plus — puis écrit son portrait.",
+    "batchTitle": "2 · Son premier lot",
+    "batchLead": "Des personnes qui lui correspondent et pour qui elle correspond aussi, chacune avec pourquoi vous deux, en mots, dans les deux sens.",
+    "talkLabel": "Enregistrement : une personne parle à l’agent, qui écrit ce qu’il a compris puis son portrait.",
+    "batchLabel": "Enregistrement : l’agent ouvre un lot de cinq personnes, chacune avec les raisons qui vous vont à tous les deux, en mots.",
+    "transcript": "Les sous-titres en texte",
+    "talk": {
+      "cues": {
+        "open": "Camille — un personnage de test, une adulte fictive — se connecte et ouvre la conversation. Elle parle en premier.",
+        "first": "Elle dit qui elle est et où elle vit. L’agent répond par une question, pas par un formulaire.",
+        "range": "Elle dit qui elle espère rencontrer : une tranche d’âge, une distance, une relation sérieuse.",
+        "saturday": "Un samedi parfait, ce qui compte pour elle. L’agent note ce qu’elle a dit, et rien de plus.",
+        "enough": "Cinq messages plus tard, l’agent a l’essentiel et qui elle espère rencontrer : il en sait assez.",
+        "portrait": "Son portrait est écrit, en mots, à partir de ce qu’elle a dit — et encodé par Orazaka : qui elle est, qui elle cherche."
+      }
+    },
+    "batch": {
+      "cues": {
+        "open": "Elle demande son premier lot. L’agent cherche des personnes qui lui correspondent et pour qui elle correspond aussi.",
+        "looking": "Les filtres jouent dans les deux sens, puis la plus faible des deux directions classe. L’agent écrit pourquoi vous deux, une personne après l’autre.",
+        "shown": "Cinq personnes, chacune avec pourquoi vous deux — en mots, dans les deux sens. Pas de note, pas de swipe. C’est une distribution de personnes fictives faite pour les tests."
+      }
+    },
+    "noteTitle": "Lis cet enregistrement honnêtement",
+    "note": "Camille est un personnage de test et les cinq personnes qu’elle rencontre sont fictives : personne ici n’existe, il n’y a aucune photo, et Yasakia n’a aucun membre. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scripté — donc un enregistrement diffère du suivant. Répondre à un lot, le bilan et les présentations ne sont pas encore construits.",
+    "nextTitle": "Quand l’appli sortira",
+    "nextText": "Son propre enregistrement, fait sur la vraie application, remplacera ceux-ci. D’ici là : le code est public."
   }
 }

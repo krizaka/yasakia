@@ -1,15 +1,21 @@
-/** The demo clip — Krizaka's media live on Bunny (never in this repository): `<name>.<hash>.<ext>`, the hash is the file's. */
-const CDN = "https://krizaka-assets.b-cdn.net/site/home/kit-native";
+/**
+ * Yasakia's recordings — Krizaka's media live on Bunny (never in this repository), under the product's own folder of the
+ * layout: `site/products/yasakia/tour/<name>.<hash>.<ext>`, the hash is the file's (a URL never changes content). The
+ * recordings are made by `npm run dev:journey` on the real development site; the request ids of the run are in the pull
+ * request that published them. A new recording replaces the old one: its hashes are changed here and the old files pruned.
+ */
+const CDN = "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour";
 
-export type Theme = "dark" | "light";
-
-const HASHES = {
-  dark: { webm: "8013cd3776", mp4: "4b17fb8bf7", jpg: "bee1f7c4bc" },
-  light: { webm: "0427641297", mp4: "52f8070fd6", jpg: "a5049f2b80" },
+/** The two recordings of the journey and the hashes of their files. */
+export const CLIPS = {
+  talk: { webm: "8830c624d5", mp4: "4b648cf8ea", jpg: "a73c38309c" },
+  batch: { webm: "7861c4cb41", mp4: "561bd30f2e", jpg: "ba0817c377" },
 } as const;
 
-export const clip = (theme: Theme) => ({
-  webm: `${CDN}/yasakia-${theme}.${HASHES[theme].webm}.webm`,
-  mp4: `${CDN}/yasakia-${theme}.${HASHES[theme].mp4}.mp4`,
-  poster: `${CDN}/yasakia-${theme}.${HASHES[theme].jpg}.jpg`,
+export type ClipId = keyof typeof CLIPS;
+
+export const clip = (id: ClipId) => ({
+  webm: `${CDN}/${id}.${CLIPS[id].webm}.webm`,
+  mp4: `${CDN}/${id}.${CLIPS[id].mp4}.mp4`,
+  poster: `${CDN}/${id}.${CLIPS[id].jpg}.jpg`,
 });
