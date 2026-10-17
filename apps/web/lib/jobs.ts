@@ -1,10 +1,11 @@
 import { purgeDeletedMedia } from "./account";
 import { drainAnalytics } from "./analytics";
 import { sweepBatches } from "./batches";
-import { analyticsConnection, setting } from "./env";
+import { analyticsConnection, photoCheckConfig, setting } from "./env";
 import { sweepExports } from "./export";
 import { sweepIntros } from "./intros";
-import { processNextPhotoCheck, sweepPhotoChecks } from "./photo-check";
+import { sweepPhotoChecks } from "./photo-check";
+import { processQueue } from "./photo-check-runner";
 import { sweepAbandonedUploads } from "./photos";
 import { sweepRateLimits } from "./rate-limit";
 import { sweepAuthCodes } from "./sign-in";
@@ -59,7 +60,7 @@ export function startJobs(): void {
     analyticsEvery,
   );
   // The photo checks asked and not yet worked (a request works its own at once; this takes what an instance left queued).
-  const photoChecks = setInterval(() => void tick("photo-checks", async () => void (await processNextPhotoCheck())), setting("APP_PHOTO_CHECK_INTERVAL_SECONDS", 15, 5, 600) * 1000);
+  const photoChecks = setInterval(() => void tick("photo-checks", async () => void (await processQueue(photoCheckConfig))), setting("APP_PHOTO_CHECK_INTERVAL_SECONDS", 15, 5, 600) * 1000);
   purge.unref();
   sweep.unref();
   analytics.unref();

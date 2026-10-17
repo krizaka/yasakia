@@ -26,7 +26,7 @@ export const PhotoCheckReport = z.object({
       findings: z.array(z.object({ code: PhotoCode, severity: z.enum(["BLOCK", "INFO"]) })),
     }),
   ),
-  identity: z.object({ status: z.enum(["CONSISTENT", "MISMATCH", "NOT_COMPARABLE"]), compared: z.number().int().min(0) }),
+  identity: z.object({ status: z.enum(["CONSISTENT", "MISMATCH", "NOT_COMPARABLE", "NOT_COMPARED"]), compared: z.number().int().min(0) }),
   counts: z.object({ photos: z.number().int(), facePhotos: z.number().int(), required: z.object({ minPhotos: z.number().int(), maxPhotos: z.number().int(), minFacePhotos: z.number().int() }) }),
   passes: z.boolean(),
   blockers: z.array(z.object({ code: PhotoCode, photos: z.array(z.number().int().min(0)) })),
@@ -44,6 +44,11 @@ export interface PhotoCheckInput {
   /** The photos in the order of the profile; each a JPEG thumbnail (about 512 px), never the stored original. */
   photos: readonly Buffer[];
   counts: PhotoCheckCounts;
+  /**
+   * Whether the engine may compare the faces of the photos with each other (biometric processing: only with the person's
+   * explicit consent, and only once the comparison has been reviewed). Off: faces are only counted.
+   */
+  compareFaces: boolean;
   signal?: AbortSignal;
 }
 
@@ -53,3 +58,6 @@ export interface PhotoCheckResult {
   report: PhotoCheckReport;
   ms: number;
 }
+
+/** The states of an Orazaka Studio run (`RunStatus` of its studio service) that this adapter tells apart. */
+export const RunStatus = { Running: "RUNNING", Pending: "PENDING", Waiting: "WAITING", Succeeded: "SUCCEEDED" } as const;

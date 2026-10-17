@@ -60,7 +60,7 @@
         "title": "Comment tes photos sont vérifiées",
         "paragraphs": [
           "<b>Yasakia est pour de vraies personnes</b> : tes photos sont donc vérifiées quand tu les ajoutes — 4 à 6 photos, dont au moins 2 où l’on voit ton visage. La vérification est faite par Orazaka, la plateforme d’IA construite par Krizaka, qui tourne sur nos propres serveurs — jamais par un service d’IA tiers.",
-          "<b>Ce qu’elle regarde :</b> combien de visages contient chaque photo et lequel est le sujet ; si tes photos de visage pourraient être de personnes différentes (la comparaison dure quelques secondes en mémoire — <b>aucune empreinte de visage n’est conservée, nulle part</b>) ; et trois questions par oui ou non posées à un modèle de vision : est-ce une capture d’écran, y a-t-il quelque chose d’écrit dessus, la personne semble-t-elle avoir moins de 18 ans.",
+          "<b>Ce qu’elle regarde :</b> combien de visages contient chaque photo et lequel est le sujet ; trois questions par oui ou non posées à un modèle de vision (est-ce une capture d’écran, y a-t-il quelque chose d’écrit dessus, la personne semble-t-elle avoir moins de 18 ans) ; et — <b>seulement avec ton accord distinct et explicite, que tu peux retirer à tout moment</b> — si tes photos de visage pourraient être de personnes différentes (la comparaison dure quelques secondes en mémoire — <b>aucune empreinte de visage n’est conservée, nulle part</b>). But : garder Yasakia pour de vraies personnes.",
           "<b>Ce qu’elle ne fait pas :</b> elle n’identifie personne, ne reconnaît aucune célébrité et ne garde rien de la comparaison. Nous ne conservons que le résultat — une liste de codes comme « visage détecté » — avec la date de la vérification.",
           "<b>Elle peut se tromper.</b> Les modèles de visage et d’image font des erreurs (un sosie, une lumière forte, un petit visage). Une photo refusée n’entraîne jamais de sanction : tu en choisis une autre. Les vignettes envoyées pour la vérification (environ 512 pixels, sans métadonnées) sont effacées du stockage de fichiers d’Orazaka dès que la vérification se termine ; la trace de la vérification, qui les contient encore, est purgée sous 30 jours au plus tard."
         ]
@@ -1054,12 +1054,26 @@
         "intro": "Yasakia, c’est pour de vraies personnes. Quand tu ajoutes des photos, Orazaka — la plateforme d’IA de Krizaka, pas un service tiers — les regarde une fois.",
         "items": {
           "faces": "<b>Les visages :</b> elle compte les visages de chaque photo et repère lequel est le sujet.",
-          "same": "<b>La même personne :</b> elle compare tes photos de visage entre elles, seulement pour repérer une photo qui est clairement quelqu’un d’autre. La comparaison dure quelques secondes en mémoire ; aucune empreinte de visage n’est gardée, nulle part.",
+          "same": "<b>La même personne — seulement si tu es d’accord :</b> elle peut comparer tes photos de visage entre elles, seulement pour repérer une photo qui est clairement quelqu’un d’autre. La comparaison dure quelques secondes en mémoire ; aucune empreinte de visage n’est gardée, nulle part.",
           "questions": "<b>Trois questions par oui ou non</b> à un modèle de vision : est-ce une capture d’écran, y a-t-il quelque chose d’écrit dessus (du texte, un numéro, un nom d’utilisateur), la personne semble-t-elle avoir moins de 18 ans ?",
           "not": "<b>Pas vérifié :</b> qui tu es. Elle n’identifie personne et ne reconnaît aucune célébrité."
         },
         "limits": "Elle peut se tromper, surtout avec un sosie, une casquette, une lumière forte ou un visage tout petit. Si une photo est refusée et que tu penses que ça ne devrait pas l’être, choisis-en une autre de toi.",
-        "more": "Le détail est dans la politique de confidentialité."
+        "more": "Le détail est dans la politique de confidentialité.",
+        "comparison": {
+          "OFF": "Tes photos ne sont pas comparées entre elles : on compte seulement les visages.",
+          "NEEDS_CONSENT": "Tes photos ne sont pas comparées entre elles tant que tu n’as pas donné ton accord plus haut : on compte seulement les visages.",
+          "ON": "Avec ton accord, tes photos sont comparées entre elles pour repérer une photo de quelqu’un d’autre. Rien n’est conservé."
+        }
+      },
+      "consent": {
+        "title": "Comparer mes photos entre elles ?",
+        "lead": "Pour t’assurer que tes photos de visage montrent la même personne, nous pouvons les comparer entre elles. C’est une analyse faciale : nous te demandons d’abord.",
+        "purpose": "Nous comparons tes photos entre elles pour vérifier qu’il s’agit de la même personne ; rien n’est conservé : la comparaison dure quelques secondes en mémoire et aucune empreinte de visage n’est stockée nulle part.",
+        "nothingKept": "Seul le résultat est gardé — une note comme « visage détecté » — jamais une empreinte de visage, une note chiffrée ni une copie de la comparaison.",
+        "optional": "Tu peux dire non, ou reprendre ton accord à tout moment. Sans lui, nous comptons seulement les visages de tes photos et cherchons du texte ou des captures d’écran.",
+        "accept": "J’accepte la comparaison",
+        "withdraw": "Retirer mon accord"
       }
     }
   }

@@ -141,6 +141,10 @@ yasakia/                           npm workspaces — Apache-2.0
   shown and opens no batch (`PHOTOS_REQUIRED`); the engine out of reach is `UNAVAILABLE`, never a pass. The thumbnails sent to
   the engine (512 px, no metadata) are deleted from its file store when the check ends. The check is a mismatch detector that
   can be wrong: a refused photo is replaced, never punished, and the text says what is and is not checked.
+  **Comparing faces is biometric processing (Québec Law 25)**: it is behind `APP_PHOTO_FACE_COMPARISON` (off until the processing
+  is reviewed — issue « CAI declaration / lawyer review ») **and** the person's own explicit, separate, withdrawable consent
+  (`biometric_consents`, `PUT/DELETE /api/me/photos/consent`, wording version `PHOTO_CONSENT_VERSION`). Without either, faces are only
+  counted (`compareFaces: false` to the engine: no vector is even computed).
 
 ### C. Position, minimisation
 - The position is **rounded to ~1 km before it is written** (`lib/geo.ts`); `geo_precision_m` is stored; the exact

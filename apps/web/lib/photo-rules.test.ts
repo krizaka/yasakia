@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describeCheck, type PhotoRow, photoCodeIsBlocking, type StoredCheck } from "./photo-rules";
+import { describeCheck, photoCodeIsBlocking, type PhotoRow, type StoredCheck } from "./photo-rules";
 
 const rules = { minPhotos: 4, maxPhotos: 6, minFacePhotos: 2 };
 const photo = (n: number): PhotoRow => ({ id: `p${n}`, position: n });
@@ -71,6 +71,13 @@ describe("describeCheck", () => {
   it("a report that does not fit the stored photo list is not trusted", () => {
     const odd = done({ report: report({ photos: [{ index: 9, kind: "FACE", faceCount: 1, findings: [] }] }) });
     expect(describeCheck({ rules, photos, currentHash: "h1", latest: odd }).state).toBe("UNCHECKED");
+  });
+
+  it("says whether faces are compared: off by default, waiting for the consent, or on", () => {
+    expect(describeCheck({ rules, photos, currentHash: "h1", latest: null }).comparison).toBe("OFF");
+    expect(describeCheck({ rules, photos, currentHash: "h1", latest: null, comparison: "NEEDS_CONSENT" }).comparison).toBe("NEEDS_CONSENT");
+    expect(describeCheck({ rules, photos, currentHash: "h1", latest: done(), comparison: "ON" }).comparison).toBe("ON");
+    expect(describeCheck({ rules, photos: [], currentHash: "", latest: null, comparison: "ON" }).comparison).toBe("ON");
   });
 
   it("the rules are echoed so the screen can say « 3/4 »", () => {

@@ -8,7 +8,7 @@
  *   node e2e/orazaka-stub.mjs [port]          # default 4599
  *   POST /__control/down | /__control/up      # the engine "goes down" (503) and comes back
  *   GET  /__control/runs                      # what it was asked: chats [{id, kind}], embeddings [runId], forgotten [id],
- *                                             #   photoChecks [{runId, photos, counts}], assets {uploaded, deleted}
+ *                                             #   photoChecks [{runId, photos, counts, compareFaces}], assets {uploaded, deleted}
  *
  * The photo check (Studio `profile-photo-check`): media upload, a run that is RUNNING once and then done, asset deletion. No
  * model and no face detection — the verdict is read from the *colour* of each thumbnail (see PHOTO_CLASSES), so a scenario
@@ -50,7 +50,7 @@ async function classOf(base64) {
 }
 
 /** The pack's verdict (profile-photo-check, worker/rules.py), computed from the classes: same shape, same codes. */
-export function photoReport(classes, counts) {
+export function photoReport(classes, counts, compareFaces = true) {
   const photos = classes.map((c, index) => {
     const kind = c === "FACE_A" || c === "FACE_B" || c === "MINOR" ? "FACE" : c === "GROUP" ? "GROUP" : "NO_FACE";
     const findings = [];
@@ -62,7 +62,7 @@ export function photoReport(classes, counts) {
   });
   const a = classes.filter((c) => c === "FACE_A").length;
   const b = classes.filter((c) => c === "FACE_B").length;
-  const mismatch = a && b ? (a >= b ? "FACE_B" : "FACE_A") : null;
+  const mismatch = compareFaces && a && b ? (a >= b ? "FACE_B" : "FACE_A") : null;
   classes.forEach((c, i) => c === mismatch && photos[i].findings.push({ code: "FACE_MISMATCH", severity: "BLOCK" }));
   const facePhotos = photos.filter((p) => p.kind === "FACE" && !p.findings.some((f) => f.code === "FACE_MISMATCH")).length;
   const blockers = [];
@@ -78,7 +78,7 @@ export function photoReport(classes, counts) {
     rulesetVersion: "2026-10-17",
     rulesetRevision: 1,
     photos,
-    identity: { status: mismatch ? "MISMATCH" : a + b > 1 ? "CONSISTENT" : "NOT_COMPARABLE", compared: a + b },
+    identity: compareFaces ? { status: mismatch ? "MISMATCH" : a + b > 1 ? "CONSISTENT" : "NOT_COMPARABLE", compared: a + b } : { status: "NOT_COMPARED", compared: 0 },
     counts: { photos: photos.length, facePhotos, required: counts },
     passes: blockers.length === 0,
     blockers,
@@ -205,10 +205,11 @@ export function startOrazakaStub(port = 4599) {
         const known = (inputs?.photos ?? []).every((id) => stored.has(id));
         if (!known || !Array.isArray(inputs?.photosBase64) || inputs.photosBase64.length !== inputs.photos.length) return reply(400, { error: "photos and photosBase64 must name the same photos" });
         const counts = { minPhotos: inputs.minPhotos ?? 4, maxPhotos: inputs.maxPhotos ?? 6, minFacePhotos: inputs.minFacePhotos ?? 2 };
-        const report = photoReport(await Promise.all(inputs.photosBase64.map(classOf)), counts);
+        const compareFaces = inputs.compareFaces === true;
+        const report = photoReport(await Promise.all(inputs.photosBase64.map(classOf)), counts, compareFaces);
         const id = randomUUID();
         photoRuns.set(id, { polls: 0, report });
-        runs.photoChecks.push({ runId: id, photos: inputs.photos.length, counts });
+        runs.photoChecks.push({ runId: id, photos: inputs.photos.length, counts, compareFaces });
         return reply(200, { id, studioKey: "profile-photo-check", status: "RUNNING", outputs: [], errorMessage: null, steps: [] });
       }
       const photoRun = /^\/edge\/api\/v1\/studios\/runs\/([^/]+)$/.exec(path);

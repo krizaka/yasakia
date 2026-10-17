@@ -54,6 +54,7 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("APP_ANALYTICS_CONSOLE_DAYS", "APP", "optional", int(7, 366), "The period the console's analytics page shows.", { default: "28" }),
   v("APP_ANALYTICS_INTERVAL_SECONDS", "APP", "optional", int(5, 3600), "How often the analytics outbox is sent to Orazaka.", { default: "30" }),
   v("APP_SWEEP_INTERVAL_SECONDS", "APP", "optional", int(5, 86400), "How often expired codes, sessions and uploads are swept.", { default: "600" }),
+  v("APP_PHOTO_FACE_COMPARISON", "APP", "optional", z.enum(["on", "off"]), "Whether Orazaka may compare a person's photos with each other to catch a photo of someone else (biometric processing, Québec Law 25: `off` until reviewed; `on` still needs the person's own consent). Counting faces does not depend on it.", { default: "off" }),
   v("APP_PHOTO_CHECK_INTERVAL_SECONDS", "APP", "optional", int(5, 600), "How often an instance picks up the photo checks asked and not yet worked.", { default: "15" }),
   v("APP_EXPORT_SYNC_BUDGET_MS", "APP", "optional", int(0, 30000), "A data export answers at once when it builds within this budget, else 202 and a background build.", { default: "1000" }),
   v("DATABASE_URL", "DATABASE", "required", text, "PostgreSQL 16 with pgvector."),

@@ -53,6 +53,20 @@ export function setting(name: string, fallback: number, min: number, max: number
 }
 
 /**
+ * Whether Orazaka may compare the faces of a person's photos with each other (`APP_PHOTO_FACE_COMPARISON=on`). Off until the
+ * biometric processing has been reviewed (Québec Law 25: declaration, legal review); even on, it needs the person's own consent.
+ * Counting faces is not gated by it.
+ */
+export function faceComparisonEnabled(env: Env = process.env): boolean {
+  return env.APP_PHOTO_FACE_COMPARISON?.trim().toLowerCase() === "on";
+}
+
+/** What the photo-check loop needs of the deployment: the engine, and whether faces may be compared (the flag; the person's consent is theirs). */
+export function photoCheckConfig(env: Env = process.env): { ai: AiProvider; compareFaces: boolean } {
+  return { ai: aiProvider(env), compareFaces: faceComparisonEnabled(env) };
+}
+
+/**
  * The door to AI: Orazaka's edge with Yasakia's service key (`AI_ENGINE_URL`, `AI_ENGINE_API_KEY`). Nothing else exists —
  * no model provider, no stand-in: unconfigured, the agent and the batches answer 503 (AGENTS.md §3.F). Read at the edge
  * (the route) and handed to the domain, which never reads the environment.

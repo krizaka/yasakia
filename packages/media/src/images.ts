@@ -54,6 +54,7 @@ export async function normalisePhoto(bytes: Buffer, declared: string): Promise<N
 }
 
 /** The longest edge of the picture sent to the photo check. */
+// @fixed: 512 px is enough for a face to be found and compared, and far less of a person than the stored photo
 export const CHECK_THUMBNAIL_EDGE = 512;
 
 /**

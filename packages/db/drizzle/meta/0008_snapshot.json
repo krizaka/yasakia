@@ -1,5 +1,5 @@
 {
-  "id": "c6a34be4-874c-485d-b62f-f0bd1a79babe",
+  "id": "e53f6fad-4b32-4329-9679-ba88e83cff71",
   "prevId": "0a1d4b8a-801f-46a4-8c88-bc799826b7de",
   "version": "7",
   "dialect": "postgresql",
@@ -571,6 +571,58 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.biometric_consents": {
+      "name": "biometric_consents",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "accepted_at": {
+          "name": "accepted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "withdrawn_at": {
+          "name": "withdrawn_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "biometric_consents_account_id_accounts_id_fk": {
+          "name": "biometric_consents_account_id_accounts_id_fk",
+          "tableFrom": "biometric_consents",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

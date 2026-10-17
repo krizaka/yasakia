@@ -46,6 +46,8 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `APP_ANALYTICS_CONSOLE_DAYS` | — |  | `28` | The period the console's analytics page shows. |
 | `APP_ANALYTICS_INTERVAL_SECONDS` | — |  | `30` | How often the analytics outbox is sent to Orazaka. |
 | `APP_SWEEP_INTERVAL_SECONDS` | — |  | `600` | How often expired codes, sessions and uploads are swept. |
+| `APP_PHOTO_FACE_COMPARISON` | — |  | `off` | Whether Orazaka may compare a person's photos with each other to catch a photo of someone else (biometric processing, Québec Law 25: `off` until reviewed; `on` still needs the person's own consent). Counting faces does not depend on it. |
+| `APP_PHOTO_CHECK_INTERVAL_SECONDS` | — |  | `15` | How often an instance picks up the photo checks asked and not yet worked. |
 | `APP_EXPORT_SYNC_BUDGET_MS` | — |  | `1000` | A data export answers at once when it builds within this budget, else 202 and a background build. |
 
 ### Database — `DATABASE_`
@@ -127,6 +129,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `AI_PSEUDONYM_KEY` | — | ✓ |  | The key of the pseudonyms Yasakia sends to Orazaka's analytics (`HMAC-SHA256`, 32+ characters). Unset: nothing is sent. Rotating it forgets every history at Orazaka. |
 | `AI_CHAT_TIMEOUT_SECONDS` | — |  | `45` | How long one conversational call to Orazaka may take before the agent gives up. |
 | `AI_EMBED_TIMEOUT_SECONDS` | — |  | `15` | How long one embedding call may take. |
+| `AI_PHOTO_CHECK_TIMEOUT_SECONDS` | — |  | `180` | How long Orazaka's photo check (up to six photos: faces, then a vision model) may take before the check is given up and can be asked again. |
 
 ### Operator — `OPERATOR_`
 

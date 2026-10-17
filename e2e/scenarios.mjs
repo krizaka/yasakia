@@ -441,10 +441,10 @@ let adaPhoto;
     `select (select count(*) from accounts where id = $1) + (select count(*) from profiles where account_id = $1) + (select count(*) from profile_photos where account_id = $1)
       + (select count(*) from agent_sessions where account_id = $1) + (select count(*) from blocks where blocker_id = $1 or blocked_id = $1)
       + (select count(*) from batch_items where candidate_id = $1) + (select count(*) from intros where account_a = $1 or account_b = $1)
-      + (select count(*) from account_exports where account_id = $1) + (select count(*) from photo_checks where account_id = $1) as n`,
+      + (select count(*) from account_exports where account_id = $1) + (select count(*) from photo_checks where account_id = $1) + (select count(*) from biometric_consents where account_id = $1) as n`,
     [ada.id],
   );
-  check("…every row of hers is gone (profile, photos, photo checks, agent, blocks, batches, intros, exports)", Number(leftovers[0].n) === 0, leftovers[0]);
+  check("…every row of hers is gone (profile, photos, photo checks, consent, agent, blocks, batches, intros, exports)", Number(leftovers[0].n) === 0, leftovers[0]);
   check("…the reports about her stay, without her name", (await sql("select count(*)::int as n from reports where reported_id is null and reason in ('SCAM', 'UNDERAGE')"))[0].n >= 2);
   let purged = false;
   for (let i = 0; i < 40 && !purged; i++) {
@@ -913,10 +913,17 @@ let adaPhoto;
       await call(`/api/me/photos/${shot}`, { method: "DELETE", token: camille.token, ip: camille.ip });
       await call(`/api/me/photos/${minor}`, { method: "DELETE", token: camille.token, ip: camille.ip });
 
-      // A face that is not the same person.
+      // A face that is not the same person — compared only with the person's own, separate agreement (Québec Law 25).
       const stranger = await add(camille, "FACE_B");
+      const uncompared = await settle(camille);
+      check("photos: without her agreement faces are only counted — a face of someone else is not flagged, the view says it waits for her consent", uncompared?.comparison === "NEEDS_CONSENT" && !uncompared.blockers.some((b) => b.code === "FACE_MISMATCH") && (await runsOfStub()).photoChecks.every((r) => r.compareFaces === false), uncompared);
+      check("photos: …and the consent is not given by default", (await call("/api/me/photos/consent", { token: camille.token, ip: camille.ip })).json.consent.given === false);
+      check("photos: a consent to another wording, or none, is refused (400); a visitor gets 401", (await call("/api/me/photos/consent", { method: "PUT", token: camille.token, body: { version: "1999-01" }, ip: camille.ip })).status === 400 && (await call("/api/me/photos/consent", { method: "PUT", token: camille.token, body: {}, ip: camille.ip })).status === 400 && (await call("/api/me/photos/consent", { method: "PUT", body: { version: "2026-10" } })).status === 401);
+      const agreed = await call("/api/me/photos/consent", { method: "PUT", token: camille.token, body: { version: "2026-10" }, ip: camille.ip });
+      check("photos: she agrees to the comparison — the photos are checked again, with it", agreed.status === 200 && agreed.json.check.comparison === "ON" && (await call("/api/me/photos/consent", { token: camille.token, ip: camille.ip })).json.consent.given === true);
       const mismatch = await settle(camille);
       check("photos: a face that clearly is not the same person is FACE_MISMATCH, on that photo — and does not count as a face photo", mismatch?.state === "FAILED" && mismatch.blockers.some((b) => b.code === "FACE_MISMATCH" && b.photos.join() === stranger) && mismatch.counts.facePhotos === 2, mismatch);
+      check("photos: the engine was told to compare only after her agreement", (await runsOfStub()).photoChecks.at(-1).compareFaces === true);
       await call(`/api/me/photos/${stranger}`, { method: "DELETE", token: camille.token, ip: camille.ip });
 
       // A group photo is no face photo; the fourth good photo passes the set.
@@ -961,6 +968,9 @@ let adaPhoto;
       await call(`/api/me/photos/${seventh}`, { method: "DELETE", token: camille.token, ip: camille.ip });
       await settle(camille, ["PASSED"]);
       check("photos: someone else never reads another person's check (it is the caller's own)", (await checkOf(carla)).state === "EMPTY");
+      const withdrawn = await call("/api/me/photos/consent", { method: "DELETE", token: camille.token, ip: camille.ip });
+      await settle(camille);
+      check("photos: she takes her agreement back — faces are only counted again, at once, and nothing biometric was ever stored", withdrawn.status === 200 && (await call("/api/me/photos/consent", { token: camille.token, ip: camille.ip })).json.consent.given === false && (await waitFor(async () => (await runsOfStub()).photoChecks.at(-1).compareFaces === false)) !== null && Number((await sql("select count(*)::int as n from information_schema.columns where table_name in ('photo_checks', 'biometric_consents') and (column_name ~* '(vector|embedding|template|score|similar)')"))[0].n) === 0);
     }
 
     check("batch: the language asked for is en or fr — anything else is refused (400), on the batch and on the talk", (await call("/api/batches", { method: "POST", token: camille.token, body: { locale: "de" }, ip: camille.ip })).status === 400 && (await call("/api/agent/messages", { method: "POST", token: camille.token, body: { content: "hi", locale: "de" }, ip: camille.ip })).status === 400);

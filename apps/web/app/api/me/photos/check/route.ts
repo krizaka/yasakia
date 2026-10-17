@@ -1,15 +1,18 @@
 import { requireUser } from "@/lib/auth";
+import { faceComparisonEnabled, photoCheckConfig } from "@/lib/env";
 import { handle, ok } from "@/lib/http";
 import { photoCheckView, requestPhotoCheck } from "@/lib/photo-check";
+import { processSoon } from "@/lib/photo-check-runner";
 
 /**
  * Where the account's photo set stands with Orazaka's check: the rules (min, max, photos with a face), each photo's kind
- * and findings, what still blocks — codes, never a score — and whether the set is `verified` (shown in batches, opens one).
+ * and findings, what still blocks — codes, never a score —, whether faces are compared (`comparison`) and whether the set is
+ * `verified` (shown in batches, opens one).
  */
 export async function GET(req: Request) {
   return handle("me/photos/check", async () => {
     const me = await requireUser(req);
-    return ok({ check: await photoCheckView(me.id) });
+    return ok({ check: await photoCheckView(me.id, faceComparisonEnabled()) });
   });
 }
 
@@ -20,6 +23,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   return handle("me/photos/check", async () => {
     const me = await requireUser(req);
-    return ok({ check: await requestPhotoCheck(req, me.id) }, { status: 202 });
+    const check = await requestPhotoCheck(req, me.id, faceComparisonEnabled());
+    processSoon(photoCheckConfig);
+    return ok({ check }, { status: 202 });
   });
 }

@@ -57,6 +57,7 @@ let assetCount = 0;
 const options = (url: string, extra: Record<string, unknown> = {}) => ({ url, key: "oz_test", chatTimeoutMs: 2000, embedTimeoutMs: 2000, photoCheckTimeoutMs: 3000, photoCheckPollMs: 10, ...extra });
 const photos = [Buffer.from("jpeg-0"), Buffer.from("jpeg-1"), Buffer.from("jpeg-2"), Buffer.from("jpeg-3")];
 const counts = { minPhotos: 4, maxPhotos: 6, minFacePhotos: 2 };
+const withFlag = (compareFaces: boolean) => ({ photos, counts, compareFaces });
 
 const inputsOf = (seen: Seen[]) => JSON.parse(seen.find((s) => s.url === "/edge/api/v1/studios/profile-photo-check/runs")!.body.toString()).inputs;
 
@@ -77,7 +78,7 @@ function happy(polls = 1) {
 describe("checkPhotos", () => {
   it("uploads each thumbnail, runs the Studio with the assets, the same bytes and the product's counts, and returns the verdict as codes", async () => {
     const { url, seen } = await engine(happy(2));
-    const result = await createOrazakaProvider(options(url)).checkPhotos({ photos, counts });
+    const result = await createOrazakaProvider(options(url)).checkPhotos(withFlag(false));
     expect(result.runId).toBe("run-1");
     expect(PhotoCheckReport.parse(result.report).passes).toBe(true);
     const uploads = seen.filter((s) => s.url === "/edge/api/v1/media/upload");
@@ -88,13 +89,13 @@ describe("checkPhotos", () => {
     expect(inputs.photos).toHaveLength(4);
     expect(inputs.photos.every((id: string) => id.startsWith("asset-"))).toBe(true);
     expect(inputs.photosBase64).toEqual(photos.map((p) => p.toString("base64")));
-    expect(inputs).toMatchObject(counts);
+    expect(inputs).toMatchObject({ ...counts, compareFaces: false });
     expect(seen.filter((s) => s.url === "/edge/api/v1/studios/runs/run-1").length).toBeGreaterThanOrEqual(3);
   });
 
   it("takes the thumbnails back as soon as the answer is in — every asset it uploaded is deleted, with the key", async () => {
     const { url, seen } = await engine(happy());
-    await createOrazakaProvider(options(url)).checkPhotos({ photos, counts });
+    await createOrazakaProvider(options(url)).checkPhotos(withFlag(false));
     const deleted = seen.filter((s) => s.method === "DELETE");
     expect(deleted.map((d) => d.url).sort()).toEqual(inputsOf(seen).photos.map((id: string) => `/edge/api/v1/media/assets/${id}`).sort());
     expect(deleted.every((d) => d.authorization === "Bearer oz_test")).toBe(true);
@@ -107,14 +108,24 @@ describe("checkPhotos", () => {
       else if (req.method === "DELETE") res.writeHead(204).end();
       else res.writeHead(200).end(run("FAILED"));
     });
-    await createOrazakaProvider(options(url)).checkPhotos({ photos, counts }).catch(() => undefined);
+    await createOrazakaProvider(options(url)).checkPhotos(withFlag(false)).catch(() => undefined);
     await expect.poll(() => seen.filter((s) => s.method === "DELETE").length).toBe(4);
   });
 
   it("a deletion that fails does not fail the check (best effort — the run's own retention is the net)", async () => {
     const happyEngine = happy();
     const { url } = await engine((req, res) => (req.method === "DELETE" ? res.writeHead(500).end() : happyEngine(req, res)));
-    await expect(createOrazakaProvider(options(url)).checkPhotos({ photos, counts })).resolves.toMatchObject({ runId: "run-1" });
+    await expect(createOrazakaProvider(options(url)).checkPhotos(withFlag(false))).resolves.toMatchObject({ runId: "run-1" });
+  });
+
+  it("tells the engine whether faces may be compared — and only when the caller says so", async () => {
+    for (const flag of [true, false]) {
+      const { url, seen } = await engine(happy());
+      await createOrazakaProvider(options(url)).checkPhotos(withFlag(flag));
+      expect(inputsOf(seen).compareFaces).toBe(flag);
+      await new Promise<void>((resolve) => server!.close(() => resolve()));
+      server = undefined;
+    }
   });
 
   it("is an unavailable engine when the run fails, never an answer", async () => {
@@ -123,7 +134,7 @@ describe("checkPhotos", () => {
       else if (req.url.endsWith("/runs")) res.writeHead(200).end(run("RUNNING"));
       else res.writeHead(200).end(run("FAILED", { errorMessage: "com.openai.errors.OpenAIIoException: Request failed" }));
     });
-    const error = await createOrazakaProvider(options(url)).checkPhotos({ photos, counts }).catch((e) => e);
+    const error = await createOrazakaProvider(options(url)).checkPhotos(withFlag(false)).catch((e) => e);
     expect(error).toBeInstanceOf(AiUnavailableError);
     expect(error.code).toBe(AiFailure.Unreachable);
     expect(error.message).not.toContain("OpenAI"); // the engine's words stay in its logs
@@ -134,7 +145,7 @@ describe("checkPhotos", () => {
       if (req.url.endsWith("/media/upload")) res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ assetId: "a" }));
       else res.writeHead(200).end(run("RUNNING"));
     });
-    const error = await createOrazakaProvider(options(url, { photoCheckTimeoutMs: 150 })).checkPhotos({ photos, counts }).catch((e) => e);
+    const error = await createOrazakaProvider(options(url, { photoCheckTimeoutMs: 150 })).checkPhotos(withFlag(false)).catch((e) => e);
     expect(error).toBeInstanceOf(AiUnavailableError);
     expect(error.code).toBe(AiFailure.Unreachable);
   });
@@ -148,7 +159,7 @@ describe("checkPhotos", () => {
       });
     for (const value of [{ ...REPORT, blockers: [{ code: "SOMETHING_NEW", photos: [] }] }, { passes: true }, "not json"]) {
       const { url } = await bad(value);
-      const error = await createOrazakaProvider(options(url)).checkPhotos({ photos, counts }).catch((e) => e);
+      const error = await createOrazakaProvider(options(url)).checkPhotos(withFlag(false)).catch((e) => e);
       expect(error, JSON.stringify(value)).toBeInstanceOf(AiUnavailableError);
       expect(error.code).toBe(AiFailure.BadResponse);
       await new Promise<void>((resolve) => server!.close(() => resolve()));
@@ -158,14 +169,14 @@ describe("checkPhotos", () => {
 
   it("refuses the engine's refusal of the key as a refusal", async () => {
     const { url } = await engine((_req, res) => res.writeHead(403).end("{}"));
-    const error = await createOrazakaProvider(options(url)).checkPhotos({ photos, counts }).catch((e) => e);
+    const error = await createOrazakaProvider(options(url)).checkPhotos(withFlag(false)).catch((e) => e);
     expect(error.code).toBe(AiFailure.Refused);
   });
 
   it("takes between one and twelve photos", async () => {
     const { url } = await engine(happy());
     const provider = createOrazakaProvider(options(url));
-    await expect(provider.checkPhotos({ photos: [], counts })).rejects.toThrow();
-    await expect(provider.checkPhotos({ photos: Array.from({ length: 13 }, () => Buffer.from("x")), counts })).rejects.toThrow();
+    await expect(provider.checkPhotos({ photos: [], counts, compareFaces: false })).rejects.toThrow();
+    await expect(provider.checkPhotos({ photos: Array.from({ length: 13 }, () => Buffer.from("x")), counts, compareFaces: false })).rejects.toThrow();
   });
 });

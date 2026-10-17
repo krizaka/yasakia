@@ -18,8 +18,12 @@ export interface PhotoRow {
 }
 export type PhotoRows = PhotoRow[];
 
+/** The `photo_checks.status` values. */
+export const CheckStatus = { Queued: "QUEUED", Running: "RUNNING", Done: "DONE", Error: "ERROR" } as const;
+export type CheckStatus = (typeof CheckStatus)[keyof typeof CheckStatus];
+
 export interface StoredCheck {
-  status: "QUEUED" | "RUNNING" | "DONE" | "ERROR";
+  status: CheckStatus;
   setHash: string;
   /** The photos checked, in the order they were sent: the report's `index` is a position in this list. */
   photoIds: string[];
@@ -31,8 +35,15 @@ export interface StoredCheck {
 export type CheckState = "EMPTY" | "UNCHECKED" | "CHECKING" | "PASSED" | "FAILED" | "UNAVAILABLE";
 export type PhotoCheckKind = "PENDING" | "FACE" | "GROUP" | "NO_FACE";
 
+/** The wording of the consent to compare one's photos with each other. A new wording is a new version, asked again. */
+export const PHOTO_CONSENT_VERSION = "2026-10"; // @fixed: the version of the consent text the person agreed to (console.photos.consent.*)
+
+/** Whether faces are compared with each other: not at all (`OFF`: only counted), waiting for the person's consent, or on. */
+export type ComparisonState = "OFF" | "NEEDS_CONSENT" | "ON";
+
 export interface PhotoCheckView {
   state: CheckState;
+  comparison: ComparisonState;
   /** The set passed Orazaka's check — the photos can be shown, a batch can open. */
   verified: boolean;
   /** The set has no verdict (never checked, or changed since): the client asks for one. */
@@ -68,17 +79,18 @@ function readReport(stored: StoredCheck): Report | null {
   return r;
 }
 
-export function describeCheck(input: { rules: PhotoRules; photos: PhotoRow[]; currentHash: string; latest: StoredCheck | null }): PhotoCheckView {
+export function describeCheck(input: { rules: PhotoRules; photos: PhotoRow[]; currentHash: string; latest: StoredCheck | null; comparison?: ComparisonState }): PhotoCheckView {
   const { rules, photos, currentHash, latest } = input;
+  const comparison = input.comparison ?? "OFF";
   const ordered = [...photos].sort((a, b) => a.position - b.position);
-  const base = { rules, counts: { photos: ordered.length, facePhotos: 0 }, blockers: [] as PhotoCheckView["blockers"] };
+  const base = { rules, comparison, counts: { photos: ordered.length, facePhotos: 0 }, blockers: [] as PhotoCheckView["blockers"] };
   const pending = ordered.map((p) => ({ id: p.id, check: "PENDING" as const, faceCount: 0, findings: [] as PhotoCode[] }));
   if (ordered.length === 0) return { ...base, state: "EMPTY", verified: false, needsCheck: false, photos: [] };
   if (!latest) return { ...base, state: "UNCHECKED", verified: false, needsCheck: true, photos: pending };
-  if (latest.status === "QUEUED" || latest.status === "RUNNING") return { ...base, state: "CHECKING", verified: false, needsCheck: false, photos: carry(ordered, latest) };
+  if (latest.status === CheckStatus.Queued || latest.status === CheckStatus.Running) return { ...base, state: "CHECKING", verified: false, needsCheck: false, photos: carry(ordered, latest) };
 
   const sameSet = latest.setHash === currentHash;
-  if (latest.status === "ERROR") {
+  if (latest.status === CheckStatus.Error) {
     return sameSet ? { ...base, state: "UNAVAILABLE", verified: false, needsCheck: false, photos: pending } : { ...base, state: "UNCHECKED", verified: false, needsCheck: true, photos: carry(ordered, latest) };
   }
   const report = readReport(latest);
@@ -91,6 +103,7 @@ export function describeCheck(input: { rules: PhotoRules; photos: PhotoRow[]; cu
     verified: passed,
     needsCheck: false,
     rules,
+    comparison,
     counts: { photos: report.counts.photos, facePhotos: report.counts.facePhotos },
     photos: photosView,
     blockers: report.blockers.map((b) => ({ code: b.code, photos: b.photos.map((i) => latest.photoIds[i]).filter((id): id is string => Boolean(id)) })),

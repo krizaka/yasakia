@@ -110,3 +110,17 @@ export const photoChecks = pgTable(
     check("photo_checks_done_has_verdict", sql`${t.status} <> 'DONE' or (${t.passes} is not null and ${t.report} is not null)`),
   ],
 );
+
+/**
+ * The explicit, separate consent to compare one's photos with each other (Québec Law 25: comparing faces is biometric
+ * processing). One row per account: `accepted_at` is when the person agreed to the wording of `version`, `withdrawn_at` when
+ * they took it back (the comparison stops at once). Nothing biometric is kept either way — the engine compares in memory.
+ */
+export const biometricConsents = pgTable("biometric_consents", {
+  accountId: uuid("account_id")
+    .primaryKey()
+    .references(() => accounts.id, { onDelete: "cascade" }),
+  version: varchar("version", { length: 20 }).notNull(),
+  acceptedAt: timestamp("accepted_at", { withTimezone: true }).defaultNow().notNull(),
+  withdrawnAt: timestamp("withdrawn_at", { withTimezone: true }),
+});

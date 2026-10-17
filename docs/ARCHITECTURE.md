@@ -92,6 +92,8 @@ job -> oz: DELETE /api/v1/media/assets/[id] (every thumbnail, whatever the answe
 job -> api: photo_checks DONE: passes, report (codes only), the engine's run id
 ```
 
+**Comparing faces with each other is biometric processing** (Québec Law 25): the engine is told `compareFaces` only when the deployment's flag `APP_PHOTO_FACE_COMPARISON` is `on` (off until reviewed) **and** the person gave their explicit, separate consent (`biometric_consents`, withdrawable at once); otherwise faces are only counted and no vector is computed (`identity: NOT_COMPARED`).
+
 The verdict belongs to **one set**: `photo_checks.set_hash` is `photo_set_hash(account)` (the SQL function over the APPROVED
 photos); any other set is unchecked, and the screen asks again by itself. The report is **codes** — `TOO_FEW_PHOTOS`,
 `TOO_FEW_FACE_PHOTOS`, `FACE_MISMATCH`, `TEXT_OR_CONTACT`, `SCREENSHOT`, `MINOR_LIKELY`, `UNVERIFIED`, `GROUP_PHOTO` — never a

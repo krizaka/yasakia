@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (63)
+## Endpoints (68)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -68,6 +68,11 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `POST` | `/api/me/photos` | bearer · account | Starts a photo: declares its type and size and answers a signed upload URL (PUT, 300 seconds, this photo only); then `PUT /api/me/photos/&#123;id&#125;/complete`. |
 | `DELETE` | `/api/me/photos/{id}` | bearer · account | Removes one of the account's photos — from storage first, then from the profile (another account's photo is a 404). |
 | `PUT` | `/api/me/photos/{id}/complete` | bearer · account | Completes an upload: checks the bytes are the declared picture, re-encodes them (orientation applied, metadata — GPS included — stripped), computes width, height and blurhash, then moderation (V1: approved automatically). |
+| `GET` | `/api/me/photos/check` | bearer · account | Where the account's photo set stands with Orazaka's check: the rules (min, max, photos with a face), each photo's kind and findings, what still blocks — codes, never a score —, whether faces are compared (`comparison`) and whether the set is `verified` (shown in batches, opens one). |
+| `POST` | `/api/me/photos/check` | bearer · account | Asks Orazaka to check the photos the account has now (idempotent: the check in progress, or the verdict of this very set, is the answer). |
+| `DELETE` | `/api/me/photos/consent` | bearer · account | The person takes the consent back: faces are only counted from now on, and nothing was kept in any case. |
+| `GET` | `/api/me/photos/consent` | bearer · account | Whether the person agreed to the comparison of their photos with each other (Law 25: explicit, separate, withdrawable). |
+| `PUT` | `/api/me/photos/consent` | bearer · account | The person agrees, to this wording (`version`), to the comparison of their photos with each other; the photos are checked again. |
 | `DELETE` | `/api/me/sessions` | bearer · account | Ends every other browser session of the account (the one making the call stays). |
 | `GET` | `/api/me/sessions` | bearer · account | The signed-in account's browser sessions — where they are signed in, since when, last used — the current one marked. |
 | `DELETE` | `/api/me/sessions/{id}` | bearer · account | Ends one browser session of the account; ending the current one signs this browser out. |
@@ -79,6 +84,6 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
 | `GET` | `/api/v1/app-config` | public | `GET /api/v1/app-config?platform=ios|android&version=x.y.z` — public and cacheable (ETag, 304): the minimum and latest versions, the update mode, maintenance, the contract range, texts in the app's language (krizaka/.github#75). |
 
-## Database tables (27)
+## Database tables (29)
 
-See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `analytics_outbox` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.
+See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `analytics_outbox` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `biometric_consents` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `photo_checks` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.

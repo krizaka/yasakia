@@ -14,7 +14,7 @@ import { ButtonLink } from "@/components/console/ButtonLink";
 import { Rich } from "@/components/Rich";
 import { BASE_PATH, errorKey } from "@/lib/client";
 import { useSay } from "@/lib/i18n-client";
-import type { PhotoCheckView } from "@/lib/photo-rules";
+import { PHOTO_CONSENT_VERSION, type PhotoCheckView } from "@/lib/photo-rules";
 
 const keys = defineKeys("photos", { list: () => ["list"], check: () => ["check"], url: (id: string) => ["url", id] });
 
@@ -99,6 +99,14 @@ export function PhotosView({ initial }: { initial: { photos: OwnPhoto[]; check: 
     mutationFn: (order: string[]) => krizakaFetch("/api/me/photos", { method: "PATCH", json: { order } }),
     onSettled: refresh,
   });
+  const agree = useMutation({
+    mutationFn: () => krizakaFetch("/api/me/photos/consent", { method: "PUT", json: { version: PHOTO_CONSENT_VERSION } }),
+    onSettled: refresh,
+  });
+  const withdraw = useMutation({
+    mutationFn: () => krizakaFetch("/api/me/photos/consent", { method: "DELETE" }),
+    onSettled: refresh,
+  });
   const recheck = useMutation({
     mutationFn: () => krizakaFetch("/api/me/photos/check", { method: "POST" }),
     onSettled: refresh,
@@ -165,6 +173,22 @@ export function PhotosView({ initial }: { initial: { photos: OwnPhoto[]; check: 
         </div>
       </Widget>
 
+      {view?.comparison === "NEEDS_CONSENT" ? (
+        <Widget level={3} title={say("photos.consent.title")} description={say("photos.consent.lead")} span={3}>
+          <div className="flex flex-col gap-3 text-sm text-fg-secondary">
+            <p>{say("photos.consent.purpose")}</p>
+            <p>{say("photos.consent.nothingKept")}</p>
+            <p>{say("photos.consent.optional")}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button size="md" variant="primary" shape="cut" loading={agree.isPending} onClick={() => agree.mutate()}>
+                {say("photos.consent.accept")}
+              </Button>
+            </div>
+            {agree.isError ? <Alert tone="danger" title={say(`errors.${errorKey(agree.error)}`)} /> : null}
+          </div>
+        </Widget>
+      ) : null}
+
       <Widget level={3} title={say(`photos.state.${state}`)} span={3}>
         <div className="flex flex-col gap-3" aria-live="polite">
           <div className="flex flex-wrap items-center gap-2">
@@ -229,6 +253,14 @@ export function PhotosView({ initial }: { initial: { photos: OwnPhoto[]; check: 
               </li>
             ))}
           </ul>
+          <p>{say(`photos.privacy.comparison.${view?.comparison ?? "OFF"}`)}</p>
+          {view?.comparison === "ON" ? (
+            <div>
+              <Button size="sm" variant="ghost" loading={withdraw.isPending} onClick={() => withdraw.mutate()}>
+                {say("photos.consent.withdraw")}
+              </Button>
+            </div>
+          ) : null}
           <p>{say("photos.privacy.limits")}</p>
           <p>
             <a className="underline" href={`/${locale}/privacy`}>

@@ -1,4 +1,4 @@
-import { type PhotoCheckInput, PhotoCheckReport, type PhotoCheckResult } from "./photo-check.types";
+import { type PhotoCheckInput, PhotoCheckReport, type PhotoCheckResult, RunStatus } from "./photo-check.types";
 import { AiFailure, type AiProvider, AiUnavailableError, type ChatInput, type ChatResult, type EmbedResult, MAX_EMBED_BATCH } from "./provider.types";
 
 export interface OrazakaOptions {
@@ -68,7 +68,7 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
    * worker reads those), the `profile-photo-check` Studio is run, and the run is asked about until it ends. The engine's own words
    * (a model's error, a stack) stay in its logs: the product only learns that the check was out of reach.
    */
-  async function runPhotoCheck({ photos, counts, signal }: PhotoCheckInput, assetIds: string[]): Promise<PhotoCheckResult> {
+  async function runPhotoCheck({ photos, counts, compareFaces, signal }: PhotoCheckInput, assetIds: string[]): Promise<PhotoCheckResult> {
     const start = now();
     const deadline = start + (options.photoCheckTimeoutMs ?? 180_000); // @fixed: three minutes for a vision model reading up to six photos on a small machine
     const pollEvery = options.photoCheckPollMs ?? 2_000; // @fixed: a poll every two seconds is gentle on the engine and quick for the person
@@ -84,21 +84,21 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
     }
     const started = await call(
       "/api/v1/studios/profile-photo-check/runs",
-      { method: "POST", body: JSON.stringify({ inputs: { photos: assetIds, photosBase64: photos.map((p) => p.toString("base64")), ...counts } }) },
+      { method: "POST", body: JSON.stringify({ inputs: { photos: assetIds, photosBase64: photos.map((p) => p.toString("base64")), compareFaces, ...counts } }) },
       left(),
       signal,
     );
     if (!started.ok) return refusal(started);
     const first = await readRun(started);
     let current = first;
-    while (current.status === "RUNNING" || current.status === "PENDING" || current.status === "WAITING") {
+    while (current.status === RunStatus.Running || current.status === RunStatus.Pending || current.status === RunStatus.Waiting) {
       if (now() >= deadline) return failure(AiFailure.Unreachable, "Orazaka's photo check did not finish in time");
       await new Promise((resolve) => setTimeout(resolve, pollEvery));
       const polled = await call(`/api/v1/studios/runs/${encodeURIComponent(first.id)}`, { method: "GET" }, left(), signal);
       if (!polled.ok) return refusal(polled);
       current = await readRun(polled);
     }
-    if (current.status !== "SUCCEEDED") return failure(AiFailure.Unreachable, `Orazaka's photo check ended ${current.status}`);
+    if (current.status !== RunStatus.Succeeded) return failure(AiFailure.Unreachable, `Orazaka's photo check ended ${current.status}`);
     const value = current.outputs.find((o) => o.key === "report")?.value;
     let report: PhotoCheckReport;
     try {

@@ -10,8 +10,8 @@ import { AnalyticsKind, recordAnalytics } from "./analytics";
 import { allDecided, BatchStatus, type DebriefAnswers, Decision, decisionRefusal } from "./batch-rules";
 import { isUniqueViolation, refuse } from "./http";
 import { openIntro } from "./intros";
-import { requirePhotosVerified } from "./photo-check";
 import { PERSONA_DOMAIN } from "./personas";
+import { requirePhotosVerified } from "./photo-check";
 import { publishToAccount } from "./realtime";
 import { matchingRules } from "./rule-sets";
 
