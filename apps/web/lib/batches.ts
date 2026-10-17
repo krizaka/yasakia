@@ -1,4 +1,4 @@
-import { type AiProvider, AiUnavailableError, type Language, parseModel, Reasons, reasonsPrompt } from "@yasakia/ai";
+import { type AiProvider, AiUnavailableError, BatchReasons, type Language, parseModel, type Reasons, reasonsPrompt } from "@yasakia/ai";
 import { agentSessions, aiCalls, batches, batchItems, db, pairsSeen } from "@yasakia/db";
 import { type Gender, type Intent, type Person, type RankedPair, selectBatch } from "@yasakia/matching";
 import { addHours } from "date-fns";
@@ -125,29 +125,30 @@ async function candidatesFor(me: Person, pool: number, now: Date): Promise<(Pers
   }));
 }
 
-async function writeReasons(ai: AiProvider, accountId: string, language: Language, me: Me, them: { name: string; about: string }): Promise<{ reasons: Reasons; runRef: string }> {
-  const conversationId = crypto.randomUUID();
-  const prompt = reasonsPrompt({ language, you: { name: me.name || "you", portrait: me.portrait }, them: { name: them.name || "them", portrait: them.about } });
-  const started = performance.now();
-  const attempt = async () => parseModel((await ai.chat({ conversationId, prompt })).text, Reasons);
-  try {
-    let reasons: Reasons | undefined;
-    for (let tries = 1; !reasons; tries++) {
-      try {
-        reasons = await attempt();
-      } catch (error) {
-        // A model sometimes answers a shape that does not fit: asked again, up to three times.
-        if (!(error instanceof AiUnavailableError && error.code === "bad_response") || tries >= 3) throw error;
-      }
+/** One call for the whole batch: every person of it, with why you two both ways. The engine's dev instance answers 500 to calls at once, and a batch is one thought. */
+async function writeReasons(ai: AiProvider, accountId: string, language: Language, me: Me, them: { name: string; about: string }[]): Promise<{ reasons: Reasons[]; runRef: string }> {
+  const prompt = reasonsPrompt({ language, you: { name: me.name || "you", portrait: me.portrait }, them: them.map((t) => ({ name: t.name || "them", portrait: t.about })) });
+  let lastError: unknown;
+  for (let tries = 1; tries <= 3; tries++) {
+    const conversationId = crypto.randomUUID();
+    const started = performance.now();
+    try {
+      const parsed = parseModel((await ai.chat({ conversationId, prompt })).text, BatchReasons);
+      const byIndex = new Map(parsed.people.map((p) => [p.index, p]));
+      const reasons = them.map((_, i) => byIndex.get(i + 1));
+      if (reasons.some((r) => !r)) throw new AiUnavailableError("bad_response", "The model's answer misses someone of the batch");
+      const ms = Math.round(performance.now() - started);
+      await db.insert(aiCalls).values({ accountId, provider: "orazaka", model: "orazaka-chat", purpose: "REASONS", tokensIn: Math.ceil(prompt.length / 4), tokensOut: Math.ceil(JSON.stringify(parsed).length / 4), latencyMs: ms, ok: true, runRef: conversationId });
+      console.log(`[batch] REASONS ok run=${conversationId} people=${them.length} ms=${ms}`);
+      return { reasons: reasons.map((r) => ({ forYou: r!.forYou, forThem: r!.forThem })), runRef: conversationId };
+    } catch (error) {
+      lastError = error;
+      await db.insert(aiCalls).values({ accountId, provider: "orazaka", model: "orazaka-chat", purpose: "REASONS", latencyMs: Math.round(performance.now() - started), ok: false, runRef: conversationId });
+      // A model sometimes answers a shape that does not fit, or the engine blinks: asked again, up to three times.
+      if (!(error instanceof AiUnavailableError)) throw error;
     }
-    const ms = Math.round(performance.now() - started);
-    await db.insert(aiCalls).values({ accountId, provider: "orazaka", model: "orazaka-chat", purpose: "REASONS", tokensIn: Math.ceil(prompt.length / 4), tokensOut: Math.ceil(JSON.stringify(reasons).length / 4), latencyMs: ms, ok: true, runRef: conversationId });
-    console.log(`[batch] REASONS ok run=${conversationId} ms=${ms}`);
-    return { reasons, runRef: conversationId };
-  } catch (error) {
-    await db.insert(aiCalls).values({ accountId, provider: "orazaka", model: "orazaka-chat", purpose: "REASONS", latencyMs: Math.round(performance.now() - started), ok: false, runRef: conversationId });
-    throw error;
   }
+  throw lastError;
 }
 
 /**
@@ -167,14 +168,12 @@ export async function openBatch(ai: AiProvider, account: { id: string; locale: L
   if (!picked) throw refuse(409, "NO_FIT_YET", "Nobody fits both ways yet — the agent keeps looking");
 
   const byId = new Map(pool.map((c) => [c.id, c]));
-  // One after the other: the engine's dev instance answers 500 to five calls at once (measured), and a batch is not a race.
-  const written: Awaited<ReturnType<typeof writeReasons>>[] = [];
-  for (const p of picked as RankedPair[]) written.push(await writeReasons(ai, account.id, account.locale, me, byId.get(p.candidateId)!));
+  const written = await writeReasons(ai, account.id, account.locale, me, (picked as RankedPair[]).map((p) => byId.get(p.candidateId)!));
 
   try {
     const batchId = await db.transaction(async (tx) => {
       const [batch] = await tx.insert(batches).values({ accountId: account.id, status: BatchStatus.Open, openedAt: now, expiresAt: addHours(now, params.batchHours) }).returning({ id: batches.id });
-      await tx.insert(batchItems).values(picked.map((p, i) => ({ batchId: batch.id, candidateId: p.candidateId, rank: i + 1, reasons: written[i].reasons })));
+      await tx.insert(batchItems).values(picked.map((p, i) => ({ batchId: batch.id, candidateId: p.candidateId, rank: i + 1, reasons: written.reasons[i] })));
       await tx.insert(pairsSeen).values(picked.map((p) => ({ accountId: account.id, seenAccountId: p.candidateId }))).onConflictDoNothing();
       const moved = await tx
         .update(agentSessions)
@@ -185,7 +184,7 @@ export async function openBatch(ai: AiProvider, account: { id: string; locale: L
       return batch.id;
     });
     await publishToAccount(account.id, { type: "batch.ready", batchId });
-    return { batchId, people: picked.length, runs: written.map((w) => w.runRef) };
+    return { batchId, people: picked.length, runs: [written.runRef] };
   } catch (error) {
     // Two clicks at once: the unique index lets one batch be current, the other is told so.
     if (isUniqueViolation(error)) throw refuse(409, "BATCH_ALREADY_OPEN", "You already have a batch to answer");

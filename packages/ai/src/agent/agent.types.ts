@@ -67,3 +67,9 @@ export interface Turn {
   content: string;
 }
 export type Language = "en" | "fr";
+
+/** The reasons for a whole batch, one entry per person introduced (by the index the prompt gave them). */
+export const BatchReasons = z.object({
+  people: z.array(z.object({ index: z.number().int().min(1).max(10), forYou: Reasons.shape.forYou, forThem: Reasons.shape.forThem })).min(1).max(10),
+});
+export type BatchReasons = z.infer<typeof BatchReasons>;

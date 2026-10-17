@@ -72,6 +72,7 @@ const context = await browser.newContext({
   ...(wantVideo ? { recordVideo: { dir: out, size: { width, height } } } : {}),
 });
 const page = await context.newPage();
+evidence.videoStartedAt = new Date().toISOString(); // the recording starts with the page: the steps' times are offsets from here
 page.setDefaultTimeout(90_000);
 await page.addInitScript((t) => {
   try {
@@ -123,6 +124,7 @@ for (const line of SAYS) {
 
 step("wait for the portrait");
 await page.getByText(locale === "fr" ? "Ton portrait" : "Your portrait", { exact: true }).waitFor({ timeout: 120_000 });
+step("portrait written");
 await page.waitForTimeout(2500);
 await shot(page, "05-portrait");
 
@@ -141,6 +143,7 @@ if (through === "batch") {
   if (response.ok()) {
     await page.getByText(locale === "fr" ? "Pourquoi vous deux" : "Why you two", { exact: true }).first().waitFor({ timeout: 60_000 });
     await page.waitForTimeout(2500);
+    step("batch shown");
     await shot(page, "07-batch");
     await page.mouse.wheel(0, 700);
     await page.waitForTimeout(1500);
