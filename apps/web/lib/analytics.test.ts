@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { AnalyticsKind, type Insights, kindCount, LOOP_FUNNEL, pseudonymOf, retryDelaySeconds, toAnalyticsEvent } from "./analytics";
+import { AnalyticsKind, asDate, claimWindow, type Insights, kindCount, LOOP_FUNNEL, pseudonymOf, retryDelaySeconds, toAnalyticsEvent } from "./analytics";
 
 const KEY = "k".repeat(32);
 
@@ -32,5 +32,18 @@ describe("what leaves Yasakia for Orazaka's analytics", () => {
     const insights = { minAudience: 3, suppressed: false, events: null, activeSubjects: null, series: [], cohorts: [], kinds: [{ kind: "talk", unit: "SECONDS", count: { current: 12, previous: 4, change: 2 }, subjects: 4, valueSum: null, valueMean: null }] } satisfies Insights;
     expect(kindCount(insights, AnalyticsKind.Talk)).toEqual({ value: 12, previous: 4 });
     expect(kindCount(insights, AnalyticsKind.ReportFiled)).toEqual({ value: null, previous: null });
+  });
+});
+
+describe("the outbox claim (measured on dev: the loop failed on a Date written as text)", () => {
+  it("hands PostgreSQL ISO-8601 timestamps, the lease two minutes ahead", () => {
+    const at = new Date("2026-10-17T09:12:30.679Z");
+    expect(claimWindow(at)).toEqual({ leaseUntil: "2026-10-17T09:14:30.679Z", claimAt: "2026-10-17T09:12:30.679Z" });
+  });
+
+  it("reads the database clock whether the driver gives a Date or text", () => {
+    expect(asDate("2026-10-17 09:12:30.67995+00").toISOString()).toBe("2026-10-17T09:12:30.679Z");
+    expect(asDate(new Date("2026-10-17T09:12:30Z")).toISOString()).toBe("2026-10-17T09:12:30.000Z");
+    expect(() => asDate("yesterday")).toThrow();
   });
 });

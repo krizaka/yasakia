@@ -119,17 +119,33 @@ const BATCH = 500;
 // @fixed: the attempts after which a row is left for an operator to look at
 const MAX_ATTEMPTS = 20;
 
+/** A timestamp as the driver returns it (a Date, or the text of a timestamptz) as a Date. */
+export function asDate(value: unknown): Date {
+  const date = value instanceof Date ? value : new Date(String(value).replace(" ", "T").replace(/\+00$/, "Z"));
+  if (Number.isNaN(date.getTime())) throw new Error("not a timestamp");
+  return date;
+}
+
+/**
+ * The parameters of the claim, as ISO-8601 text: a raw `sql` template hands a Date to the driver as its
+ * `toString()` (« Sat Oct 17 2026 … GMT+0000 (Coordinated Universal Time) »), which PostgreSQL refuses — measured on dev.
+ */
+export function claimWindow(now: Date): { leaseUntil: string; claimAt: string } {
+  return { leaseUntil: addSeconds(now, LEASE_SECONDS).toISOString(), claimAt: now.toISOString() };
+}
+
 type Claimed = { id: string; kind: OutboxKind; payload: Record<string, unknown>; attempts: number };
 
 /** One round: claims a batch, sends the events in one call and each erasure in its own, records the outcome, prunes. */
 export async function drainAnalytics(conn: AnalyticsConnection, at?: Date, fetchImpl: typeof fetch = fetch): Promise<{ sent: number; erased: number; failed: number }> {
   // The outbox's clock is the database's: every instance agrees on it, and the loop needs no ambient clock.
-  const now = at ?? (await db.execute<{ now: Date }>(sql`select now() as now`)).rows[0].now;
+  const now = at ?? asDate((await db.execute<{ now: unknown }>(sql`select now() as now`)).rows[0].now);
+  const { leaseUntil, claimAt } = claimWindow(now);
   const claimed = await db.execute<Claimed>(sql`
-    update analytics_outbox set next_attempt_at = ${addSeconds(now, LEASE_SECONDS)}
+    update analytics_outbox set next_attempt_at = ${leaseUntil}::timestamptz
     where id in (
       select id from analytics_outbox
-      where sent_at is null and next_attempt_at <= ${now} and attempts < ${MAX_ATTEMPTS}
+      where sent_at is null and next_attempt_at <= ${claimAt}::timestamptz and attempts < ${MAX_ATTEMPTS}
       order by created_at
       limit ${BATCH}
       for update skip locked)
