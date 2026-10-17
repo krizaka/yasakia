@@ -41,7 +41,7 @@ export async function resetQaAgent(email: string): Promise<boolean> {
 }
 
 if (require.main === module) {
-  const email = (process.env.QA_USER_EMAIL ?? "qa+user@yasakia.com").trim().toLowerCase();
+  const email = (process.env.AUTH_QA_USER_EMAIL ?? "qa+user@yasakia.com").trim().toLowerCase();
   const refusal = qaResetRefusal(email, process.env);
   if (refusal) {
     console.error(`QA reset ${refusal}`);

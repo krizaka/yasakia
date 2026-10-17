@@ -794,10 +794,10 @@ let adaPhoto;
     check("QA journey: the owner is shown where the engine's runs can be found (one id per purpose, no score)", ["CHAT", "EXTRACT", "PORTRAIT", "EMBED"].every((p) => typeof qaDone?.json.agent.evidence[p] === "string"), qaDone?.json.agent?.evidence);
 
     // `npm run db:qa-reset`: a blank page again — and only for a QA address.
-    const reset = spawnSync("npx", ["tsx", "packages/db/src/qa-reset.ts"], { cwd: ROOT, env: { ...process.env, DATABASE_URL: env("DATABASE_URL", ""), QA_USER_EMAIL: qaEmail }, encoding: "utf8" });
+    const reset = spawnSync("npx", ["tsx", "packages/db/src/qa-reset.ts"], { cwd: ROOT, env: { ...process.env, DATABASE_URL: env("DATABASE_URL", ""), AUTH_QA_USER_EMAIL: qaEmail }, encoding: "utf8" });
     const after = await asBrowser("/api/agent", { cookie });
     check("QA journey: db:qa-reset gives the QA person's agent a blank page — no talk, nothing understood, no portrait, no vectors", reset.status === 0 && after.json.agent.state === "ONBOARDING" && after.json.agent.messages.length === 0 && after.json.agent.facets.length === 0 && after.json.agent.portrait === null && (await sql("select 1 from facet_embeddings where account_id = $1", [qa.id])).length === 0, { out: reset.stdout, err: reset.stderr, agent: after.json.agent });
-    const refused = spawnSync("npx", ["tsx", "packages/db/src/qa-reset.ts"], { cwd: ROOT, env: { ...process.env, DATABASE_URL: env("DATABASE_URL", ""), QA_USER_EMAIL: `camille-${run}@example.test` }, encoding: "utf8" });
+    const refused = spawnSync("npx", ["tsx", "packages/db/src/qa-reset.ts"], { cwd: ROOT, env: { ...process.env, DATABASE_URL: env("DATABASE_URL", ""), AUTH_QA_USER_EMAIL: `camille-${run}@example.test` }, encoding: "utf8" });
     check("QA journey: db:qa-reset refuses an address that is not a QA address", refused.status === 1 && /not a QA address/.test(refused.stderr), refused.stderr);
   }
 }

@@ -5,7 +5,7 @@
  * `--through batch`, open the first batch). It records a video of the run, takes the key screens, and writes
  * `evidence.json` — the engine run ids (the lines in Orazaka's logs) that prove the run was real.
  *
- *   QA_USER_EMAIL=… QA_USER_PASSWORD=… node scripts/dev-journey.mjs --base https://dev.yasakia.com --out <dir>
+ *   AUTH_QA_USER_EMAIL=… AUTH_QA_USER_PASSWORD=… node scripts/dev-journey.mjs --base https://dev.yasakia.com --out <dir>
  *       [--locale fr|en] [--theme dark|light] [--viewport 1280x720|390x844] [--through talk|batch] [--no-video] [--shots]
  *
  * The password is read from the environment and never printed. The person is the QA account, whose agent starts from a
@@ -29,10 +29,10 @@ const through = flag("through", "talk");
 const out = path.resolve(String(flag("out", "journey-out")));
 const wantVideo = flag("no-video", false) !== true;
 const wantShots = flag("shots", false) === true;
-const email = process.env.QA_USER_EMAIL ?? "qa+user@yasakia.com";
-const password = process.env.QA_USER_PASSWORD;
+const email = process.env.AUTH_QA_USER_EMAIL ?? "qa+user@yasakia.com";
+const password = process.env.AUTH_QA_USER_PASSWORD;
 if (!password) {
-  console.error("QA_USER_PASSWORD is not set (read it with the secret tool; never type it on a command line).");
+  console.error("AUTH_QA_USER_PASSWORD is not set (read it with the secret tool; never type it on a command line).");
   process.exit(2);
 }
 
