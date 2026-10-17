@@ -363,6 +363,24 @@
     },
     {
       "method": "GET",
+      "path": "/api/admin/rule-sets",
+      "access": "public",
+      "summary": "Every version of the rule sets the app reads (MATCHING, AGENT), newest first, the active one marked."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/rule-sets/{domain}",
+      "access": "public",
+      "summary": "Publishes a new version of a rule set — checked against its bounds, with a reason, audited; it is active at once."
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/rule-sets/{domain}/restore",
+      "access": "public",
+      "summary": "Rolls back: publishes the parameters of an earlier version again, as a new version (the history stays append-only)."
+    },
+    {
+      "method": "GET",
       "path": "/api/admin/users",
       "access": "public",
       "summary": "Lists accounts for the console — searched by address or name, filtered by status and role, sorted and paged on the server."

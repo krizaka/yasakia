@@ -244,7 +244,8 @@
       "adminBrand": "Admin",
       "devBadge": "DEV · {version}",
       "talk": "Parle à ton agent",
-      "batch": "Ton lot"
+      "batch": "Ton lot",
+      "rules": "Règles"
     },
     "signIn": {
       "title": "Content de te revoir",
@@ -298,7 +299,10 @@
       "NO_FIT_YET": "Personne ne te correspond encore dans les deux sens. L’agent continue de chercher — on n’invente personne pour remplir un lot.",
       "NOT_READY": "L’agent n’a pas encore écrit ton portrait. Continue de lui parler.",
       "PROFILE_INCOMPLETE": "L’agent a encore besoin de quelques repères : dis-lui qui tu es, qui tu veux rencontrer et où tu vis.",
-      "BATCH_ALREADY_OPEN": "Tu as déjà un lot à répondre."
+      "BATCH_ALREADY_OPEN": "Tu as déjà un lot à répondre.",
+      "RULES_OUT_OF_BOUNDS": "Ces valeurs sortent de ce que le code permet.",
+      "RULES_UNCHANGED": "Rien n’a changé : cette version est déjà la version active.",
+      "CONFLICT": "Quelqu’un a publié une version au même moment. Rechargez et réessayez."
     },
     "dashboard": {
       "greeting": "Bonjour, {name}",
@@ -592,7 +596,8 @@
           "admin.restore": "Compte rétabli",
           "admin.sessions_revoked": "Sessions terminées",
           "admin.role": "Rôle modifié",
-          "admin.delete": "Compte effacé par un opérateur"
+          "admin.delete": "Compte effacé par un opérateur",
+          "admin.rules_published": "Jeu de règles publié"
         }
       },
       "table": {
@@ -726,6 +731,49 @@
         "purgesPending": "Effacements dont les médias restent à supprimer",
         "purgesFailing": "Effacements dont la purge a échoué",
         "refusedSignIns": "Connexions refusées, 24 h"
+      },
+      "rules": {
+        "title": "Règles",
+        "description": "Ce sur quoi tournent la sélection et l’agent : versionné, publié avec une raison, journalisé. Une sélection déjà ouverte garde la version sous laquelle elle a été faite.",
+        "domains": {
+          "MATCHING": "La sélection",
+          "AGENT": "L’agent"
+        },
+        "domainHints": {
+          "MATCHING": "Qui peut être dans une sélection, combien de personnes, et combien de temps elle reste ouverte.",
+          "AGENT": "Combien de temps l’agent parle avant d’écrire un portrait, et ce qu’il doit savoir."
+        },
+        "params": {
+          "batchMin": "Le moins de personnes par sélection",
+          "batchMax": "Le plus de personnes par sélection",
+          "batchHours": "Heures d’ouverture d’une sélection",
+          "candidatePool": "Personnes examinées par sélection",
+          "minAffinity": "Accord minimal, dans les deux sens (0 à 1)",
+          "minUserTurns": "Le moins de vos messages avant un portrait",
+          "historyMessages": "Messages que l’agent relit",
+          "messageMaxChars": "Message le plus long (caractères)",
+          "requiredFacets": "Facettes toujours requises",
+          "minFacets": "Le moins de facettes pour un portrait"
+        },
+        "activeVersion": "Version {version} active",
+        "noActive": "Aucune version active",
+        "active": "Active",
+        "history": "Historique ({count} versions)",
+        "versionLabel": "Version {version}",
+        "version": "Version",
+        "chooseVersion": "Choisissez une version",
+        "publish": "Publier une nouvelle version",
+        "publishTitle": "{domain} : publier une nouvelle version",
+        "publishDescription": "Chaque valeur reste dans les bornes que le code impose. La nouvelle version est active tout de suite ; l’ancienne reste dans l’historique.",
+        "publishSubmit": "Publier",
+        "restore": "Restaurer une version",
+        "restoreTitle": "{domain} : restaurer une version",
+        "restoreDescription": "Ses valeurs sont publiées de nouveau, comme une nouvelle version — rien n’est effacé.",
+        "restoreSubmit": "Restaurer",
+        "reason": "Pourquoi",
+        "reasonHint": "Une phrase pour le journal d’audit et l’historique.",
+        "now": "Actuellement : {value}",
+        "published": "La version {version} est active. Modifié : {changed}."
       }
     },
     "reset": {

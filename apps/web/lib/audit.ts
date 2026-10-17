@@ -9,7 +9,7 @@ import { clientIp } from "./client-ip";
  * their address from every line they acted in (lib/account.ts).
  */
 
-export const AUDIT_ACTIONS = ["auth.sign_in", "auth.sign_in_refused", "auth.sign_out", "auth.password_changed", "auth.password_reset", "account.deleted", "admin.suspend", "admin.restore", "admin.report", "admin.sessions_revoked", "admin.role", "admin.delete"] as const;
+export const AUDIT_ACTIONS = ["auth.sign_in", "auth.sign_in_refused", "auth.sign_out", "auth.password_changed", "auth.password_reset", "account.deleted", "admin.suspend", "admin.restore", "admin.report", "admin.sessions_revoked", "admin.role", "admin.delete", "admin.rules_published"] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 export interface AuditEntry {

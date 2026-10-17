@@ -244,7 +244,8 @@
       "adminBrand": "Admin",
       "devBadge": "DEV · {version}",
       "talk": "Talk to your agent",
-      "batch": "Your batch"
+      "batch": "Your batch",
+      "rules": "Rules"
     },
     "signIn": {
       "title": "Welcome back",
@@ -298,7 +299,10 @@
       "NO_FIT_YET": "Nobody fits you both ways yet. The agent keeps looking — nobody is made up to fill a batch.",
       "NOT_READY": "The agent has not written your portrait yet. Keep talking.",
       "PROFILE_INCOMPLETE": "The agent still needs a few basics: tell it who you are, who you want to meet and where you live.",
-      "BATCH_ALREADY_OPEN": "You already have a batch to answer."
+      "BATCH_ALREADY_OPEN": "You already have a batch to answer.",
+      "RULES_OUT_OF_BOUNDS": "These values are outside what the code allows.",
+      "RULES_UNCHANGED": "Nothing changed: this version is already the active one.",
+      "CONFLICT": "Someone published a version at the same time. Reload and try again."
     },
     "dashboard": {
       "greeting": "Hello, {name}",
@@ -592,7 +596,8 @@
           "admin.restore": "Account restored",
           "admin.sessions_revoked": "Sessions ended",
           "admin.role": "Role changed",
-          "admin.delete": "Account erased by an operator"
+          "admin.delete": "Account erased by an operator",
+          "admin.rules_published": "Rule set published"
         }
       },
       "table": {
@@ -726,6 +731,49 @@
         "purgesPending": "Erasures with media still to delete",
         "purgesFailing": "Erasures whose purge failed",
         "refusedSignIns": "Refused sign-ins, last 24 h"
+      },
+      "rules": {
+        "title": "Rules",
+        "description": "What the batch and the agent run on: versioned, published with a reason, audited. A batch already open keeps the version it was made under.",
+        "domains": {
+          "MATCHING": "The batch",
+          "AGENT": "The agent"
+        },
+        "domainHints": {
+          "MATCHING": "Who may be in a batch, how many people, and for how long it stays open.",
+          "AGENT": "How long the agent talks before it writes a portrait, and what it needs to know."
+        },
+        "params": {
+          "batchMin": "Fewest people in a batch",
+          "batchMax": "Most people in a batch",
+          "batchHours": "Hours a batch stays open",
+          "candidatePool": "People considered per batch",
+          "minAffinity": "Lowest fit, both ways (0 to 1)",
+          "minUserTurns": "Fewest of your messages before a portrait",
+          "historyMessages": "Messages the agent rereads",
+          "messageMaxChars": "Longest message (characters)",
+          "requiredFacets": "Facets always needed",
+          "minFacets": "Fewest facets for a portrait"
+        },
+        "activeVersion": "Version {version} active",
+        "noActive": "No active version",
+        "active": "Active",
+        "history": "History ({count} versions)",
+        "versionLabel": "Version {version}",
+        "version": "Version",
+        "chooseVersion": "Choose a version",
+        "publish": "Publish a new version",
+        "publishTitle": "{domain}: publish a new version",
+        "publishDescription": "Each value stays within the bounds the code holds. The new version is active at once; the old one stays in the history.",
+        "publishSubmit": "Publish",
+        "restore": "Restore a version",
+        "restoreTitle": "{domain}: restore a version",
+        "restoreDescription": "Its values are published again as a new version — nothing is erased.",
+        "restoreSubmit": "Restore",
+        "reason": "Why",
+        "reasonHint": "A sentence for the audit log and the history.",
+        "now": "Now: {value}",
+        "published": "Version {version} is active. Changed: {changed}."
       }
     },
     "reset": {

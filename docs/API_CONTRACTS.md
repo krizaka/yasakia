@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (52)
+## Endpoints (55)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -23,6 +23,9 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `GET` | `/api/admin/report-queue/{id}` | public | One report with its details opened — operators only. |
 | `PATCH` | `/api/admin/report-queue/{id}` | public | Moves a report along (REVIEWED · ACTIONED · DISMISSED, or back to OPEN); the decision is logged with who made it. |
 | `GET` | `/api/admin/reports` | operator · service token + IP allow-list | The reports for operators — urgent reasons (UNDERAGE, THREAT) first, details decrypted; service token and IP allow-list. |
+| `GET` | `/api/admin/rule-sets` | public | Every version of the rule sets the app reads (MATCHING, AGENT), newest first, the active one marked. |
+| `POST` | `/api/admin/rule-sets/{domain}` | public | Publishes a new version of a rule set — checked against its bounds, with a reason, audited; it is active at once. |
+| `POST` | `/api/admin/rule-sets/{domain}/restore` | public | Rolls back: publishes the parameters of an earlier version again, as a new version (the history stays append-only). |
 | `GET` | `/api/admin/users` | public | Lists accounts for the console — searched by address or name, filtered by status and role, sorted and paged on the server. |
 | `DELETE` | `/api/admin/users/{id}` | public | Law 25 erasure of an account, asked of an operator; the e-mail typed confirms. |
 | `GET` | `/api/admin/users/{id}` | public | One account for the console: state, role, counts and the audit lines about it — never a date of birth, a message or a photo. |
