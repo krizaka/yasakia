@@ -33,9 +33,8 @@ describe("the public dev site", () => {
   });
 
   it("reads its demo from the CDN only, hashed, under the product's own folder — and lazily, with a poster, never autoplaying", () => {
-    for (const id of ["talk", "batch"] as const) {
-      for (const url of Object.values(clip(id))) expect(url).toMatch(/^https:\/\/krizaka-assets\.b-cdn\.net\/site\/products\/yasakia\/tour\/(talk|batch)\.[0-9a-f]{10}\.(webm|mp4|jpg)$/);
-    }
+    // One recording of the whole loop; the old talk and batch clips (an e-mail showed in their footer) are gone.
+    for (const url of Object.values(clip("loop"))) expect(url).toMatch(/^https:\/\/krizaka-assets\.b-cdn\.net\/site\/products\/yasakia\/tour\/loop\.[0-9a-f]{10}\.(webm|mp4|jpg)$/);
     const player = readFileSync(new URL("../components/CaptionedVideo.tsx", import.meta.url), "utf8");
     expect(player).toContain('preload="none"');
     expect(player).toContain("poster={poster}");

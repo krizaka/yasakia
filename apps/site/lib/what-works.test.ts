@@ -27,9 +27,8 @@ describe("what works today (the home page)", () => {
 
   it("names only what the code runs: the location is rounded, the radius filters, sign-in exists", () => {
     const working = WHAT_WORKS.filter((w) => w.status === "working").map((w) => w.id);
-    expect(working).toEqual(expect.arrayContaining(["talk", "portrait", "batch", "location", "radius", "signin"]));
-    // What is not built says so: the answer to a batch, the debrief and the introductions.
-    expect(WHAT_WORKS.filter((w) => w.status === "development").map((w) => w.id)).toEqual(["debrief", "intros"]);
+    // The whole loop runs on dev (2026-10-17, #94): answering a batch, the debrief and the introductions included.
+    expect(working).toEqual(expect.arrayContaining(["talk", "portrait", "batch", "location", "radius", "signin", "debrief", "intros"]));
     const en = messages("en").home.works.items;
     expect(en.location.text).toMatch(/1 km/);
   });

@@ -102,12 +102,12 @@
           "text": "Des personnes qui te correspondent et pour qui tu corresponds aussi — la plus faible des deux directions décide —, chacune avec pourquoi vous deux, en mots. Moins de trois : tu attends, on n’invente personne."
         },
         "debrief": {
-          "title": "Répondre à un lot et le bilan",
-          "text": "Dire comment ça s’est passé pour que le lot suivant te convienne mieux est en construction ; ce n’est pas encore publié."
+          "title": "Répondre à un lot et le débrief",
+          "text": "Intéressé·e, dis-m’en plus ou je passe — puis trois questions rapides avant le prochain lot."
         },
         "intros": {
           "title": "Les présentations",
-          "text": "Sept jours pour se parler quand vous dites oui tous les deux : en construction ; ce n’est pas encore publié."
+          "text": "Sept jours pour se parler quand vous avez dit oui tous les deux, avec une première phrase que ton agent te suggère, à toi seul·e. Continuez ensemble, ou laissez s’éteindre."
         }
       },
       "working": "Fonctionne",
@@ -156,34 +156,30 @@
   "demo": {
     "title": "Démo",
     "eyebrow": "Le vrai parcours",
-    "lead": "Enregistré sur le site de développement, avec le vrai moteur : une personne de test parle à l’agent jusqu’à ce qu’il écrive son portrait, puis ouvre son premier lot. Ni une animation ni une maquette — et pas retouché : seulement coupé à ces deux moments et accéléré pendant que l’agent réfléchit.",
-    "talkTitle": "1 · Tu parles en premier",
-    "talkLead": "L’agent apprend à la connaître, une question à la fois. Il note ce qu’elle a dit — rien de plus — puis écrit son portrait.",
-    "batchTitle": "2 · Son premier lot",
-    "batchLead": "Des personnes qui lui correspondent et pour qui elle correspond aussi, chacune avec pourquoi vous deux, en mots, dans les deux sens.",
-    "talkLabel": "Enregistrement : une personne parle à l’agent, qui écrit ce qu’il a compris puis son portrait.",
-    "batchLabel": "Enregistrement : l’agent ouvre un lot de cinq personnes, chacune avec les raisons qui vous vont à tous les deux, en mots.",
+    "lead": "Enregistré sur le site de développement, avec le vrai moteur : une personne de test parle à l’agent jusqu’à ce qu’il écrive son portrait, ouvre son premier lot, y répond, envoie le débrief, puis écrit la première phrase de la présentation qui s’ouvre. Ni une animation ni une maquette, et pas retouché : un seul passage, accéléré pendant que l’agent réfléchit.",
     "transcript": "Les sous-titres en texte",
-    "talk": {
-      "cues": {
-        "open": "Camille — un personnage de test, une adulte fictive — se connecte et ouvre la conversation. Elle parle en premier.",
-        "first": "Elle dit qui elle est et où elle vit. L’agent répond par une question, pas par un formulaire.",
-        "range": "Elle dit qui elle espère rencontrer : une tranche d’âge, une distance, une relation sérieuse.",
-        "saturday": "Un samedi parfait, ce qui compte pour elle. L’agent note ce qu’elle a dit, et rien de plus.",
-        "enough": "Cinq messages plus tard, l’agent a l’essentiel et qui elle espère rencontrer : il en sait assez.",
-        "portrait": "Son portrait est écrit, en mots, à partir de ce qu’elle a dit — et encodé par Orazaka : qui elle est, qui elle cherche."
-      }
-    },
-    "batch": {
-      "cues": {
-        "open": "Elle demande son premier lot. L’agent cherche des personnes qui lui correspondent et pour qui elle correspond aussi.",
-        "looking": "Les filtres jouent dans les deux sens, puis la plus faible des deux directions classe. L’agent écrit pourquoi vous deux, une personne après l’autre.",
-        "shown": "Cinq personnes, chacune avec pourquoi vous deux — en mots, dans les deux sens. Pas de note, pas de swipe. C’est une distribution de personnes fictives faite pour les tests."
-      }
-    },
     "noteTitle": "Lis cet enregistrement honnêtement",
-    "note": "Camille est un personnage de test et les cinq personnes qu’elle rencontre sont fictives : personne ici n’existe, il n’y a aucune photo, et Yasakia n’a aucun membre. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scripté — donc un enregistrement diffère du suivant. Répondre à un lot, le bilan et les présentations ne sont pas encore construits.",
+    "note": "Camille est une personne de test et les personnes qu’elle rencontre sont une distribution fictive : personne ici n’existe, il n’y a aucune photo, et Yasakia n’a pas de membres. La distribution fictive répond oui, c’est ce qui permet de montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scénarisé — donc un passage diffère du suivant. Aucun courriel n’est montré : l’adresse du compte est remplacée à l’écran par le nom de la personne.",
     "nextTitle": "Quand l’appli sortira",
-    "nextText": "Son propre enregistrement, fait sur la vraie application, remplacera ceux-ci. D’ici là : le code est public."
+    "nextText": "Son propre enregistrement, fait sur la vraie application, remplacera ceux-ci. D’ici là : le code est public.",
+    "journeyTitle": "Parler, un lot, un oui des deux côtés, une présentation",
+    "journeyLead": "Toute la boucle, comme une personne la vit — en un seul enregistrement.",
+    "journeyLabel": "Enregistrement : une personne parle à l’agent, reçoit son portrait et un lot de cinq personnes avec les raisons en mots, répond à chacune, envoie le débrief, puis écrit dans la présentation qui s’est ouverte.",
+    "journey": {
+      "cues": {
+        "talk": "Camille — une personne de test, une adulte fictive — ouvre la conversation. Elle parle en premier.",
+        "first": "Elle dit qui elle est et où elle vit. L’agent répond par une question, pas par un formulaire.",
+        "understood": "Un samedi parfait, ce qui compte pour elle. L’agent note ce qu’elle a dit, et rien de plus.",
+        "portrait": "Son portrait est écrit, en mots, à partir de ce qu’elle a dit — et vectorisé par Orazaka.",
+        "look": "Elle demande son premier lot : des personnes qui lui correspondent, et pour qui elle correspond aussi.",
+        "shown": "Cinq personnes, chacune avec pourquoi vous deux — en mots, dans les deux sens. Pas de note, pas de swipe. Une distribution fictive faite pour les tests.",
+        "answer": "« Dis-m’en plus » ouvre qui l’une d’elles espère rencontrer, dans ses propres mots.",
+        "yes": "Elle dit oui. Il a dit oui aussi : une présentation s’ouvre, pour sept jours.",
+        "answered": "Elle passe pour les autres. Tout le monde a sa réponse.",
+        "debrief": "Trois questions avant le prochain lot : les raisons sonnaient-elles juste, ce qui comptait, la suite.",
+        "intro": "La présentation : son agent lui souffle une première phrase qu’elle seule voit. Il ne lit jamais la suite.",
+        "line": "Elle l’envoie. À partir d’ici, deux personnes se parlent."
+      }
+    }
   }
 }

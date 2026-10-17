@@ -18,13 +18,12 @@
       "checked": "2026-10-16"
     },
     "journey.core": {
-      "evidence": null,
-      "gap": "Recorded on dev with the real engine (talk, portrait, first batch: https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/batch.561bd30f2e.mp4) — but answering a batch, the debrief and the introductions are not built, so the loop is not end to end.",
-      "issue": "https://github.com/krizaka/yasakia/issues/53"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/loop.31a8872f96.mp4",
+      "checked": "2026-10-17"
     },
     "journey.ai-via-orazaka": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/talk.4b648cf8ea.mp4",
-      "checked": "2026-10-16"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/loop.31a8872f96.mp4",
+      "checked": "2026-10-17"
     },
     "ui.krizaka-ui": {
       "evidence": null,

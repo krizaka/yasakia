@@ -103,11 +103,11 @@
         },
         "debrief": {
           "title": "Answering a batch and the debrief",
-          "text": "Saying how it went so the next batch fits better is being built; it is not released yet."
+          "text": "Interested, tell me more or pass — then three quick questions before the next batch."
         },
         "intros": {
           "title": "Introductions",
-          "text": "Seven days to talk when you both say yes: being built; it is not released yet."
+          "text": "Seven days to talk when you both said yes, with a first line your agent suggests to you only. Continue together, or let it fade."
         }
       },
       "working": "Working today",
@@ -156,34 +156,30 @@
   "demo": {
     "title": "Demo",
     "eyebrow": "The real journey",
-    "lead": "Recorded on the development site, against the real engine: a test persona talks to the agent until it has written her portrait, then opens her first batch. Not an animation, not a mock-up — and not edited, only cut to these two moments and sped up while the agent thinks.",
-    "talkTitle": "1 · Talk first",
-    "talkLead": "The agent gets to know her, one question at a time. It writes down what she said — nothing more — then her portrait.",
-    "batchTitle": "2 · Her first batch",
-    "batchLead": "People who fit her and for whom she fits too, each with why you two, in words, both ways.",
-    "talkLabel": "Recording: a person talks to the agent, which writes what it understood and then her portrait.",
-    "batchLabel": "Recording: the agent opens a batch of five people, each with the reasons you two fit, in words.",
+    "lead": "Recorded on the development site, against the real engine: a test persona talks to the agent until it writes her portrait, opens her first batch, answers it, sends the debrief, and writes the first line of the introduction that opens. Not an animation, not a mock-up, and not edited: one run, sped up while the agent thinks.",
     "transcript": "Captions as text",
-    "talk": {
-      "cues": {
-        "open": "Camille — a test persona, a fictional adult — signs in and opens the talk. She speaks first.",
-        "first": "She says who she is and where she lives. The agent answers with a question, not a form.",
-        "range": "She says whom she hopes to meet: an age range, a distance, a serious relationship.",
-        "saturday": "A perfect Saturday, what matters to her. The agent writes down what she said, and nothing more.",
-        "enough": "Five messages in, the agent has the basics and who she hopes to meet: it knows enough.",
-        "portrait": "Her portrait is written, in words, from what she said — and embedded by Orazaka: who she is, who she looks for."
-      }
-    },
-    "batch": {
-      "cues": {
-        "open": "She asks for her first batch. The agent looks for people who fit her and for whom she fits too.",
-        "looking": "The filters work both ways, then the weaker of the two directions ranks. The agent writes why you two, one person after the other.",
-        "shown": "Five people, each with why you two — in words, both ways. No score, no swiping. They are a cast of fictional people made for tests."
-      }
-    },
     "noteTitle": "Read this recording honestly",
-    "note": "Camille is a test persona and the five people she meets are a fictional cast: nobody here exists, there is no photo, and Yasakia has no members. The agent's words are generated live by Orazaka — the model is not scripted — so a run differs from the next. Answering a batch, the debrief and the introductions are not built yet.",
+    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists, there is no photo, and Yasakia has no members. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next. No e-mail is shown: the account’s address is replaced by the persona’s name on screen.",
     "nextTitle": "When the app ships",
-    "nextText": "Its own recording, made on the real application, replaces these. Until then: the code is public."
+    "nextText": "Its own recording, made on the real application, replaces these. Until then: the code is public.",
+    "journeyTitle": "Talk, a batch, a yes both ways, an introduction",
+    "journeyLead": "The whole loop, as a person lives it — in one recording.",
+    "journeyLabel": "Recording: a person talks to the agent, gets her portrait and a batch of five people with the reasons in words, answers each one, sends the debrief, then writes in the introduction that opened.",
+    "journey": {
+      "cues": {
+        "talk": "Camille — a test persona, a fictional adult — opens the talk. She speaks first.",
+        "first": "She says who she is and where she lives. The agent answers with a question, not a form.",
+        "understood": "A perfect Saturday, what matters to her. The agent writes down what she said, and nothing more.",
+        "portrait": "Her portrait is written, in words, from what she said — and embedded by Orazaka.",
+        "look": "She asks for her first batch: people who fit her, and for whom she fits too.",
+        "shown": "Five people, each with why you two — in words, both ways. No score, no swiping. A fictional cast made for tests.",
+        "answer": "« Tell me more » opens who one of them hopes to meet, in their own words.",
+        "yes": "She says yes. He said yes too: an introduction opens, for seven days.",
+        "answered": "She passes on the others. Everyone is answered.",
+        "debrief": "Three questions before the next batch: did the reasons ring true, what mattered, what next.",
+        "intro": "The introduction: her agent whispers a first line only she can see. It never reads what follows.",
+        "line": "She sends it. From here, two people talk."
+      }
+    }
   }
 }

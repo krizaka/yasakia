@@ -27,7 +27,7 @@ const end = (Date.parse(evidence.finishedAt) - t0) / 1000;
 const MAX = looped ? 60 : 55; // seconds: the rule says 20 to 60
 // The whole loop (`--through loop`) is one clip: talk → portrait → batch → answers → debrief → introduction.
 const clips = looped
-  ? [["journey", at("open the conversation") - 0.5, end, ["open the conversation", "message 1 sent", "message 3 sent", "portrait written", "open the first batch", "batch shown", "answer the batch", "said yes", "everyone answered", "debrief sent", "open the introduction", "first line sent"]]]
+  ? [["loop", at("open the conversation") - 0.5, end, ["open the conversation", "message 1 sent", "message 3 sent", "portrait written", "open the first batch", "batch shown", "answer the batch", "said yes", "everyone answered", "debrief sent", "open the introduction", "first line sent"]]]
   : [
   ["talk", at("open the conversation") - 0.5, at("portrait written") + 3.5, ["open the conversation", "message 1 sent", "message 2 sent", "message 3 sent", "message 5 sent", "portrait written"]],
   ["batch", at("open the first batch") - 0.5, end, ["open the first batch", "batch: HTTP", "batch shown"]],

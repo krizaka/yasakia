@@ -6,17 +6,18 @@ import type { ClipId } from "./media";
  * are messages in both languages; the recordings are the real journey, never scripted on the agent's side.
  */
 export const CUES = {
-  talk: [
-    { id: "open", at: 0 },
-    { id: "first", at: 4.3 },
-    { id: "range", at: 18.2 },
-    { id: "saturday", at: 26.8 },
-    { id: "enough", at: 39.4 },
-    { id: "portrait", at: 51.9 },
-  ],
-  batch: [
-    { id: "open", at: 0 },
-    { id: "looking", at: 1.1 },
-    { id: "shown", at: 12.9 },
+  loop: [
+    { id: "talk", at: 0.3 },
+    { id: "first", at: 2.7 },
+    { id: "understood", at: 13.3 },
+    { id: "portrait", at: 32 },
+    { id: "look", at: 33.8 },
+    { id: "shown", at: 42.1 },
+    { id: "answer", at: 43.1 },
+    { id: "yes", at: 45.8 },
+    { id: "answered", at: 50.3 },
+    { id: "debrief", at: 52.1 },
+    { id: "intro", at: 53.8 },
+    { id: "line", at: 57.8 },
   ],
 } as const satisfies Record<ClipId, readonly { id: string; at: number }[]>;
