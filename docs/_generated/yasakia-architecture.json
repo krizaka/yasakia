@@ -264,7 +264,7 @@
     },
     {
       "name": "intros",
-      "columns": 13,
+      "columns": 11,
       "references": [
         "accounts"
       ]
@@ -567,7 +567,7 @@
       "method": "GET",
       "path": "/api/intros/{id}",
       "access": "bearer · account",
-      "summary": "One of my introductions: who, until when, the first line my agent whispered to me (mine only), and our messages."
+      "summary": "One of my introductions: who, until when, and our messages (typed by us two — the AI writes none)."
     },
     {
       "method": "POST",

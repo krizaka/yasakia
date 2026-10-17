@@ -107,7 +107,7 @@
         },
         "intros": {
           "title": "Les présentations",
-          "text": "Sept jours pour se parler quand vous avez dit oui tous les deux, avec une première phrase que ton agent te suggère, à toi seul·e. Continuez ensemble, ou laissez s’éteindre."
+          "text": "Sept jours pour se parler quand vous avez dit oui tous les deux. Chaque message est écrit par vous deux : l’agent n’écrit rien à votre place et ne lit jamais votre conversation. Continuez ensemble, ou laissez s’éteindre."
         }
       },
       "working": "Fonctionne",
@@ -156,10 +156,10 @@
   "demo": {
     "title": "Démo",
     "eyebrow": "Le vrai parcours",
-    "lead": "Enregistré sur le site de développement, avec le vrai moteur : une personne de test parle à l’agent jusqu’à ce qu’il écrive son portrait, ouvre son premier lot, y répond, envoie le débrief, puis écrit la première phrase de la présentation qui s’ouvre. Ni une animation ni une maquette, et pas retouché : un seul passage, accéléré pendant que l’agent réfléchit.",
+    "lead": "Enregistré sur le site de développement, avec le vrai moteur : une personne de test parle à l’agent jusqu’à ce qu’il écrive son portrait, ouvre son premier lot, y répond, envoie le débrief, puis écrit dans la présentation qui s’ouvre. Pas une animation, pas une maquette, pas de montage : un seul passage, accéléré pendant que l’agent réfléchit.",
     "transcript": "Les sous-titres en texte",
     "noteTitle": "Lis cet enregistrement honnêtement",
-    "note": "Camille est une personne de test et les personnes qu’elle rencontre sont une distribution fictive : personne ici n’existe, il n’y a aucune photo, et Yasakia n’a pas de membres. La distribution fictive répond oui, c’est ce qui permet de montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scénarisé — donc un passage diffère du suivant. Aucun courriel n’est montré : l’adresse du compte est remplacée à l’écran par le nom de la personne.",
+    "note": "Camille est une personne de test et les personnes qu’elle rencontre sont une distribution fictive : personne ici n’existe, il n’y a aucune photo, et Yasakia n’a pas de membres. La distribution fictive répond oui, c’est ce qui permet de montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scénarisé — donc un passage diffère du suivant. Aucun courriel n’est montré : l’adresse du compte est remplacée à l’écran par le nom de la personne. Note d’honnêteté : cet enregistrement date d’avant le 2026-10-17 et montre encore une première phrase suggérée par l’agent — Yasakia ne l’offre plus, chaque message est écrit par la personne ; un nouvel enregistrement le remplacera.",
     "nextTitle": "Quand l’appli sortira",
     "nextText": "Son propre enregistrement, fait sur la vraie application, remplacera ceux-ci. D’ici là : le code est public.",
     "journeyTitle": "Parler, un lot, un oui des deux côtés, une présentation",
@@ -177,8 +177,8 @@
         "yes": "Elle dit oui. Il a dit oui aussi : une présentation s’ouvre, pour sept jours.",
         "answered": "Elle passe pour les autres. Tout le monde a sa réponse.",
         "debrief": "Trois questions avant le prochain lot : les raisons sonnaient-elles juste, ce qui comptait, la suite.",
-        "intro": "La présentation : son agent lui souffle une première phrase qu’elle seule voit. Il ne lit jamais la suite.",
-        "line": "Elle l’envoie. À partir d’ici, deux personnes se parlent."
+        "intro": "La présentation s’ouvre. Personne n’écrit à sa place : l’agent n’écrit aucune phrase et ne lit jamais la suite.",
+        "line": "Elle écrit son propre message. À partir de là, deux personnes se parlent."
       }
     }
   }

@@ -300,7 +300,7 @@ export async function decide(ai: AiProvider, me: string, batchId: string, itemId
     return { candidateId: item.candidateId, lookingFor: other?.seeking ?? null, mutual, debriefDue };
   });
   await recordAnalytics(me, AnalyticsKind.BatchAnswer, now);
-  const intro = outcome.mutual ? await openIntro(ai, me, outcome.candidateId, now) : null;
+  const intro = outcome.mutual ? await openIntro(me, outcome.candidateId, now) : null;
   return { decision, lookingFor: outcome.lookingFor, introId: intro?.introId ?? null, debriefDue: outcome.debriefDue };
 }
 

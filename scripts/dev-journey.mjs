@@ -2,7 +2,7 @@
 /**
  * `npm run dev:journey` — walks the core journey in a real browser, as the QA person, on a real deployment (dev.yasakia.com)
  * or a local server wired to the real engine: sign in, talk to the agent until it has written the portrait (and, with
- * `--through batch`, open the first batch; with `--through loop`, answer it — tell me more, yes, pass —, write the first line
+ * `--through batch`, open the first batch; with `--through loop`, answer it — tell me more, yes, pass —, write her own first message
  * in the introduction that opens, and send the debrief). It records a video of the run, takes the key screens, and writes
  * `evidence.json` — the engine run ids (the lines in Orazaka's logs) that prove the run was real.
  *
@@ -211,16 +211,14 @@ if (through === "loop" && batch?.status === 201) {
     await box.waitFor();
     await page.waitForTimeout(2500);
     await shot(page, "11-intro");
-    // The line her agent whispered (only she sees it): she sends it as it is — the page shows it above the conversation.
-    const detail = await page.evaluate(async (id) => (await (await fetch(`/api/intros/${id}`, { credentials: "same-origin" })).json()).intro, evidence.introId);
-    evidence.openerShown = Boolean(detail?.opener);
-    const line = detail?.opener ?? UI.note;
+    // Nobody writes for her: she types her own first message.
+    const line = UI.note;
     await box.click();
     await box.pressSequentially(line.slice(0, 160), { delay: 22 });
     const sent = page.waitForResponse((r) => r.url().endsWith("/messages") && r.request().method() === "POST");
     await box.press("Enter");
     evidence.introMessageStatus = (await sent).status();
-    step(`first line sent: HTTP ${evidence.introMessageStatus}`);
+    step(`her own message sent: HTTP ${evidence.introMessageStatus}`);
     await page.waitForTimeout(3000);
     await shot(page, "12-intro-message");
   }

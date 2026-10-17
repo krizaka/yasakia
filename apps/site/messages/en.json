@@ -107,7 +107,7 @@
         },
         "intros": {
           "title": "Introductions",
-          "text": "Seven days to talk when you both said yes, with a first line your agent suggests to you only. Continue together, or let it fade."
+          "text": "Seven days to talk when you both said yes. Every message is typed by you two: the agent writes nothing for you and never reads your conversation. Continue together, or let it fade."
         }
       },
       "working": "Working today",
@@ -156,10 +156,10 @@
   "demo": {
     "title": "Demo",
     "eyebrow": "The real journey",
-    "lead": "Recorded on the development site, against the real engine: a test persona talks to the agent until it writes her portrait, opens her first batch, answers it, sends the debrief, and writes the first line of the introduction that opens. Not an animation, not a mock-up, and not edited: one run, sped up while the agent thinks.",
+    "lead": "Recorded on the development site, against the real engine: a test persona talks to the agent until it writes her portrait, opens her first batch, answers it, sends the debrief, and writes in the introduction that opens. Not an animation, not a mock-up, and not edited: one run, sped up while the agent thinks.",
     "transcript": "Captions as text",
     "noteTitle": "Read this recording honestly",
-    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists, there is no photo, and Yasakia has no members. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next. No e-mail is shown: the account’s address is replaced by the persona’s name on screen.",
+    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists, there is no photo, and Yasakia has no members. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next. No e-mail is shown: the account’s address is replaced by the persona’s name on screen. Honest note: this recording was made before 2026-10-17 and still shows a first line suggested by the agent — Yasakia no longer offers it, every message is typed by the person; a new recording replaces this one.",
     "nextTitle": "When the app ships",
     "nextText": "Its own recording, made on the real application, replaces these. Until then: the code is public.",
     "journeyTitle": "Talk, a batch, a yes both ways, an introduction",
@@ -177,8 +177,8 @@
         "yes": "She says yes. He said yes too: an introduction opens, for seven days.",
         "answered": "She passes on the others. Everyone is answered.",
         "debrief": "Three questions before the next batch: did the reasons ring true, what mattered, what next.",
-        "intro": "The introduction: her agent whispers a first line only she can see. It never reads what follows.",
-        "line": "She sends it. From here, two people talk."
+        "intro": "The introduction opens. Nobody writes for her: the agent writes no line and never reads what follows.",
+        "line": "She types her own message. From here, two people talk."
       }
     }
   }

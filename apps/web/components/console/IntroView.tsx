@@ -17,7 +17,7 @@ const keys = defineKeys("intro", { detail: (id: string) => [id] });
 const POLL_MS = 8000; // @fixed: interface refresh rate, not a business parameter
 
 /**
- * One introduction: the line my agent whispered to me (private), the messages, the composer while it is open, and
+ * One introduction: the messages, the composer while it is open (every word is typed by the person), and
  * « continue » — once both said it, it has no end. Humans talk here; the agent never reads it.
  */
 export function IntroView({ initial }: { initial: IntroDetail }) {
@@ -60,11 +60,7 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
     <DashboardLayout headingAs="h2" title={say("intros.with", { name })} description={open ? say("intros.openUntil", { date: time.format(new Date(intro.expiresAt)) }) : say(`intros.states.${intro.state as "OPEN" | "CONTINUED" | "FADED" | "CLOSED"}`)}>
       <Widget level={3} title={say("intros.threadLabel")} span={2}>
         <div className="flex flex-col gap-3">
-          {intro.opener ? (
-            <Alert tone="info" title={say("intros.openerTitle")}>
-              {intro.opener}
-            </Alert>
-          ) : null}
+          <p className="text-sm text-fg-muted">{say("intros.typedByYou")}</p>
           <div role="log" aria-live="polite" aria-label={say("intros.threadLabel")} className="flex max-h-[28rem] min-h-48 flex-col gap-2 overflow-y-auto pr-1">
             {intro.messages.length === 0 ? <p className="text-sm text-fg-muted">{say("intros.noMessage")}</p> : null}
             {intro.messages.map((m) => (

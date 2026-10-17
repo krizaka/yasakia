@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: getDictionary(asLocale((await params).locale)).console.shell.myIntros };
 }
 
-/** One introduction: the private first line my agent whispered, our messages, « continue ». Someone else's is a 404. */
+/** One introduction: our messages, « continue ». Someone else's is a 404. */
 export default async function IntroPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { id } = await params;
   const session = await pageSession();

@@ -146,6 +146,13 @@ yasakia/                           npm workspaces — Apache-2.0
   (`biometric_consents`, `PUT/DELETE /api/me/photos/consent`, wording version `PHOTO_CONSENT_VERSION`). Without either, faces are only
   counted (`compareFaces: false` to the engine: no vector is even computed).
 
+### B2. The AI never writes for the person
+- **Every message of an introduction is typed by one of the two people.** No suggested first line, no « reply for me », no draft,
+  no rewrite: the agent helps with the *batch* (why you two, in words) and with getting to know the person, never with what
+  they say to someone. The agent's persona forbids it in every prompt (`PERSONA`), the schema has no column for such a line,
+  no endpoint returns one (`apps/web/lib/no-ghostwriting.test.ts`, and the e2e checks the intro detail's exact shape), and the words
+  of the app say so where the person types. Orazaka may *judge* a message (an authenticity signal, a safety check) — it never writes one.
+
 ### C. Position, minimisation
 - The position is **rounded to ~1 km before it is written** (`lib/geo.ts`); `geo_precision_m` is stored; the exact
   coordinates exist nowhere. Never the phone's contacts.

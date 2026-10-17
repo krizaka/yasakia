@@ -976,7 +976,6 @@
       "openUntil": "Open until {date}",
       "with": "You and {name}",
       "threadLabel": "Your conversation",
-      "openerTitle": "Your agent suggests a first line (only you see it)",
       "noMessage": "Nobody has written yet.",
       "placeholder": "Write a message",
       "send": "Send",
@@ -991,7 +990,8 @@
         "CONTINUED": "Continued — you both said so",
         "FADED": "Faded — the time ran out",
         "CLOSED": "Closed"
-      }
+      },
+      "typedByYou": "Every message here is typed by you two. The agent writes nothing for you and never reads this conversation."
     },
     "photos": {
       "lead": "Add {min} to {max} photos, at least {faces} where your face is clearly the subject. They stay private to you until they pass a check — then only the people of your batches see them.",
