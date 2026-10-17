@@ -11,7 +11,7 @@ description: Every HTTP endpoint of the Yasakia API, with the access rule that g
 Base: `https://<host>/api`. Every answer is JSON with `success`; a refusal carries a stable `code` (the app words it).
 Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client: "native"`).
 
-## Endpoints (68)
+## Endpoints (72)
 
 | Method | Path | Access | Summary |
 | :--- | :--- | :--- | :--- |
@@ -55,6 +55,9 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `GET` | `/api/intros` | bearer · account | My introductions — the people who said yes to me as I said yes to them — the live ones first. |
 | `GET` | `/api/intros/{id}` | bearer · account | One of my introductions: who, until when, and our messages (typed by us two — the AI writes none). |
 | `POST` | `/api/intros/{id}/continue` | bearer · account | « Continue »: once both said it, the introduction has no end. |
+| `POST` | `/api/intros/{id}/media` | bearer · account | Starts a media message — a photo, a short video or a voice message — in an introduction while it is open: declares its kind, type, size and length (the limits are the MEDIA rule set's, 413 beyond), answers a signed upload URL (PUT, 300 seconds, this message only); then `PUT …/complete`. |
+| `GET` | `/api/intros/{id}/media/{messageId}` | bearer · account | A URL to read a media message's file, signed for this reader for 300 seconds — after the access rule: the sender sees their own, the other person only once it passed the safety check, and only while the conversation lives. |
+| `PUT` | `/api/intros/{id}/media/{messageId}/complete` | bearer · account | Completes a media upload: the bytes are the declared kind of media within the limits (its measured length decides), made clean of every metadata block and stored as they are — nothing is trimmed or edited —, then the safety check is queued. |
 | `POST` | `/api/intros/{id}/messages` | bearer · account | Writes in an introduction while it is open (idempotent per `clientId`); the other person is told at once. |
 | `DELETE` | `/api/me` | bearer · account | Deletes the account for good, at once — every row that is theirs, in one transaction; the photos are purged from storage right after (retried until done, 30 days at most) and a confirmation e-mail leaves. |
 | `GET` | `/api/me` | bearer · account | The signed-in account: e-mail, status, language, age (never the date of birth), profile, rounded position, the agent's state. |
@@ -81,9 +84,10 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `DELETE` | `/api/push/tokens` | bearer · account | Forgets this phone's push token (notifications turned off on the device). |
 | `POST` | `/api/push/tokens` | bearer · account | Registers this phone's Expo push token for the account (a phone that changed hands moves to the new account). |
 | `POST` | `/api/reports` | bearer · account | Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it. |
+| `PUT` | `/api/uploads/messages/{id}` | public | Receives one media message's bytes at the URL `POST /api/intros/&#123;id&#125;/media` signed — the signature is the authorisation (one message, 300 seconds); the type must be the declared one and the size at most the declared one. |
 | `PUT` | `/api/uploads/photos/{id}` | signed upload URL (one photo, 300 s) | Receives one photo's bytes at the URL `POST /api/me/photos` signed — the signature is the authorisation (one photo, 300 seconds); the type must be the declared one and the size at most the declared one. |
 | `GET` | `/api/v1/app-config` | public | `GET /api/v1/app-config?platform=ios|android&version=x.y.z` — public and cacheable (ETag, 304): the minimum and latest versions, the update mode, maintenance, the contract range, texts in the app's language (krizaka/.github#75). |
 
-## Database tables (30)
+## Database tables (31)
 
-See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `analytics_outbox` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `biometric_consents` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_message_signals` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `photo_checks` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.
+See the Database Reference: `account_credentials` · `account_deletions` · `account_exports` · `accounts` · `agent_messages` · `agent_sessions` · `ai_calls` · `analytics_outbox` · `audit_log` · `auth_codes` · `batch_items` · `batches` · `biometric_consents` · `blocks` · `debriefs` · `facet_embeddings` · `facets` · `intro_media` · `intro_message_signals` · `intro_messages` · `intros` · `pairs_seen` · `password_reset_codes` · `photo_checks` · `profile_photos` · `profiles` · `push_tokens` · `rate_limit_buckets` · `reports` · `rule_sets` · `web_sessions`.

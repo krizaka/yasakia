@@ -25,6 +25,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ key: string[] }
     if (!ok) throw new HttpError(403, "This media URL is not valid (expired or altered)", { code: "MEDIA_SIGNATURE" });
     const bytes = await mediaStorage(config).get(key);
     if (!bytes) throw new HttpError(404, "Not found", { code: "NOT_FOUND" });
+    if (width === 0) {
+      // A media message's file (video, voice message, photo as sent): served as it is, still under its 300-second signature.
+      const type = key.endsWith(".mp4") ? "video/mp4" : key.endsWith(".webm") ? "video/webm" : key.endsWith(".ogg") ? "audio/ogg" : key.endsWith(".mp3") ? "audio/mpeg" : key.endsWith(".wav") ? "audio/wav" : key.endsWith(".m4a") ? "audio/mp4" : "image/jpeg";
+      return new Response(new Uint8Array(bytes), { headers: { "Content-Type": type, "Cache-Control": "private, max-age=300" } });
+    }
     const body = await sharp(bytes).resize({ width, withoutEnlargement: true }).jpeg({ quality: 80 }).toBuffer();
     return new Response(new Uint8Array(body), { headers: { "Content-Type": "image/jpeg", "Cache-Control": "private, max-age=300" } });
   });

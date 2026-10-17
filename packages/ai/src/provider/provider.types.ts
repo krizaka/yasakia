@@ -3,6 +3,7 @@
  * embeddings. The one adapter is Orazaka's (`orazaka.ts`); Yasakia never calls a model provider.
  */
 
+import type { MediaSafetyInput, MediaSafetyResult } from "./media-safety.types";
 import type { MessageJudgeInput, MessageJudgeResult } from "./message-judge.types";
 import type { PhotoCheckInput, PhotoCheckResult } from "./photo-check.types";
 
@@ -67,6 +68,11 @@ export interface AiProvider {
    * never writes one.
    */
   judgeMessage(input: MessageJudgeInput): Promise<MessageJudgeResult>;
+  /**
+   * Judges the safety of a photo, the frames of a video or a voice message with Orazaka's `media-safety` Studio. Fails closed: the
+   * verdict is APPROVED only when everything was examined and read; an engine that cannot answer throws, it never approves.
+   */
+  moderateMedia(input: MediaSafetyInput): Promise<MediaSafetyResult>;
 }
 
 // @fixed: Orazaka's limit per request (EmbeddingClientImpl.MAX_BATCH).

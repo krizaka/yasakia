@@ -1,6 +1,6 @@
 import { db, ruleSets } from "@yasakia/db";
 import { MatchingParams } from "@yasakia/matching";
-import { MAX_PHOTOS } from "@yasakia/media";
+import { MAX_PHOTOS, MediaLimits } from "@yasakia/media";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
@@ -36,7 +36,7 @@ export const PhotoParams = z
   .refine((p) => p.maxPhotos >= p.minPhotos && p.minFacePhotos <= p.maxPhotos, { message: "min ≤ max photos, face photos ≤ max photos" });
 export type PhotoParams = z.infer<typeof PhotoParams>;
 
-export const RuleDomain = { Matching: "MATCHING", Agent: "AGENT", Photos: "PHOTOS", Authenticity: "AUTHENTICITY" } as const;
+export const RuleDomain = { Matching: "MATCHING", Agent: "AGENT", Photos: "PHOTOS", Authenticity: "AUTHENTICITY", Media: "MEDIA" } as const;
 
 /** A rule set the database cannot give is a configuration problem: 503, the name logged, nothing leaked. */
 function misconfigured(what: string): HttpError {
@@ -75,6 +75,14 @@ export async function photoRules(): Promise<{ version: number; params: PhotoPara
   return { version: row.version, params: parsed.data };
 }
 
+/** The limits of media messages (a photo ≤ 10 MB, a video ≤ 60 s / 50 MB, a voice message ≤ 2 min / 10 MB at version 1). */
+export async function mediaRules(): Promise<{ version: number; params: MediaLimits }> {
+  const row = await activeRow(RuleDomain.Media);
+  const parsed = MediaLimits.safeParse(row.params);
+  if (!parsed.success) throw misconfigured(`rule set MEDIA v${row.version} is outside its bounds`);
+  return { version: row.version, params: parsed.data };
+}
+
 export async function authenticityRules(): Promise<{ version: number; params: AuthenticityParams }> {
   const row = await activeRow(RuleDomain.Authenticity);
   const parsed = AuthenticityParams.safeParse(row.params);
@@ -87,7 +95,7 @@ export async function authenticityRules(): Promise<{ version: number; params: Au
 export type RuleDomain = (typeof RuleDomain)[keyof typeof RuleDomain];
 export const RULE_DOMAINS = Object.values(RuleDomain);
 
-const SCHEMAS: Record<RuleDomain, z.ZodObject> = { [RuleDomain.Matching]: MatchingParams, [RuleDomain.Agent]: AgentParams, [RuleDomain.Photos]: PhotoParams, [RuleDomain.Authenticity]: AuthenticityParams };
+const SCHEMAS: Record<RuleDomain, z.ZodObject> = { [RuleDomain.Matching]: MatchingParams, [RuleDomain.Agent]: AgentParams, [RuleDomain.Photos]: PhotoParams, [RuleDomain.Authenticity]: AuthenticityParams, [RuleDomain.Media]: MediaLimits };
 
 /** A domain from a URL segment: only the ones the app reads (anything else does not exist — 404). */
 export function parseRuleDomain(value: string): RuleDomain {

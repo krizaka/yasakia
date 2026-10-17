@@ -170,6 +170,23 @@ yasakia/                           npm workspaces — Apache-2.0
   corroborating sign, not a detector to rely on.
 - The agent still never reads the conversation; a classifier (not the chat model) reads each message once for its mark and keeps nothing.
 
+### B4. Media messages — photos, videos, voice messages
+- Any of the two people can send a **photo, a video (≤ 60 s, ≤ 50 MB) or a voice message (≤ 2 min, ≤ 10 MB; a photo ≤ 10 MB)** in an
+  introduction. The limits are the `MEDIA` rule set (`lib/rule-sets.ts`, bounded by `MediaLimits`), told by the screen before the upload and
+  **measured again by the server** (a video that lies about its length is refused). **Nothing is edited**: no filter, trim or effect — the
+  person captures or picks, sees it, sends it; the file is only made clean (every metadata block, GPS included, removed by copying the streams
+  into a fresh container; a photo is re-encoded) and measured. `packages/media/src/message-media.ts`, ffmpeg (`ffmpeg-static`, a GPL static
+  build run as a separate process; the image copies it to `MEDIA_FFMPEG_PATH`).
+- **Private on Bunny** (`messages/<intro>/<message>.<ext>`), never served raw: `GET /api/intros/{id}/media/{messageId}` evaluates who asks
+  (`lib/intro-media-rules.ts` — the sender sees their own; the other person only once it is APPROVED; nobody once the conversation is faded,
+  closed, frozen or past its days) and only then signs a 300-second URL. The thread carries no URL and no key.
+- **Judged before it is shown**: Orazaka's `media-safety` Studio (krizaka/orazaka-packs) looks at the photo / frames of the video and, for a voice
+  message, judges its transcript. It **fails closed**: a check that cannot decide (an unreadable answer, the engine out of reach) HOLDS the
+  media — never approves it — and is tried again; a refusal deletes the bytes and tells only the sender why, in codes.
+- **Expiry follows the conversation**: when an introduction fades or closes the sweep deletes its media (GONE); an account deletion queues the
+  media of its conversations for the purge; an upload nobody completed is swept. The audio has a waveform (64 peaks computed server-side,
+  drawn by `@krizaka/ui`'s AudioPlayer).
+
 ### C. Position, minimisation
 - The position is **rounded to ~1 km before it is written** (`lib/geo.ts`); `geo_precision_m` is stored; the exact
   coordinates exist nowhere. Never the phone's contacts.

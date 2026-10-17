@@ -68,6 +68,7 @@
         "debriefs",
         "facet_embeddings",
         "facets",
+        "intro_media",
         "intro_message_signals",
         "intro_messages",
         "intros",
@@ -256,6 +257,13 @@
       ]
     },
     {
+      "name": "intro_media",
+      "columns": 15,
+      "references": [
+        "intro_messages"
+      ]
+    },
+    {
       "name": "intro_message_signals",
       "columns": 12,
       "references": [
@@ -264,7 +272,7 @@
     },
     {
       "name": "intro_messages",
-      "columns": 6,
+      "columns": 7,
       "references": [
         "intros",
         "accounts"
@@ -585,6 +593,24 @@
     },
     {
       "method": "POST",
+      "path": "/api/intros/{id}/media",
+      "access": "bearer · account",
+      "summary": "Starts a media message — a photo, a short video or a voice message — in an introduction while it is open: declares its kind, type, size and length (the limits are the MEDIA rule set's, 413 beyond), answers a signed upload URL (PUT, 300 seconds, this message only); then `PUT …/complete`."
+    },
+    {
+      "method": "GET",
+      "path": "/api/intros/{id}/media/{messageId}",
+      "access": "bearer · account",
+      "summary": "A URL to read a media message's file, signed for this reader for 300 seconds — after the access rule: the sender sees their own, the other person only once it passed the safety check, and only while the conversation lives."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/intros/{id}/media/{messageId}/complete",
+      "access": "bearer · account",
+      "summary": "Completes a media upload: the bytes are the declared kind of media within the limits (its measured length decides), made clean of every metadata block and stored as they are — nothing is trimmed or edited —, then the safety check is queued."
+    },
+    {
+      "method": "POST",
       "path": "/api/intros/{id}/messages",
       "access": "bearer · account",
       "summary": "Writes in an introduction while it is open (idempotent per `clientId`); the other person is told at once."
@@ -738,6 +764,12 @@
       "path": "/api/reports",
       "access": "bearer · account",
       "summary": "Reports someone, with a normalised reason — persisted before it is acknowledged, the details encrypted at rest, a report inside an intro freezes it."
+    },
+    {
+      "method": "PUT",
+      "path": "/api/uploads/messages/{id}",
+      "access": "public",
+      "summary": "Receives one media message's bytes at the URL `POST /api/intros/{id}/media` signed — the signature is the authorisation (one message, 300 seconds); the type must be the declared one and the size at most the declared one."
     },
     {
       "method": "PUT",

@@ -18,6 +18,10 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+import { execFileSync } from "node:child_process";
+import os from "node:os";
+
+import ffmpegPath from "ffmpeg-static";
 import pg from "pg";
 import sharp from "sharp";
 
@@ -1090,6 +1094,127 @@ let adaPhoto;
         check("signal: …and its signal comes from how it was typed alone (HAND), never a block", (await signalOf(m10.json.message.id)) === "HAND");
         await control("up");
         check("signal: a signal is first-write-wins: a message judged once keeps its word", (await sql("select count(*)::int as n from intro_message_signals where signal is not null and judged_at is not null"))[0].n >= 8);
+      }
+      // ── Media messages: photo, video, voice message — private, within limits, never edited, judged before they are shown ────
+      {
+        const mia = await signUp("mia", { birthDate: "1990-02-02" });
+        const noa = await signUp("noa", { birthDate: "1989-03-03" });
+        const eve = await signUp("eve", { birthDate: "1988-04-04" });
+        const [pa, pb] = mia.id < noa.id ? [mia.id, noa.id] : [noa.id, mia.id];
+        const [{ id: roomId }] = await sql("insert into intros (account_a, account_b, state, expires_at) values ($1, $2, 'OPEN', now() + interval '7 days') returning id", [pa, pb]);
+        const mk = (name, args) => {
+          const out = path.join(os.tmpdir(), `yasakia-e2e-${run}-${name}`);
+          execFileSync(ffmpegPath, ["-v", "error", ...args, "-y", out]);
+          return fs.readFileSync(out);
+        };
+        const video = mk("clip.mp4", ["-f", "lavfi", "-i", "testsrc=duration=3:size=320x240:rate=15", "-f", "lavfi", "-i", "sine=frequency=440:duration=3", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", "-metadata", "title=E2E-SECRET-TITLE", "-metadata", "location=+45.5017-073.5673/"]);
+        const longVideo = mk("long.mp4", ["-f", "lavfi", "-i", "testsrc=duration=70:size=160x120:rate=5", "-c:v", "libx264", "-pix_fmt", "yuv420p"]);
+        const voice = mk("voice.m4a", ["-f", "lavfi", "-i", "sine=frequency=330:duration=2", "-c:a", "aac", "-metadata", "artist=E2E-SECRET-ARTIST"]);
+        const photo = await sharp({ create: { width: 800, height: 600, channels: 3, background: { r: 30, g: 120, b: 200 } } }).withExif({ IFD0: { Make: "E2E Phone" } }).jpeg().toBuffer();
+        const as = (user) => (pathname, init = {}) => call(pathname, { ...init, token: user.token, ip: user.ip });
+        const asMia = as(mia), asNoa = as(noa), asEve = as(eve);
+        const room = `/api/intros/${roomId}`;
+        const safety = (verdict, blockers = [], times = 1) => fetch(`${STUB}/__control/safety`, { method: "POST", body: JSON.stringify({ verdict, blockers, times }) });
+        const start = (user, kind, contentType, bytes, durationMs) => as(user)(`${room}/media`, { method: "POST", body: { kind, contentType, bytes: bytes.length, ...(durationMs !== undefined ? { durationMs } : {}), clientId: crypto.randomUUID() } });
+        const put = (started, bytes, contentType) => fetch(started.json.upload.url, { method: "PUT", headers: { "Content-Type": contentType }, body: bytes });
+        const send = async (user, kind, contentType, bytes, durationMs) => {
+          const started = await start(user, kind, contentType, bytes, durationMs);
+          if (started.status !== 201) return { started };
+          const uploaded = await put(started, bytes, contentType);
+          const done = await as(user)(`${room}/media/${started.json.messageId}/complete`, { method: "PUT" });
+          return { started, uploaded, done, id: started.json.messageId };
+        };
+        const seenBy = async (user) => (await as(user)(room)).json.intro.messages;
+        const approved = (id) => waitFor(async () => (await sql("select status from intro_media where message_id = $1", [id]))[0]?.status === "APPROVED", 30000);
+        const stored = (key) => fs.existsSync(path.join(STORAGE, key));
+
+        // The limits are the rule set's — told at the start, measured again at the end.
+        const detail0 = await asMia(room);
+        check("media: the limits ride the thread (photo 10 MB, video 60 s / 50 MB, voice 2 min / 10 MB), read from the MEDIA rule set", detail0.json.intro.mediaLimits.photoMaxBytes === 10485760 && detail0.json.intro.mediaLimits.videoMaxSeconds === 60 && detail0.json.intro.mediaLimits.videoMaxBytes === 52428800 && detail0.json.intro.mediaLimits.audioMaxSeconds === 120 && detail0.json.intro.mediaLimits.audioMaxBytes === 10485760, detail0.json.intro.mediaLimits);
+        check("media: a declared size beyond the limit is refused before any upload (413 MEDIA_TOO_LARGE, with the max)", (await as(mia)(`${room}/media`, { method: "POST", body: { kind: "PHOTO", contentType: "image/jpeg", bytes: 11 * 1024 * 1024, clientId: crypto.randomUUID() } })).json.code === "MEDIA_TOO_LARGE" && (await as(mia)(`${room}/media`, { method: "POST", body: { kind: "VIDEO", contentType: "video/mp4", bytes: 1000, durationMs: 61000, clientId: crypto.randomUUID() } })).json.code === "MEDIA_TOO_LONG");
+        check("media: a type that is not a photo/video/sound is refused (415), and a visitor or a stranger gets 401/404", (await start(mia, "VIDEO", "application/pdf", Buffer.from("x"))).status === 415 && (await call(`${room}/media`, { method: "POST", body: {} })).status === 401 && (await asEve(`${room}/media`, { method: "POST", body: { kind: "PHOTO", contentType: "image/jpeg", bytes: 10, clientId: crypto.randomUUID() } })).status === 404);
+
+        // A video that lies about its length: the measured length decides.
+        const liar = await send(mia, "VIDEO", "video/mp4", longVideo, 1000);
+        check("media: the file is measured — a 70-second video declared as 1 second is refused (413 MEDIA_TOO_LONG) and leaves nothing behind", liar.done.status === 413 && liar.done.json.code === "MEDIA_TOO_LONG" && (await sql("select count(*)::int as n from intro_messages where id = $1", [liar.id]))[0].n === 0);
+        const wrong = await send(mia, "AUDIO", "audio/mp4", video, 3000);
+        check("media: a video declared as a voice message is refused (422 MEDIA_WRONG_KIND), and a file that is no media at all too (422)", wrong.done.json.code === "MEDIA_WRONG_KIND" && (await send(mia, "VIDEO", "video/mp4", Buffer.from("this is not a video, only text ".repeat(20)), 3000)).done.status === 422);
+
+        // The signed upload: the signature is the authorisation.
+        const st = await start(mia, "PHOTO", "image/jpeg", photo);
+        const forged = st.json.upload.url.replace(/signature=[^&]+/, "signature=AAAA");
+        check("media: the upload URL is signed for one message and 300 seconds — a forged or reused signature is refused (403)", st.status === 201 && /\/api\/uploads\/messages\/[0-9a-f-]{36}\?expires=\d+&signature=/.test(st.json.upload.url) && (await fetch(forged, { method: "PUT", headers: { "Content-Type": "image/jpeg" }, body: photo })).status === 403 && (await put(st, photo, "image/png")).status === 415);
+        check("media: completing before the bytes arrive: 409 UPLOAD_MISSING", (await asMia(`${room}/media/${st.json.messageId}/complete`, { method: "PUT" })).json.code === "UPLOAD_MISSING");
+        await put(st, photo, "image/jpeg");
+
+        // A photo: stored clean, held until the safety check passed — the other person cannot see it before.
+        const done1 = await asMia(`${room}/media/${st.json.messageId}/complete`, { method: "PUT" });
+        const holdId = st.json.messageId;
+        check("media: a photo is cleaned and stored, then waits for its safety check (PENDING) — the sender sees it, the other person does not", done1.status === 200 && ["PENDING", "APPROVED"].includes(done1.json.media.status) && (await seenBy(mia)).some((m) => m.id === holdId));
+        check("media: …nothing of it exists for the other person while it waits (not in the thread, 404 on its URL)", done1.json.media.status !== "PENDING" || (!(await seenBy(noa)).some((m) => m.id === holdId) && (await asNoa(`${room}/media/${holdId}`)).status === 404));
+        check("media: the safety check approved it through Orazaka (media-safety, a run id kept)", (await approved(holdId)) !== null && (await sql("select engine_run_id from intro_media where message_id = $1", [holdId]))[0].engine_run_id !== null && (await runsOfStub()).mediaSafety.length >= 1);
+        const seenNoa = (await seenBy(noa)).find((m) => m.id === holdId);
+        check("media: once approved the other person sees it, with no URL in the thread (the file comes through a signed URL)", seenNoa?.kind === "PHOTO" && seenNoa.media.status === "APPROVED" && !JSON.stringify(seenNoa).includes("messages/") && !/https?:/.test(JSON.stringify(seenNoa)));
+        const url1 = await asNoa(`${room}/media/${holdId}`);
+        const img = await fetch(url1.json.media.url);
+        const imgBytes = Buffer.from(await img.arrayBuffer());
+        check("media: a signed URL (300 s) serves the photo as it was stored — re-encoded, no EXIF/GPS left", url1.status === 200 && img.status === 200 && (await sharp(imgBytes).metadata()).exif === undefined && !imgBytes.includes(Buffer.from("E2E Phone")));
+        check("media: …and an altered or expired signature is refused (403); a stranger gets 404", (await fetch(url1.json.media.url.replace(/expires=\d+/, "expires=1"))).status === 403 && (await asEve(`${room}/media/${holdId}`)).status === 404);
+
+        // A video: metadata gone, a poster, three frames judged.
+        const v = await send(mia, "VIDEO", "video/mp4", video, 3000);
+        check("media: a short video is accepted (≤ 60 s, ≤ 50 MB)", v.done.status === 200 && (await approved(v.id)) !== null);
+        const vUrl = await asNoa(`${room}/media/${v.id}`);
+        const vBytes = Buffer.from(await (await fetch(vUrl.json.media.url)).arrayBuffer());
+        check("media: its title and GPS tags are gone from the stored file; the other person gets a poster and the video", !vBytes.includes(Buffer.from("E2E-SECRET-TITLE")) && !vBytes.includes(Buffer.from("+45.5017")) && vBytes.length > 5000 && typeof vUrl.json.media.posterUrl === "string" && (await runsOfStub()).mediaSafety.some((r) => r.frames === 3 && !r.speech));
+
+        // A voice message: a waveform, judged on its words.
+        const a = await send(mia, "AUDIO", "audio/mp4", voice, 2000);
+        check("media: a voice message is accepted, with its length and a 64-bar waveform", a.done.status === 200 && a.done.json.media.waveform?.length === 64 && a.done.json.media.waveform.every((x) => x >= 0 && x <= 100) && Math.abs(a.done.json.media.durationMs - 2000) < 500);
+        check("media: …judged on its transcript (the engine was given the sound, no pictures)", (await approved(a.id)) !== null && (await runsOfStub()).mediaSafety.some((r) => r.frames === 0 && r.speech));
+        const aBytes = Buffer.from(await (await fetch((await asNoa(`${room}/media/${a.id}`)).json.media.url)).arrayBuffer());
+        check("media: its tags are gone too", !aBytes.includes(Buffer.from("E2E-SECRET-ARTIST")));
+
+        // The safety check: refused, unreadable, engine down — and what each leaves.
+        await safety("REJECTED", ["SEXUAL_CONTENT"]);
+        const bad = await send(mia, "PHOTO", "image/jpeg", photo);
+        await waitFor(async () => (await sql("select status from intro_media where message_id = $1", [bad.id]))[0]?.status === "REJECTED", 30000);
+        const badKey = (await sql("select storage_key from intro_media where message_id = $1", [bad.id]))[0].storage_key;
+        const badMine = (await seenBy(mia)).find((m) => m.id === bad.id);
+        check("media: a refused photo is deleted (bytes gone), and only its sender learns why — in codes, never the engine's words", !stored(badKey) && badMine?.media.status === "REJECTED" && badMine.media.codes.join() === "SEXUAL_CONTENT");
+        check("media: …the other person never saw it, and it has no URL (404) for anyone", !(await seenBy(noa)).some((m) => m.id === bad.id) && (await asMia(`${room}/media/${bad.id}`)).status === 404 && (await asNoa(`${room}/media/${bad.id}`)).status === 404);
+
+        await safety("UNREADABLE");
+        const held = await send(mia, "PHOTO", "image/jpeg", photo);
+        await waitFor(async () => (await sql("select attempts from intro_media where message_id = $1", [held.id]))[0]?.attempts >= 1, 30000);
+        const heldRow = (await sql("select status from intro_media where message_id = $1", [held.id]))[0];
+        check("media: a check that cannot read is a HOLD, never an approval — still PENDING, invisible to the other person", heldRow.status === "PENDING" && !(await seenBy(noa)).some((m) => m.id === held.id));
+        await sql("update intro_media set attempts = 99 where message_id = $1", [held.id]); // out of the loop: it waits for a person
+
+        await control("down");
+        const offline = await send(mia, "PHOTO", "image/jpeg", photo);
+        await sleep(1500);
+        check("media: with the engine down the photo is held (PENDING), not approved and not lost", offline.done.status === 200 && (await sql("select status from intro_media where message_id = $1", [offline.id]))[0].status === "PENDING" && !(await seenBy(noa)).some((m) => m.id === offline.id));
+        await control("up");
+        check("media: …and it is decided when the engine is back", (await approved(offline.id)) !== null);
+
+        // Expiry follows the conversation.
+        await sql("update intros set state = 'FADED', closed_at = now() where id = $1", [roomId]);
+        const keyVideo = (await sql("select storage_key from intro_media where message_id = $1", [v.id]))[0].storage_key;
+        check("media: once the conversation has faded nobody opens its media (404), whoever asks", (await asNoa(`${room}/media/${v.id}`)).status === 404 && (await asMia(`${room}/media/${v.id}`)).status === 404);
+        check("media: …and the sweep deletes the bytes (GONE)", (await waitFor(async () => !stored(keyVideo) && (await sql("select status from intro_media where message_id = $1", [v.id]))[0].status === "GONE", 40000)) !== null);
+
+        // Deleting an account takes the conversation's media with it.
+        await sql("update intros set state = 'OPEN', closed_at = null where id = $1", [roomId]);
+        const last = await send(mia, "PHOTO", "image/jpeg", photo);
+        await approved(last.id);
+        const keepKey = (await sql("select storage_key from intro_media where message_id = $1", [last.id]))[0].storage_key;
+        check("media: (the last photo is approved and its bytes are in storage before the deletion)", stored(keepKey));
+        const del = await as(noa)("/api/me", { method: "DELETE" });
+        const keys = (await sql("select storage_keys from account_deletions where account_id = $1", [noa.id]))[0]?.storage_keys ?? [];
+        check("media: deleting an account queues the media of its conversations for the purge (both people's files)", del.status === 200 && keys.includes(keepKey));
+        check("media: …and the purge removes them from storage", (await waitFor(async () => !stored(keepKey), 40000)) !== null);
+        check("media: no raw URL, storage key or score in the media answers", !/"storage_?key"|"posterKey"/i.test(JSON.stringify(answers.slice(-60))));
       }
       const cont = await as(`/api/intros/${yes.json.introId}/continue`, { method: "POST" });
       check("intros: « continue » alone waits for the other (still OPEN), and is said once", cont.json.state === "OPEN" && (await as(`/api/intros/${yes.json.introId}/continue`, { method: "POST" })).json.code === "ALREADY_CONTINUED" && (await as(`/api/intros/${yes.json.introId}`)).json.intro.continuedByMe === true);

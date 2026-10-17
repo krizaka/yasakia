@@ -16,6 +16,10 @@
  *
  * The message check (Studio `message-authenticity`): a coarse level from marker words — « delve » reads as machine (HIGH), « tapestry »
  * as doubtful (MID), anything else LOW, UNAVAILABLE under 12 words — in the pack's closed shape. It keeps no text.
+ *
+ * The media safety check (Studio `media-safety`): APPROVED by default; a scenario decides the next verdicts with
+ *   POST /__control/safety   {"verdict":"REJECTED","blockers":["SEXUAL_CONTENT"],"times":1}   (UNREADABLE and APPROVED too).
+ * Pictures are not looked at — a stand-in has no eyes; the verdict is the scenario's, said out loud.
  */
 import { createHash, randomUUID } from "node:crypto";
 import http from "node:http";
@@ -156,10 +160,12 @@ function answerFor(prompt) {
 
 export function startOrazakaStub(port = 4599) {
   let isDown = false;
-  const runs = { chats: [], embeddings: [], forgotten: [], photoChecks: [], assets: { uploaded: [], deleted: [] }, messageJudgements: [] };
+  const runs = { chats: [], embeddings: [], forgotten: [], photoChecks: [], assets: { uploaded: [], deleted: [] }, messageJudgements: [], mediaSafety: [] };
   const stored = new Map(); // asset id -> bytes
   const photoRuns = new Map(); // run id -> { polls, report }
   const messageRuns = new Map(); // run id -> { polls, report }
+  const safetyRuns = new Map(); // run id -> { polls, report }
+  const safetyQueue = []; // verdicts a scenario decided, used once each (times)
   const server = http.createServer((req, res) => {
     const chunks = [];
     req.on("data", (chunk) => chunks.push(chunk));
@@ -174,6 +180,11 @@ export function startOrazakaStub(port = 4599) {
       if (path === "/__control/down") return (isDown = true), reply(200, { down: true });
       if (path === "/__control/up") return (isDown = false), reply(200, { down: false });
       if (path === "/__control/runs") return reply(200, runs);
+      if (path === "/__control/safety") {
+        const { verdict = "APPROVED", blockers = [], times = 1 } = JSON.parse(body || "{}");
+        for (let i = 0; i < times; i++) safetyQueue.push({ verdict, blockers });
+        return reply(200, { queued: safetyQueue.length });
+      }
       if (isDown) return reply(503, { error: "down" });
       if (!/^Bearer oz_/.test(req.headers.authorization ?? "")) return reply(401, {});
       const chat = /^\/edge\/api\/v1\/chat\/stream\/([^/]+)$/.exec(path);
@@ -228,7 +239,23 @@ export function startOrazakaStub(port = 4599) {
         runs.messageJudgements.push({ runId: id, words: inputs.text.trim().split(/\s+/).length });
         return reply(200, { id, studioKey: "message-authenticity", status: "RUNNING", outputs: [], errorMessage: null, steps: [] });
       }
+      if (req.method === "POST" && path === "/edge/api/v1/studios/media-safety/runs") {
+        const { inputs } = JSON.parse(body || "{}");
+        const known = (inputs?.frames ?? []).every((id) => stored.has(id)) && (!inputs?.audio || stored.has(inputs.audio));
+        if (!known || inputs?.frameCount !== (inputs?.frames ?? []).length || (inputs.frames.length === 0 && !inputs.audio)) return reply(400, { error: "frames, frameCount and audio must name uploaded assets" });
+        const decided = safetyQueue.shift() ?? { verdict: "APPROVED", blockers: [] };
+        const report = { rulesetId: "media-safety", rulesetVersion: "2026-10-17", rulesetRevision: 1, verdict: decided.verdict, blockers: decided.blockers, findings: decided.blockers.map((code) => ({ code, frame: code.endsWith("SPEECH") || code === "HATE" || code === "THREAT_OR_HARASSMENT" ? null : 0 })), examined: { frames: inputs.frames.length, speech: Boolean(inputs.audio) }, unreadable: decided.verdict === "UNREADABLE" ? 1 : 0, limits: ["MODEL_ANSWERS_CAN_BE_WRONG", "FAILS_CLOSED_WHEN_UNREADABLE"] };
+        const id = randomUUID();
+        safetyRuns.set(id, { polls: 0, report });
+        runs.mediaSafety.push({ runId: id, frames: inputs.frames.length, speech: Boolean(inputs.audio) });
+        return reply(200, { id, studioKey: "media-safety", status: "RUNNING", outputs: [], errorMessage: null, steps: [] });
+      }
       const photoRun = /^\/edge\/api\/v1\/studios\/runs\/([^/]+)$/.exec(path);
+      if (req.method === "GET" && photoRun && safetyRuns.has(photoRun[1])) {
+        const run = safetyRuns.get(photoRun[1]);
+        const done = ++run.polls > 1;
+        return reply(200, { id: photoRun[1], studioKey: "media-safety", status: done ? "SUCCEEDED" : "RUNNING", outputs: done ? [{ key: "report", label: "Verdict, en codes", type: "JSON", value: JSON.stringify(run.report) }] : [], errorMessage: null, steps: [] });
+      }
       if (req.method === "GET" && photoRun && messageRuns.has(photoRun[1])) {
         const run = messageRuns.get(photoRun[1]);
         const done = ++run.polls > 1;

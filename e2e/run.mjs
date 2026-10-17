@@ -24,6 +24,8 @@ export const E2E_ENV = {
   OPERATOR_API_TOKEN: "e2e-only-operator-token-0123456789abcdef0123",
   OPERATOR_ALLOWED_IPS: "203.0.113.7",
   APP_ACCOUNT_PURGE_INTERVAL_SECONDS: "1",
+  APP_SWEEP_INTERVAL_SECONDS: "5",
+  APP_MEDIA_REVIEW_INTERVAL_SECONDS: "5",
   MEDIA_STORAGE_PROVIDER: "local",
   // The comparison of photos is biometric processing: off by default in production; the scenarios run it on (and prove it needs the person's consent).
   APP_PHOTO_FACE_COMPARISON: "on",

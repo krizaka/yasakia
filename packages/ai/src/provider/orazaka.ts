@@ -1,3 +1,4 @@
+import { type MediaSafetyInput, MediaSafetyReport, type MediaSafetyResult } from "./media-safety.types";
 import { type MessageJudgeInput, MessageJudgeReport, type MessageJudgeResult } from "./message-judge.types";
 import { type PhotoCheckInput, PhotoCheckReport, type PhotoCheckResult, RunStatus } from "./photo-check.types";
 import { AiFailure, type AiProvider, AiUnavailableError, type ChatInput, type ChatResult, type EmbedResult, MAX_EMBED_BATCH } from "./provider.types";
@@ -13,6 +14,8 @@ export interface OrazakaOptions {
   embedTimeoutMs: number;
   /** How long a whole photo check (uploads, the Studio run, its answer) may take, in milliseconds. Default 180 000. */
   photoCheckTimeoutMs?: number;
+  /** How long a media safety check (uploads, transcript, judgement) may take, in milliseconds. Default 300 000. */
+  mediaSafetyTimeoutMs?: number;
   /** How long judging one message may take, in milliseconds. Default 30 000. */
   messageJudgeTimeoutMs?: number;
   /** How often a run is asked about, in milliseconds. Default 2 000. */
@@ -66,6 +69,20 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
   };
   const refusal = (response: Response) => failure(response.status >= 500 ? AiFailure.Unreachable : AiFailure.Refused, `Orazaka answered ${response.status}`);
 
+  /** Uploads bytes to Orazaka's file store (sealed, the caller's own space) and returns the asset id. */
+  async function uploadAsset(bytes: Buffer, type: string, filename: string, timeoutMs: number, signal?: AbortSignal): Promise<string> {
+    const form = new FormData();
+    form.append("file", new Blob([new Uint8Array(bytes)], { type }), filename);
+    const uploaded = await call("/api/v1/media/upload", { method: "POST", body: form }, timeoutMs, signal);
+    if (!uploaded.ok) return refusal(uploaded);
+    const id = await uploaded.json().then((j: { assetId?: unknown }) => j.assetId, () => undefined);
+    if (typeof id !== "string" || !id) return failure(AiFailure.BadResponse, "Orazaka answered an upload without an asset id");
+    return id;
+  }
+
+  /** Takes uploaded assets back (best effort): the person's media are read once. */
+  const takeBack = (assetIds: string[]) => Promise.allSettled(assetIds.map((id) => call(`/api/v1/media/assets/${encodeURIComponent(id)}`, { method: "DELETE" }, options.embedTimeoutMs)));
+
   /**
    * Runs one of Orazaka's Studios (`POST /api/v1/studios/{key}/runs`) and asks about the run until it ends, within `deadline`.
    * Returns the run's id (the proof of use) and the JSON its `report` output carries. The engine's own words (a model's error, a
@@ -102,15 +119,7 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
     const start = now();
     const deadline = start + (options.photoCheckTimeoutMs ?? 180_000); // @fixed: three minutes for a vision model reading up to six photos on a small machine
     const left = () => Math.max(1, deadline - now());
-    for (const photo of photos) {
-      const form = new FormData();
-      form.append("file", new Blob([new Uint8Array(photo)], { type: "image/jpeg" }), "photo.jpg");
-      const uploaded = await call("/api/v1/media/upload", { method: "POST", body: form }, left(), signal);
-      if (!uploaded.ok) return refusal(uploaded);
-      const id = await uploaded.json().then((j: { assetId?: unknown }) => j.assetId, () => undefined);
-      if (typeof id !== "string" || !id) return failure(AiFailure.BadResponse, "Orazaka answered an upload without an asset id");
-      assetIds.push(id);
-    }
+    for (const photo of photos) assetIds.push(await uploadAsset(photo, "image/jpeg", "photo.jpg", left(), signal));
     const run = await runStudio("profile-photo-check", { photos: assetIds, photosBase64: photos.map((p) => p.toString("base64")), compareFaces, ...counts }, deadline, signal);
     const parsed = PhotoCheckReport.safeParse(run.report);
     if (!parsed.success) return failure(AiFailure.BadResponse, "Orazaka's photo check answered something that is not the contract");
@@ -134,7 +143,30 @@ export function createOrazakaProvider(options: OrazakaOptions): AiProvider {
         return await runPhotoCheck(input, assetIds);
       } finally {
         // The person's photos are read once; they are taken back the moment the answer is in, whatever it is (best effort).
-        await Promise.allSettled(assetIds.map((id) => call(`/api/v1/media/assets/${encodeURIComponent(id)}`, { method: "DELETE" }, options.embedTimeoutMs)));
+        await takeBack(assetIds);
+      }
+    },
+
+    async moderateMedia({ frames, audio, signal }: MediaSafetyInput): Promise<MediaSafetyResult> {
+      if (frames.length > 8 || (frames.length === 0 && !audio)) throw new Error("moderateMedia takes 1 to 8 pictures, or a sound");
+      const start = now();
+      const deadline = start + (options.mediaSafetyTimeoutMs ?? 300_000); // @fixed: five minutes — a transcript of two minutes of speech on a small machine
+      const assetIds: string[] = [];
+      try {
+        const left = () => Math.max(1, deadline - now());
+        for (const frame of frames) assetIds.push(await uploadAsset(frame, "image/jpeg", "frame.jpg", left(), signal));
+        const frameCount = assetIds.length;
+        let audioId: string | undefined;
+        if (audio) {
+          audioId = await uploadAsset(audio.bytes, audio.mime, "voice", left(), signal);
+          assetIds.push(audioId);
+        }
+        const run = await runStudio("media-safety", { frames: assetIds.slice(0, frameCount), frameCount, expectsSpeech: Boolean(audio), ...(audioId ? { audio: audioId } : {}) }, deadline, signal);
+        const parsed = MediaSafetyReport.safeParse(run.report);
+        if (!parsed.success) return failure(AiFailure.BadResponse, "Orazaka's safety check answered something that is not the contract");
+        return { runId: run.runId, report: parsed.data, ms: now() - start };
+      } finally {
+        await takeBack(assetIds);
       }
     },
 

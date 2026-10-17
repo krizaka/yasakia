@@ -1,9 +1,11 @@
 import { purgeDeletedMedia } from "./account";
 import { drainAnalytics } from "./analytics";
 import { sweepBatches } from "./batches";
-import { analyticsConnection, photoCheckConfig, setting } from "./env";
+import { analyticsConnection, mediaReviewConfig, photoCheckConfig, setting } from "./env";
 import { sweepExports } from "./export";
+import { sweepIntroMedia } from "./intro-media";
 import { sweepIntros } from "./intros";
+import { reviewQueue } from "./media-review-runner";
 import { finalizeStaleSignals } from "./message-signals";
 import { sweepPhotoChecks } from "./photo-check";
 import { processQueue } from "./photo-check-runner";
@@ -48,6 +50,7 @@ export function startJobs(): void {
         await sweepIntros();
         await sweepPhotoChecks();
         await finalizeStaleSignals();
+        await sweepIntroMedia();
       }),
     sweepEvery,
   );
@@ -63,11 +66,14 @@ export function startJobs(): void {
   );
   // The photo checks asked and not yet worked (a request works its own at once; this takes what an instance left queued).
   const photoChecks = setInterval(() => void tick("photo-checks", async () => void (await processQueue(photoCheckConfig))), setting("APP_PHOTO_CHECK_INTERVAL_SECONDS", 15, 5, 600) * 1000);
+  // The media messages waiting for their safety check (a request decides its own at once; this takes what an instance left, or could not decide).
+  const mediaReview = setInterval(() => void tick("media-review", async () => void (await reviewQueue(mediaReviewConfig))), setting("APP_MEDIA_REVIEW_INTERVAL_SECONDS", 30, 5, 600) * 1000);
+  mediaReview.unref();
   purge.unref();
   sweep.unref();
   analytics.unref();
   photoChecks.unref();
-  holder.__yasakiaJobs = [purge, sweep, analytics, photoChecks];
+  holder.__yasakiaJobs = [purge, sweep, analytics, photoChecks, mediaReview];
 }
 
 /** Purges right away (after a deletion's response) instead of waiting for the next tick. */

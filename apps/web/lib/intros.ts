@@ -5,10 +5,13 @@ import { and, asc, eq, lte, or, sql } from "drizzle-orm";
 import { AnalyticsKind, recordAnalytics } from "./analytics";
 import type { AuthenticitySignal, MessageSignals } from "./authenticity-rules";
 import { refuse } from "./http";
+import { mediaOf, type MediaView, mediaView } from "./intro-media";
+import { MessageKind, visibleMedia } from "./intro-media-rules";
 import { afterContinue, continueRefusal, IntroState, orderedPair, type Side, sideOf, writeRefusal } from "./intro-rules";
 import { recordPendingSignal, signalsOf } from "./message-signals";
 import { PERSONA_DOMAIN } from "./personas";
 import { publishToAccount } from "./realtime";
+import { mediaRules } from "./rule-sets";
 import { matchingRules } from "./rule-sets";
 
 /**
@@ -68,8 +71,8 @@ export interface IntroSummary {
 export async function listIntros(me: string): Promise<IntroSummary[]> {
   const res = await db.execute<{ id: string; state: string; opened_at: Date; expires_at: Date; name: string | null; email: string; messages: number; last_at: Date | null }>(sql`
     select i.id, i.state, i.opened_at, i.expires_at, p.display_name as name, a.email,
-           (select count(*)::int from intro_messages m where m.intro_id = i.id) as messages,
-           (select max(m.created_at) from intro_messages m where m.intro_id = i.id) as last_at
+           (select count(*)::int from intro_messages m where m.intro_id = i.id and (m.kind = 'TEXT' or m.sender_id = ${me} or exists (select 1 from intro_media x where x.message_id = m.id and x.status = 'APPROVED'))) as messages,
+           (select max(m.created_at) from intro_messages m where m.intro_id = i.id and (m.kind = 'TEXT' or m.sender_id = ${me} or exists (select 1 from intro_media x where x.message_id = m.id and x.status = 'APPROVED'))) as last_at
     from intros i
     join accounts a on a.id = case when i.account_a = ${me} then i.account_b else i.account_a end
     left join profiles p on p.account_id = a.id
@@ -89,12 +92,18 @@ export interface IntroMessageView {
   mine: boolean;
   body: string;
   createdAt: string;
+  /** TEXT, or the kind of the media this message carries (`body` is then empty). */
+  kind: "TEXT" | "PHOTO" | "VIDEO" | "AUDIO";
+  /** The media, with its state for its sender — the other person sees it only once it passed the safety check. */
+  media: MediaView | null;
   /** The authenticity signal — one of four words, null while it is being read. A signal, never a verdict; it never held a message back. */
   signal: AuthenticitySignal | null;
 }
 
 export interface IntroDetail {
   id: string;
+  /** The limits of media messages (the MEDIA rule set), so the screen tells before it uploads. */
+  mediaLimits: Awaited<ReturnType<typeof mediaRules>>["params"];
   state: string;
   openedAt: string;
   expiresAt: string;
@@ -109,9 +118,13 @@ export async function introDetail(me: string, introId: string): Promise<IntroDet
   const { intro, side } = await mine(me, introId);
   const other = await card(side === "A" ? intro.accountB : intro.accountA);
   const rows = await db.select().from(introMessages).where(eq(introMessages.introId, intro.id)).orderBy(asc(introMessages.createdAt)).limit(500);
-  const signals = await signalsOf(rows.map((m) => m.id));
+  const media = await mediaOf(rows.filter((m) => m.kind !== MessageKind.Text).map((m) => m.id));
+  const shown = rows.filter((m) => m.kind === MessageKind.Text || (media.get(m.id) && visibleMedia(me, { senderId: m.senderId, status: media.get(m.id)!.status })));
+  const signals = await signalsOf(shown.filter((m) => m.kind === MessageKind.Text).map((m) => m.id));
+  const { params: mediaLimits } = await mediaRules();
   return {
     id: intro.id,
+    mediaLimits,
     state: intro.state,
     openedAt: intro.openedAt.toISOString(),
     expiresAt: intro.expiresAt.toISOString(),
@@ -119,7 +132,7 @@ export async function introDetail(me: string, introId: string): Promise<IntroDet
     continuedByMe: (side === "A" ? intro.continuedByAAt : intro.continuedByBAt) !== null,
     continuedByThem: (side === "A" ? intro.continuedByBAt : intro.continuedByAAt) !== null,
     them: { name: other.name, about: other.about, fictional: other.fictional },
-    messages: rows.map((m) => ({ id: m.id, mine: m.senderId === me, body: m.body, createdAt: m.createdAt.toISOString(), signal: signals.get(m.id) ?? null })),
+    messages: shown.map((m) => ({ id: m.id, mine: m.senderId === me, body: m.body, createdAt: m.createdAt.toISOString(), kind: m.kind as IntroMessageView["kind"], media: media.get(m.id) ? mediaView(media.get(m.id)!) : null, signal: m.kind === MessageKind.Text ? (signals.get(m.id) ?? null) : null })),
   };
 }
 
@@ -134,7 +147,7 @@ export async function sendIntroMessage(me: string, introId: string, body: string
     await recordPendingSignal(created.id, signals);
     await publishToAccount(side === "A" ? intro.accountB : intro.accountA, { type: "intro.message", introId: intro.id, messageId: created.id });
   }
-  return { id: row.id, mine: true, body: row.body, createdAt: row.createdAt.toISOString(), signal: null };
+  return { id: row.id, mine: true, body: row.body, createdAt: row.createdAt.toISOString(), kind: "TEXT", media: null, signal: null };
 }
 
 /** « Continue »: the intro has no end once both said it. */

@@ -16,6 +16,8 @@ COPY packages/ai/package.json ./packages/ai/
 COPY packages/matching/package.json ./packages/matching/
 COPY packages/config/package.json ./packages/config/
 RUN npm ci --no-audit --no-fund --ignore-scripts
+# --ignore-scripts skipped ffmpeg-static's download: fetch the binary (a static build, it runs on musl) that cleans and measures media messages.
+RUN node node_modules/ffmpeg-static/install.js
 
 # 2. Build
 FROM base AS builder
@@ -63,6 +65,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/mail-templates ./apps/we
 # Database migrations: `node migrate.cjs` applies ./drizzle (0000 creates the extensions) to DATABASE_DIRECT_URL or DATABASE_URL.
 COPY --from=builder --chown=nextjs:nodejs /app/packages/db/dist/migrate.cjs ./migrate.cjs
 COPY --from=builder --chown=nextjs:nodejs /app/packages/db/drizzle ./drizzle
+
+# ffmpeg (static build): cleans and measures videos and voice messages, extracts frames for their safety check.
+COPY --from=builder /app/node_modules/ffmpeg-static/ffmpeg /usr/local/bin/ffmpeg
+ENV MEDIA_FFMPEG_PATH=/usr/local/bin/ffmpeg
 
 USER nextjs
 EXPOSE 3000

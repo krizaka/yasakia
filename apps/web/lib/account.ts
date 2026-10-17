@@ -6,6 +6,7 @@ import { ageOn } from "./age";
 import { recordErasure } from "./analytics";
 import { roundPosition } from "./geo";
 import { isUniqueViolation, refuse } from "./http";
+import { mediaKeysOfAccount } from "./intro-media";
 import { sendTemplate } from "./mail";
 import { mediaStorage } from "./media";
 import { stagingKey } from "./photos";
@@ -155,7 +156,7 @@ export async function deleteAccount(accountId: string): Promise<{ deletionId: st
     if (!account) throw refuse(404, "NOT_FOUND", "Not found");
     const photos = await tx.select({ key: profilePhotos.storageKey, id: profilePhotos.id, mimeType: profilePhotos.mimeType }).from(profilePhotos).where(eq(profilePhotos.accountId, accountId));
     // The final keys and any staging upload (`uploads/<account>/<photo>.<ext>`).
-    const keys = photos.flatMap((p) => [p.key, stagingKey(accountId, p.id, p.mimeType)]);
+    const keys = [...photos.flatMap((p) => [p.key, stagingKey(accountId, p.id, p.mimeType)]), ...(await mediaKeysOfAccount(tx, accountId))];
     const [deletion] = await tx.insert(accountDeletions).values({ accountId, storageKeys: keys }).returning({ id: accountDeletions.id });
     await tx.execute(sql`update intros set state = 'CLOSED', closed_at = now(), closed_reason = 'DELETED' where (account_a = ${accountId} or account_b = ${accountId}) and state in ('OPEN', 'CONTINUED')`);
     // The audit log keeps what was done, not who the person was: their address is blanked from every line they acted in.
