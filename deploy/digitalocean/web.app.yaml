@@ -42,7 +42,13 @@ services:
       - { key: DATABASE_ENCRYPTION_KEY, scope: RUN_TIME, type: SECRET }
       - { key: AUTH_SIGNUP_ENABLED, scope: RUN_TIME, value: "false" }
       - { key: AUTH_ALLOWED_IPS, scope: RUN_TIME, value: "142.122.41.109" }
-      - { key: MEDIA_STORAGE_PROVIDER, scope: RUN_TIME, value: none }
+      # Photos: Yasakia's own private Bunny storage zone + pull zone (token authentication, signed URLs of 300 s), both `yasakia-dev`.
+      - { key: MEDIA_STORAGE_PROVIDER, scope: RUN_TIME, value: bunny }
+      - { key: MEDIA_STORAGE_ZONE, scope: RUN_TIME, value: yasakia-dev }
+      - { key: MEDIA_STORAGE_ENDPOINT, scope: RUN_TIME, value: ny.storage.bunnycdn.com }
+      - { key: MEDIA_CDN_HOSTNAME, scope: RUN_AND_BUILD_TIME, value: yasakia-dev.b-cdn.net }
+      - { key: MEDIA_STORAGE_API_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: MEDIA_CDN_TOKEN_AUTH_KEY, scope: RUN_TIME, type: SECRET }
       - { key: MAIL_PROVIDER, scope: RUN_TIME, value: none }
       - { key: REALTIME_BUS, scope: RUN_TIME, value: postgres }
       - { key: ABUSE_RATE_LIMIT_STORE, scope: RUN_TIME, value: postgres }
