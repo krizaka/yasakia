@@ -1,7 +1,7 @@
 "use client";
 
 import { BatchIcon } from "@krizaka/icons";
-import { defineKeys, krizakaFetch, useMutation, useQuery } from "@krizaka/query";
+import { defineKeys, krizakaFetch, useMutation, useQuery, useQueryClient } from "@krizaka/query";
 import { Alert } from "@krizaka/ui/alert";
 import { Avatar } from "@krizaka/ui/avatar";
 import { Badge } from "@krizaka/ui/badge";
@@ -31,6 +31,7 @@ export interface BatchPageData {
 export function BatchView({ initial }: { initial: BatchPageData }) {
   const { say, locale } = useSay();
   const router = useRouter();
+  const client = useQueryClient();
   const query = useQuery({
     queryKey: keys.current(),
     queryFn: ({ signal }) => krizakaFetch("/api/batches/current", { signal }).then((r) => (r as { batch: BatchDto | null }).batch),
@@ -39,9 +40,13 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
   });
   const open = useMutation({
     mutationFn: () => krizakaFetch("/api/batches", { method: "POST", json: { locale } }),
-    onSuccess: () => router.refresh(),
+    // The batch is read again (the person sees it at once), and the page — the agent's state — with it.
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: keys.current() });
+      router.refresh();
+    },
   });
-  const batch = open.isSuccess ? null : query.data;
+  const batch = query.data;
   const date = useMemo(() => {
     const f = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
     return (iso: string) => f.format(new Date(iso));
