@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/krizaka/.github/main/docs/standards/dev-preview.schema.json",
   "version": 1,
   "product": "yasakia",
-  "index": "off",
+  "index": "on",
   "criteria": {
     "site.healthy": {
       "evidence": "https://dev.yasakia.com/api/healthz",
