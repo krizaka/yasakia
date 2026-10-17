@@ -3,6 +3,7 @@ import { aiCalls, db, introMessages, intros } from "@yasakia/db";
 import { addDays } from "date-fns";
 import { and, asc, eq, lte, or, sql } from "drizzle-orm";
 
+import { AnalyticsKind, recordAnalytics } from "./analytics";
 import { refuse } from "./http";
 import { afterContinue, continueRefusal, IntroState, orderedPair, type Side, sideOf, writeRefusal } from "./intro-rules";
 import { PERSONA_DOMAIN } from "./personas";
@@ -66,6 +67,7 @@ export async function openIntro(ai: AiProvider, x: string, y: string, now: Date)
     const [existing] = await db.select({ id: intros.id }).from(intros).where(and(eq(intros.accountA, accountA), eq(intros.accountB, accountB))).limit(1);
     return { introId: existing.id, runRef: null };
   }
+  await recordAnalytics([accountA, accountB], AnalyticsKind.IntroStart, now);
   const [a, b] = await Promise.all([card(accountA), card(accountB)]);
   const lines = await writeOpeners(ai, x, a, b);
   if (lines) await db.update(intros).set({ openerA: lines.openerA, openerB: lines.openerB }).where(eq(intros.id, created.id));

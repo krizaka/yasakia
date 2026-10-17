@@ -9,6 +9,7 @@
     "/app/*",
     "/app/*/account",
     "/app/*/admin",
+    "/app/*/admin/analytics",
     "/app/*/admin/audit",
     "/app/*/admin/health",
     "/app/*/admin/intros",

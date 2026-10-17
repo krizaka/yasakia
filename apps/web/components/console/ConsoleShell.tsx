@@ -1,6 +1,6 @@
 "use client";
 
-import { BatchIcon, ChatIcon, ClockIcon, FilterIcon, FlagIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
+import { BatchIcon, ChatIcon, ClockIcon, FilterIcon, FlagIcon, GoalIcon, HomeIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
@@ -42,6 +42,8 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
         ? "shell.reports"
         : path.startsWith(`${home}/admin/intros`)
           ? "shell.intros"
+          : path.startsWith(`${home}/admin/analytics`)
+            ? "shell.analytics"
           : path.startsWith(`${home}/admin/health`)
             ? "shell.health"
             : path.startsWith(`${home}/admin/rules`)
@@ -99,6 +101,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
             {item(`${home}/admin/users`, say("shell.users"), <UsersIcon />)}
             {item(`${home}/admin/reports`, say("shell.reports"), <FlagIcon />)}
             {item(`${home}/admin/intros`, say("shell.intros"), <IntroIcon />)}
+            {item(`${home}/admin/analytics`, say("shell.analytics"), <GoalIcon />)}
             {item(`${home}/admin/rules`, say("shell.rules"), <FilterIcon />)}
             {item(`${home}/admin/audit`, say("shell.audit"), <ClockIcon />)}
             {item(`${home}/admin/health`, say("shell.health"), <ServerIcon />)}

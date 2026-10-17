@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 26 tables · 17 enums · 7 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 27 tables · 18 enums · 8 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -152,6 +152,21 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `created_at` | timestamp with time zone | no | `now()` |  |
 
 **Indexes:** `ai_calls_created_idx` (created_at) · `ai_calls_account_idx` (account_id)
+
+### `analytics_outbox`
+
+| Column | Type | Null | Default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | uuid | no | `gen_random_uuid()` | primary key |
+| `kind` | analytics_outbox_kind | no |  |  |
+| `payload` | jsonb | no |  |  |
+| `attempts` | integer | no | `0` |  |
+| `next_attempt_at` | timestamp with time zone | no | `now()` |  |
+| `sent_at` | timestamp with time zone | yes |  |  |
+| `last_error` | varchar(40) | yes |  |  |
+| `created_at` | timestamp with time zone | no | `now()` |  |
+
+**Indexes:** `analytics_outbox_pending_idx` (next_attempt_at, where sent_at is null)
 
 ### `audit_log`
 
@@ -444,6 +459,7 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `agent_message_role` | `USER`, `AGENT`, `SYSTEM` |
 | `agent_state` | `ONBOARDING`, `DISCOVERY`, `WAITING_POOL`, `BATCH_READY`, `BATCH_OPEN`, `DEBRIEF_DUE` |
 | `ai_call_purpose` | `CHAT`, `EXTRACT`, `EMBED`, `PORTRAIT`, `REASONS`, `DEBRIEF`, `OPENER` |
+| `analytics_outbox_kind` | `EVENT`, `ERASURE` |
 | `batch_decision` | `INTERESTED`, `PASS`, `TELL_ME_MORE` |
 | `batch_status` | `OPEN`, `DEBRIEF_DUE`, `DONE`, `EXPIRED` |
 | `embedding_kind` | `SELF`, `SEEKING` |
@@ -466,3 +482,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0004_rule_sets_and_1024_vectors.sql`
 - `0005_intro_days_rule.sql`
 - `0006_app_config.sql`
+- `0007_analytics_outbox.sql`

@@ -246,7 +246,8 @@
       "talk": "Parle à ton agent",
       "batch": "Ton lot",
       "rules": "Règles",
-      "myIntros": "Présentations"
+      "myIntros": "Présentations",
+      "analytics": "Statistiques"
     },
     "signIn": {
       "title": "Content de te revoir",
@@ -784,6 +785,34 @@
         "reasonHint": "Une phrase pour le journal d’audit et l’historique.",
         "now": "Actuellement : {value}",
         "published": "La version {version} est active. Modifié : {changed}."
+      },
+      "analytics": {
+        "title": "Statistiques",
+        "description": "Les {days} derniers jours, comptés par le moteur d'analyse à partir d'événements pseudonymes — jamais une personne.",
+        "people": "Personnes actives",
+        "vsBefore": "par rapport à la période précédente",
+        "hidden": "Moins de {min}",
+        "kinds": {
+          "talk": "Échanges avec l'agent",
+          "batch_open": "Sélections ouvertes",
+          "batch_answer": "Réponses",
+          "intro_start": "Présentations",
+          "report_filed": "Signalements"
+        },
+        "daily": "Personnes actives par jour",
+        "day": "Jour",
+        "funnel": "D'une sélection à une présentation",
+        "funnelHint": "Les personnes qui ont ouvert une sélection, répondu, puis été présentées dans la semaine.",
+        "funnelEmpty": "L'entonnoir apparaît dès qu'au moins {min} personnes passent d'une sélection à une réponse.",
+        "cohorts": "Qui revient",
+        "cohortsEmpty": "Les cohortes apparaissent dès qu'au moins {min} personnes ont commencé la même semaine.",
+        "cohortLine": "Semaine du {week} · {size} personnes",
+        "offTitle": "Les statistiques ne sont pas branchées",
+        "offBody": "Renseignez l'adresse du moteur, la clé de service et la clé des pseudonymes (AI_ENGINE_URL, AI_ENGINE_API_KEY, AI_PSEUDONYM_KEY).",
+        "unavailableTitle": "Les statistiques sont injoignables pour un moment",
+        "unavailableBody": "Rien n'est perdu : les événements attendent dans la file et les chiffres reviennent d'eux-mêmes.",
+        "smallTitle": "Encore trop peu de personnes pour afficher",
+        "smallBody": "Les chiffres apparaissent dès qu'au moins {min} personnes ont été actives sur la période — personne ne peut être isolé."
       }
     },
     "reset": {

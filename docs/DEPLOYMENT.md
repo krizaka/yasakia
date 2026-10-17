@@ -43,6 +43,8 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `NEXT_PUBLIC_APP_BASE_PATH` *(build)* | — |  |  | The path the app is served under (dev.yasakia.com serves it at `/app`, next to the static site at `/`). Empty: the root. |
 | `NEXT_PUBLIC_APP_ENV` *(build)* | — |  | `local` | Where the build runs, for the build information. |
 | `APP_ACCOUNT_PURGE_INTERVAL_SECONDS` | — |  | `60` | How often accounts past their deletion delay are purged. |
+| `APP_ANALYTICS_CONSOLE_DAYS` | — |  | `28` | The period the console's analytics page shows. |
+| `APP_ANALYTICS_INTERVAL_SECONDS` | — |  | `30` | How often the analytics outbox is sent to Orazaka. |
 | `APP_SWEEP_INTERVAL_SECONDS` | — |  | `600` | How often expired codes, sessions and uploads are swept. |
 | `APP_EXPORT_SYNC_BUDGET_MS` | — |  | `1000` | A data export answers at once when it builds within this budget, else 202 and a background build. |
 
@@ -122,6 +124,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | :--- | :---: | :---: | :--- | :--- |
 | `AI_ENGINE_URL` | — |  |  | Base URL of the Orazaka engine's edge (its `/edge` path). Yasakia reaches a model through Orazaka only. Unset: the agent and the batches answer 503 — never a demo, never a stand-in. |
 | `AI_ENGINE_API_KEY` | — | ✓ |  | Yasakia's service key at Orazaka (`oz_…`, the account `svc_yasakia`). A SECRET set with `doctl apps update`; never printed. |
+| `AI_PSEUDONYM_KEY` | — | ✓ |  | The key of the pseudonyms Yasakia sends to Orazaka's analytics (`HMAC-SHA256`, 32+ characters). Unset: nothing is sent. Rotating it forgets every history at Orazaka. |
 | `AI_CHAT_TIMEOUT_SECONDS` | — |  | `45` | How long one conversational call to Orazaka may take before the agent gives up. |
 | `AI_EMBED_TIMEOUT_SECONDS` | — |  | `15` | How long one embedding call may take. |
 

@@ -69,6 +69,18 @@ export function aiProvider(env: Env = process.env): AiProvider {
   });
 }
 
+/**
+ * Orazaka's analytics (krizaka/yasakia#86): the engine's edge, the service key and the pseudonym key. `null` when one
+ * is missing — then nothing is sent and the console says the analytics are not connected.
+ */
+export function analyticsConnection(env: Env = process.env): { url: string; key: string; pseudonymKey: string; timeoutMs: number } | null {
+  const url = env.AI_ENGINE_URL?.trim();
+  const key = env.AI_ENGINE_API_KEY?.trim();
+  const pseudonymKey = env.AI_PSEUDONYM_KEY?.trim();
+  if (!url || !key || !pseudonymKey) return null;
+  return { url, key, pseudonymKey, timeoutMs: setting("AI_EMBED_TIMEOUT_SECONDS", 15, 2, 60, env) * 1000 }; // @fixed: seconds to milliseconds
+}
+
 /** True on a dev deployment (`NEXT_PUBLIC_APP_ENV=dev`): the only place where e-mail and photo storage may be left unconfigured. */
 export function isDevDeployment(env: Env = process.env): boolean {
   return env.NEXT_PUBLIC_APP_ENV?.trim() === "dev";
