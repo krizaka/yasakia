@@ -22,7 +22,9 @@ async function tick(name: string, work: () => Promise<unknown>): Promise<void> {
   try {
     await work();
   } catch (error) {
-    console.error(`[jobs] ${name} failed:`, (error as Error).message);
+    // The database's own words are in the cause (drizzle wraps them in "Failed query: …"): without them a failing loop says nothing.
+    const cause = (error as { cause?: { message?: string; code?: string } }).cause;
+    console.error(`[jobs] ${name} failed:`, cause?.message ? `${cause.code ?? ""} ${cause.message}`.trim() : (error as Error).message);
   }
 }
 
