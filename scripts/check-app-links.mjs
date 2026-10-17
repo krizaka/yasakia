@@ -37,7 +37,16 @@ export function normalizeRoute(route) {
   return route.replace(/\[\[?\.\.\.[^\]]+\]?\]/g, "*").replace(/\[[^\]]+\]/g, "*") || "/";
 }
 
-/** Next.js `app/` tree → routes, groups `(x)` and slots `@x` removed, only folders holding a page. */
+/**
+ * A catch-all page that does nothing but answer 404 (`app/[locale]/[...rest]/page.tsx` → `notFound()`), there so that an
+ * unmatched address gets the app's own not-found page inside its layout. It is no shareable route.
+ */
+export function isNotFoundOnly(source) {
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return /^\s*(import\s[^;]+;\s*)*export\s+default\s+(async\s+)?function\s+\w*\s*\([^)]*\)\s*\{\s*notFound\(\)\s*;?\s*\}\s*$/.test(code);
+}
+
+/** Next.js `app/` tree → routes, groups `(x)` and slots `@x` removed, only folders holding a page (a not-found-only catch-all is no route). */
 export function nextRoutes(appDir) {
   const out = [];
   const walk = (dir, segs) => {
@@ -47,7 +56,10 @@ export function nextRoutes(appDir) {
         if (name.startsWith("_") || name === "node_modules") continue;
         const hidden = /^\(.*\)$/.test(name) || name.startsWith("@");
         walk(full, hidden ? segs : [...segs, name]);
-      } else if (PAGE.test(name)) out.push("/" + segs.join("/"));
+      } else if (PAGE.test(name)) {
+        if (/^\[\[?\.\.\./.test(segs.at(-1) ?? "") && isNotFoundOnly(readFileSync(full, "utf8"))) continue;
+        out.push("/" + segs.join("/"));
+      }
     }
   };
   if (existsSync(appDir)) walk(appDir, []);
