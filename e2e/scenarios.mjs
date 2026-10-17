@@ -671,6 +671,15 @@ let adaPhoto;
     await sql("update rule_sets set active = true where domain = 'MATCHING' and version = $1", [active.version]);
   }
 
+  // The QA reset, from the console: a QA address only, operators only.
+  {
+    const asAdmin = (path, init = {}) => web(path, { cookie: adminIn.cookie, ip: ADMIN_IP_HEADER, ...init });
+    check("qa reset: refused to a person (403)", (await web("/api/admin/qa-reset", { method: "POST", cookie: user.cookie, ip: ADMIN_IP_HEADER, body: { email: QA_USER.email } })).status === 403);
+    check("qa reset: never a real person's address (422)", (await asAdmin("/api/admin/qa-reset", { method: "POST", body: { email: "camille@example.com" } })).json.code === "QA_RESET_REFUSED");
+    const reset = await asAdmin("/api/admin/qa-reset", { method: "POST", body: { email: QA_USER.email } });
+    check("qa reset: a QA account starts from a blank page again (ONBOARDING), and it is in the audit log", reset.status === 200 && (await sql("select s.state::text as state from agent_sessions s join accounts a on a.id = s.account_id where a.email = $1", [QA_USER.email])).every((r) => r.state === "ONBOARDING") && (await asAdmin("/api/admin/audit?action=admin.qa_reset&size=5")).json.rows?.length >= 1);
+  }
+
   // The console's pages.
   const page = (p, cookie, ip) => web(p, { cookie, ip });
   check("pages: the sign-in page is served (200) and not indexed", (await page("/app/en/sign-in")).status === 200 && (await page("/app/en/sign-in")).text.includes("noindex"));

@@ -82,6 +82,17 @@ await page.addInitScript((t) => {
     /* storage can be unavailable */
   }
 }, theme);
+// Privacy: a recording never shows an account's e-mail. Wherever the page writes it (the console's "Signed in as …"),
+// the persona's display name takes its place on screen — the account and the requests are untouched.
+await page.addInitScript(({ hidden, shown }) => {
+  const mask = (root) => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.nodeValue?.includes(hidden)) n.nodeValue = n.nodeValue.split(hidden).join(shown);
+  };
+  new MutationObserver(() => mask(document.body)).observe(document, { childList: true, subtree: true, characterData: true });
+  document.addEventListener("DOMContentLoaded", () => mask(document.body));
+}, { hidden: email, shown: "Camille" });
+
 // The conversation ids of the replies, as the API hands them back (the lines in Orazaka's logs).
 page.on("response", async (res) => {
   if (res.url().endsWith("/api/agent/messages") && res.request().method() === "POST" && res.ok()) {
