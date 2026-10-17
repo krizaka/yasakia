@@ -141,6 +141,9 @@
     "privacy": {
       "position": "Your position is rounded to about one kilometre before it is stored.",
       "photos": "Photos are re-encoded to strip every metadata block, GPS included, and shown only to someone in your batch or your intro, through a link that expires in minutes.",
+      "realPeople": "Real people: 4 to 6 photos, at least 2 showing your face, and a batch opens only once Orazaka — Krizaka’s own AI platform — has checked them: a face is the subject, nothing is written over a photo, no screenshots, nobody who looks under 18. It never identifies anyone. Comparing your photos with each other is biometric processing: it is off until it has been reviewed, and even then only with your separate, explicit agreement, and nothing is kept. It can be wrong; a refused photo is replaced, never punished.",
+      "typed": "Every message is typed by a person: the agent writes nothing for you and never reads your conversation. A small mark before each message says whether it looks written by hand, uncertain, probably generated, or too short to judge — a signal, not a verdict, never a number, and it never blocks a message. These detectors are unreliable, especially on short texts and on French or non-native writing: how the message was typed counts as much as its text, and the signal says so.",
+      "media": "Photos, videos and voice messages can be sent in a conversation — as they are, nothing is edited — within limits, privately, and only after a safety check; they disappear with the conversation.",
       "encrypted": "Sensitive answers are encrypted at rest.",
       "control": "Export and deletion of your data are in the API from day one; blocks and reports work at once.",
       "honest": "No demo mode and no fake profile: where there is nothing real, nothing is shown."
