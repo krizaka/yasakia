@@ -17,16 +17,3 @@ html {
 body {
   background: var(--kz-surface-0);
 }
-
-/* The demo shows the recording of the active theme: dark on :root, light on html.light. */
-.yz-demo-light {
-  display: none;
-}
-
-html.light .yz-demo-dark {
-  display: none;
-}
-
-html.light .yz-demo-light {
-  display: block;
-}

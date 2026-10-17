@@ -6,12 +6,14 @@ import { Page, Section } from "@krizaka/ui/page";
 import { PageHero } from "@krizaka/ui/page-hero";
 import Link from "next/link";
 
+import { CUES } from "@/lib/demo";
 import { type Locale, translator } from "@/lib/i18n";
 import { clip } from "@/lib/media";
 import { contactHref, pagePath, REPO_URL } from "@/lib/site";
 import { WHAT_WORKS } from "@/lib/what-works";
 
 import { ButtonLink } from "./ButtonLink";
+import { CaptionedVideo } from "./CaptionedVideo";
 import { SiteFooter, SiteHeader } from "./SiteChrome";
 
 function Status({ locale }: { locale: Locale }) {
@@ -147,9 +149,10 @@ export function HowView({ locale }: { locale: Locale }) {
   );
 }
 
-/** The demo: the one recording that exists, read honestly. Media come from the CDN only. */
+/** The demo: the real journey, recorded on the development site — two clips, captioned in the page. Media come from the CDN only. */
 export function DemoView({ locale }: { locale: Locale }) {
   const t = translator(locale);
+  const clips = ["talk", "batch"] as const;
   return (
     <>
       <SiteHeader locale={locale} current="demo" />
@@ -157,20 +160,23 @@ export function DemoView({ locale }: { locale: Locale }) {
         <PageHero eyebrow={t("demo.eyebrow")} title={t("demo.title")} lead={t("demo.lead")} backdrop="grid">
           <Status locale={locale} />
         </PageHero>
-        <Section>
-          <Page size="narrow">
-            {(["dark", "light"] as const).map((theme) => {
-              const media = clip(theme);
-              return (
-                // The theme's own recording: the other is hidden by the active theme (html.light) in globals.css.
-                <video key={theme} className={theme === "dark" ? "yz-demo-dark mx-auto w-full max-w-xs rounded-2xl border border-border-default" : "yz-demo-light mx-auto w-full max-w-xs rounded-2xl border border-border-default"} poster={media.poster} controls playsInline muted loop preload="none" aria-label={t("demo.videoLabel")}>
-                  <source src={media.webm} type="video/webm" />
-                  <source src={media.mp4} type="video/mp4" />
-                </video>
-              );
-            })}
-          </Page>
-        </Section>
+        {clips.map((id, i) => {
+          const media = clip(id);
+          return (
+            <Section key={id} title={t(`demo.${id}Title`)} lead={t(`demo.${id}Lead`)} divider={i > 0} spacing="sm">
+              <Page size="wide">
+                <CaptionedVideo
+                  webm={media.webm}
+                  mp4={media.mp4}
+                  poster={media.poster}
+                  label={t(`demo.${id}Label`)}
+                  transcriptLabel={t("demo.transcript")}
+                  cues={id === "talk" ? CUES.talk.map((c) => ({ at: c.at, text: t(`demo.talk.cues.${c.id}`) })) : CUES.batch.map((c) => ({ at: c.at, text: t(`demo.batch.cues.${c.id}`) }))}
+                />
+              </Page>
+            </Section>
+          );
+        })}
         <Section title={t("demo.noteTitle")} lead={t("demo.note")} spacing="sm" />
         <Section spacing="sm">
           <CtaPanel title={t("demo.nextTitle")} body={t("demo.nextText")}>

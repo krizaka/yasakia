@@ -1,5 +1,6 @@
 "use client";
 
+import { HomeIcon, InfoIcon, PlayIcon } from "@krizaka/icons";
 import { YasakiaLogo } from "@krizaka/ui";
 import { Button } from "@krizaka/ui/button";
 import { NavBar } from "@krizaka/ui/nav-bar";
@@ -10,10 +11,13 @@ import Link from "next/link";
 
 import { type Locale, otherLocale, translator } from "@/lib/i18n";
 import { indexable } from "@/lib/indexing";
+import { groupOf, NAV_GROUPS, signInHref } from "@/lib/nav";
 import { APP_VERSION, contactHref, type PageId, pagePath, PAGES, REPO_URL } from "@/lib/site";
 
-/** This site's sections in the bar's centre (the home is the brand). */
+/** The footer lists every page; the bar groups them (lib/nav.ts). */
 const SECTIONS = PAGES.filter((p) => p !== "home");
+
+const ICONS = { home: <HomeIcon />, "how-it-works": <InfoIcon />, demo: <PlayIcon /> } as const;
 
 /** The bar: the animated mark, the DEV badge · the sections of this site · the repository, the theme, the language and
     the one action. No family switcher: a deployed product is independent. Below md, one panel. */
@@ -29,13 +33,15 @@ export function SiteHeader({ locale, current }: { locale: Locale; current: PageI
             Yasakia
           </Link>
         </NavBar.Brand>
-        <NavBar.Badge env="dev" version={APP_VERSION} />
-
         <NavBar.Items>
-          {SECTIONS.map((page) => (
-            <NavBar.Link key={page} asChild active={page === current}>
-              <Link href={pagePath(locale, page)}>{t(`chrome.nav.${page}`)}</Link>
-            </NavBar.Link>
+          {NAV_GROUPS.map((group) => (
+            <NavBar.Menu key={group.id} value={group.id} label={t(`chrome.nav.${group.id}`)} active={groupOf(current) === group.id} columns={1}>
+              {group.pages.map((page) => (
+                <NavBar.MenuLink key={page} asChild icon={ICONS[page]} title={t(`chrome.menu_product.${page}.title`)} description={t(`chrome.menu_product.${page}.text`)} active={page === current}>
+                  <Link href={pagePath(locale, page)} />
+                </NavBar.MenuLink>
+              ))}
+            </NavBar.Menu>
           ))}
         </NavBar.Items>
 
@@ -50,16 +56,27 @@ export function SiteHeader({ locale, current }: { locale: Locale; current: PageI
               {t("chrome.otherLanguage")}
             </Link>
           </Button>
+          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+            <a href={signInHref(locale)}>{t("chrome.signIn")}</a>
+          </Button>
           <Button asChild variant="primary" size="sm" shape="cut" className="ml-1 hidden font-bold md:inline-flex">
             <a href={contactHref("dev-yasakia-bar")}>{t("chrome.contact")}</a>
           </Button>
 
           <NavBar.Mobile openLabel={t("chrome.menu")} closeLabel={t("chrome.menu")} className="max-h-[calc(100dvh-6rem)] gap-1 overflow-y-auto overscroll-contain p-3">
-            {SECTIONS.map((page) => (
-              <NavBar.MobileLink key={page} asChild active={page === current}>
-                <Link href={pagePath(locale, page)}>{t(`chrome.nav.${page}`)}</Link>
-              </NavBar.MobileLink>
+            {NAV_GROUPS.map((group) => (
+              <div key={group.id} role="group" aria-label={t(`chrome.nav.${group.id}`)} className="flex flex-col gap-1">
+                <p className="px-3 pt-1 text-xs font-semibold uppercase tracking-wider text-fg-muted">{t(`chrome.nav.${group.id}`)}</p>
+                {group.pages.map((page) => (
+                  <NavBar.MobileLink key={page} asChild active={page === current}>
+                    <Link href={pagePath(locale, page)}>{t(`chrome.menu_product.${page}.title`)}</Link>
+                  </NavBar.MobileLink>
+                ))}
+              </div>
             ))}
+            <NavBar.MobileLink asChild>
+              <a href={signInHref(locale)}>{t("chrome.signIn")}</a>
+            </NavBar.MobileLink>
             <NavBar.MobileLink asChild>
               <Link href={pagePath(other, current)} hrefLang={other} lang={other}>
                 {t("chrome.otherLanguage")}

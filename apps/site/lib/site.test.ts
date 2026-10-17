@@ -32,10 +32,14 @@ describe("the public dev site", () => {
     for (const banned of ["sign up", "sign-up", "download now", "app store", "google play", "waiting list", "inscrivez", "télécharger maintenant"]) expect(words).not.toContain(banned);
   });
 
-  it("reads its demo from the CDN only, hashed", () => {
-    for (const theme of ["dark", "light"] as const) {
-      for (const url of Object.values(clip(theme))) expect(url).toMatch(/^https:\/\/krizaka-assets\.b-cdn\.net\/site\/home\/kit-native\/yasakia-(dark|light)\.[0-9a-f]{10}\.(webm|mp4|jpg)$/);
+  it("reads its demo from the CDN only, hashed, under the product's own folder — and lazily, with a poster, never autoplaying", () => {
+    for (const id of ["talk", "batch"] as const) {
+      for (const url of Object.values(clip(id))) expect(url).toMatch(/^https:\/\/krizaka-assets\.b-cdn\.net\/site\/products\/yasakia\/tour\/(talk|batch)\.[0-9a-f]{10}\.(webm|mp4|jpg)$/);
     }
+    const player = readFileSync(new URL("../components/CaptionedVideo.tsx", import.meta.url), "utf8");
+    expect(player).toContain('preload="none"');
+    expect(player).toContain("poster={poster}");
+    expect(player).not.toMatch(/autoPlay/);
   });
 
   it("links to Krizaka's contact form with Yasakia pre-selected", () => {
@@ -82,11 +86,11 @@ function robotsText(r: ReturnType<typeof robots>): string {
 }
 
 describe("the navigation of an independent product (@krizaka/ui)", () => {
-  it("the bar has no family switcher; the footer is the product's: family={false}, a DEV badge, « A Krizaka product »", () => {
+  it("the bar has no family switcher and no version chip; the footer is the product's: family={false}, the DEV badge and the build, « A Krizaka product »", () => {
     const src = readFileSync(new URL("../components/SiteChrome.tsx", import.meta.url), "utf8");
     expect(src).not.toContain("NavBar.Family");
-    expect(src).toContain('<NavBar.Badge env="dev"');
-    expect(src).toMatch(/<FamilyFooter current="yasakia" family=\{false\}/);
+    expect(src).not.toContain("NavBar.Badge");
+    expect(src).toMatch(/<FamilyFooter current="yasakia" family=\{false\}.*env="dev"/);
     expect(src).not.toMatch(/KRIZAKA_URL/);
   });
 });

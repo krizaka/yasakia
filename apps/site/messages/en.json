@@ -10,7 +10,8 @@
     "nav": {
       "home": "Home",
       "how-it-works": "How it works",
-      "demo": "Demo"
+      "demo": "Demo",
+      "product": "Product"
     },
     "languageLabel": "Language",
     "otherLanguage": "Français",
@@ -20,7 +21,22 @@
     "contact": "Talk to us",
     "menu": "Menu",
     "footerLabel": "Footer",
-    "devNotice": "Development environment — access by invitation"
+    "devNotice": "Development environment — access by invitation",
+    "menu_product": {
+      "home": {
+        "title": "Overview",
+        "text": "What Yasakia is: you talk first, then a small batch."
+      },
+      "how-it-works": {
+        "title": "How it works",
+        "text": "The loop in four steps, and what is private."
+      },
+      "demo": {
+        "title": "Demo",
+        "text": "The real journey, recorded on the development site."
+      }
+    },
+    "signIn": "Sign in (by invitation)"
   },
   "status": {
     "label": "Under development",
@@ -73,9 +89,25 @@
           "title": "Sign in by e-mail code or password",
           "text": "A 6-digit code arrives by e-mail, or sign in with a password. A forgotten password is reset by code, and every other session ends."
         },
-        "batches": {
-          "title": "Batches of three to five people",
-          "text": "The batch logic is being built; it is not released yet."
+        "talk": {
+          "title": "An agent you talk to first",
+          "text": "One question at a time, in your language, in your own words — no form, no swipe. What it understood is shown back to you, the sensitive part sealed."
+        },
+        "portrait": {
+          "title": "A portrait in words, never a score",
+          "text": "When it knows enough, the agent writes who you are and who you look for, and embeds both. You can read it."
+        },
+        "batch": {
+          "title": "Your first batch, three to five people",
+          "text": "People who fit you and for whom you fit too — the weaker of the two directions decides — each with why you two, in words. Fewer than three: you wait, nobody is made up."
+        },
+        "debrief": {
+          "title": "Answering a batch and the debrief",
+          "text": "Saying how it went so the next batch fits better is being built; it is not released yet."
+        },
+        "intros": {
+          "title": "Introductions",
+          "text": "Seven days to talk when you both say yes: being built; it is not released yet."
         }
       },
       "working": "Working today",
@@ -123,12 +155,35 @@
   },
   "demo": {
     "title": "Demo",
-    "eyebrow": "What already runs",
-    "lead": "The app is not released. This is the one recording that exists: Krizaka UI's native components, the bricks Yasakia's screens are built from, running on a phone.",
-    "videoLabel": "A phone running Krizaka UI native components: a card deck, a tag selector and a location picker.",
+    "eyebrow": "The real journey",
+    "lead": "Recorded on the development site, against the real engine: a test persona talks to the agent until it has written her portrait, then opens her first batch. Not an animation, not a mock-up — and not edited, only cut to these two moments and sped up while the agent thinks.",
+    "talkTitle": "1 · Talk first",
+    "talkLead": "The agent gets to know her, one question at a time. It writes down what she said — nothing more — then her portrait.",
+    "batchTitle": "2 · Her first batch",
+    "batchLead": "People who fit her and for whom she fits too, each with why you two, in words, both ways.",
+    "talkLabel": "Recording: a person talks to the agent, which writes what it understood and then her portrait.",
+    "batchLabel": "Recording: the agent opens a batch of five people, each with the reasons you two fit, in words.",
+    "transcript": "Captions as text",
+    "talk": {
+      "cues": {
+        "open": "Camille — a test persona, a fictional adult — signs in and opens the talk. She speaks first.",
+        "first": "She says who she is and where she lives. The agent answers with a question, not a form.",
+        "range": "She says whom she hopes to meet: an age range, a distance, a serious relationship.",
+        "saturday": "A perfect Saturday, what matters to her. The agent writes down what she said, and nothing more.",
+        "enough": "Five messages in, the agent has the basics and who she hopes to meet: it knows enough.",
+        "portrait": "Her portrait is written, in words, from what she said — and embedded by Orazaka: who she is, who she looks for."
+      }
+    },
+    "batch": {
+      "cues": {
+        "open": "She asks for her first batch. The agent looks for people who fit her and for whom she fits too.",
+        "looking": "The filters work both ways, then the weaker of the two directions ranks. The agent writes why you two, one person after the other.",
+        "shown": "Five people, each with why you two — in words, both ways. No score, no swiping. They are a cast of fictional people made for tests."
+      }
+    },
     "noteTitle": "Read this recording honestly",
-    "note": "It is a component demo, not the app. The portrait is generated for the demo — it is not a person and Yasakia has no members. The deck shown here is a building block; Yasakia itself has no swipe.",
+    "note": "Camille is a test persona and the five people she meets are a fictional cast: nobody here exists, there is no photo, and Yasakia has no members. The agent's words are generated live by Orazaka — the model is not scripted — so a run differs from the next. Answering a batch, the debrief and the introductions are not built yet.",
     "nextTitle": "When the app ships",
-    "nextText": "Its own recording, made on the real application, replaces this one here. Until then: the code is public."
+    "nextText": "Its own recording, made on the real application, replaces these. Until then: the code is public."
   }
 }
