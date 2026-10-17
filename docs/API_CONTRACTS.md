@@ -53,7 +53,7 @@ Sessions: `Authorization: Bearer <token>` from `POST /api/auth/verify` (`client:
 | `GET` | `/api/events` | bearer · account | The account's live events as Server-Sent Events — `batch.ready`, `intro.opened`, `intro.message` (ids only: the app fetches what changed) — with a heartbeat every 15 s, ending every 5 minutes (the app reconnects at once). |
 | `GET` | `/api/healthz` | public | Health of this instance: the database answers (503 when it does not) and whether the realtime bus hears the other instances. |
 | `GET` | `/api/intros` | bearer · account | My introductions — the people who said yes to me as I said yes to them — the live ones first. |
-| `GET` | `/api/intros/{id}` | bearer · account | One of my introductions: who, until when, the first line my agent whispered to me (mine only), and our messages. |
+| `GET` | `/api/intros/{id}` | bearer · account | One of my introductions: who, until when, and our messages (typed by us two — the AI writes none). |
 | `POST` | `/api/intros/{id}/continue` | bearer · account | « Continue »: once both said it, the introduction has no end. |
 | `POST` | `/api/intros/{id}/messages` | bearer · account | Writes in an introduction while it is open (idempotent per `clientId`); the other person is told at once. |
 | `DELETE` | `/api/me` | bearer · account | Deletes the account for good, at once — every row that is theirs, in one transaction; the photos are purged from storage right after (retried until done, 30 days at most) and a confirmation e-mail leaves. |

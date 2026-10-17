@@ -74,6 +74,3 @@ export const BatchReasons = z.object({
 });
 export type BatchReasons = z.infer<typeof BatchReasons>;
 
-/** The private first lines of an introduction: each person reads only theirs (the other's agent wrote the other). */
-export const Openers = z.object({ forFirst: z.string().trim().min(3).max(240), forSecond: z.string().trim().min(3).max(240) }).strict();
-export type Openers = z.infer<typeof Openers>;

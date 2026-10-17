@@ -32,7 +32,7 @@
     },
     "journey.no-ghostwriting": {
       "evidence": null,
-      "gap": "Not done: the introduction screen still shows « Your agent suggests a first line » until the ghost-writing is removed.",
+      "gap": "Removed in code and guarded by tests (no suggested line, no column, no endpoint, the agent's persona forbids it); not yet seen running on dev, and the recorded journey on the site still shows the old suggested line (said on the demo page until it is re-recorded).",
       "issue": "https://github.com/krizaka/yasakia/issues/111"
     },
     "journey.authenticity-signal": {

@@ -8,7 +8,7 @@ description: Every table, column, index, foreign key, check and enum of the Yasa
 > Generated from `packages/db/src/schema` by `scripts/generate-docs.mjs` — do not hand-edit.
 > To change the schema: edit it, `npm run db:generate -- --name <what_changed>`, read the SQL, `npm run db:migrate` — see the Development guide.
 
-PostgreSQL 16 + pgvector · 29 tables · 18 enums · 9 migrations (`packages/db/drizzle`).
+PostgreSQL 16 + pgvector · 29 tables · 18 enums · 10 migrations (`packages/db/drizzle`).
 
 ## Design notes
 
@@ -312,8 +312,6 @@ Every foreign key, read from the schema: what each table points to (through whic
 | `account_a` | uuid | no |  | → `accounts.id` (on delete cascade) |
 | `account_b` | uuid | no |  | → `accounts.id` (on delete cascade) |
 | `state` | intro_state | no | `"OPEN"` |  |
-| `opener_a` | text | yes |  |  |
-| `opener_b` | text | yes |  |  |
 | `opened_at` | timestamp with time zone | no | `now()` |  |
 | `expires_at` | timestamp with time zone | no |  |  |
 | `continued_by_a_at` | timestamp with time zone | yes |  |  |
@@ -517,3 +515,4 @@ Every foreign key, read from the schema: what each table points to (through whic
 - `0006_app_config.sql`
 - `0007_analytics_outbox.sql`
 - `0008_photo_checks.sql`
+- `0009_no_ghostwriting.sql`

@@ -976,7 +976,6 @@
       "openUntil": "Ouverte jusqu’au {date}",
       "with": "Toi et {name}",
       "threadLabel": "Votre conversation",
-      "openerTitle": "Ton agent te suggère une première phrase (toi seul·e la vois)",
       "noMessage": "Personne n’a encore écrit.",
       "placeholder": "Écris un message",
       "send": "Envoyer",
@@ -991,7 +990,8 @@
         "CONTINUED": "Continuée — vous l’avez dit tous les deux",
         "FADED": "Éteinte — le temps s’est écoulé",
         "CLOSED": "Fermée"
-      }
+      },
+      "typedByYou": "Chaque message ici est écrit par vous deux. L’agent n’écrit rien à ta place et ne lit jamais cette conversation."
     },
     "photos": {
       "lead": "Ajoute de {min} à {max} photos, dont au moins {faces} où ton visage est clairement le sujet. Elles restent privées tant qu’elles n’ont pas passé une vérification — ensuite, seules les personnes de tes lots les voient.",

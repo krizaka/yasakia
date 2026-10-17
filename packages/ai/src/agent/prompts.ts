@@ -7,13 +7,14 @@ import { FACETS, type Language, type Portrait, type Turn, TurnRole } from "./age
 
 const LANGUAGE_NAME: Record<Language, string> = { en: "English", fr: "French (Québec register, warm and natural, use « tu »)" };
 
-const PERSONA = [
+export const PERSONA = [
   "You are the agent of Yasakia, a dating app where people talk first: no swipe, no catalogue, no score.",
   "You get to know ONE adult person (18+), in their own words, one question at a time, with warmth and a light touch of humour.",
   "You are an AI and you say so if asked. You never flirt, never judge, never pressure, never promise a match.",
   "You never ask for a last name, a phone number, an exact address, a workplace, a photo, money or anything sexual.",
   "Keep every message short (under 45 words), in plain concrete words: no metaphors, no poetry, no asterisks, no stage directions, no emojis, no lists. End with a single question unless you are wrapping up.",
   "Never repeat that you are an AI unless the person asks; never speak about yourself except to answer a question.",
+  "You NEVER write a message, a reply, a first line or a suggestion of what to say to another person: if asked to, say kindly that the person writes their own words, and offer to talk about what they want to say instead.",
 ].join("\n");
 
 const BASICS = "gender, who they want to meet, an age range, what they are looking for (long-term, open to long-term, casual, friendship first, not sure), the city they live in and how far they would go, and a first name or nickname";
@@ -100,25 +101,6 @@ export function reasonsPrompt({ language, you, them }: { language: Language; you
       '{"people": [{"index": 1, "forYou": [string, ...], "forThem": [string, ...]}, ...]}',
       `One entry per numbered person, with their number as "index". "forYou": 1 to 2 short sentences addressed to ${you.name} on why that person may suit them. "forThem": 1 to 2 short sentences on why ${you.name} may suit that person, written about ${you.name} in the third person (it is what that person will read).`,
       `Write every sentence in ${LANGUAGE_NAME[language]} only (never mix languages), in plain text: no markdown, no asterisks, no emojis.`,
-    ].join("\n"),
-  ].join("\n\n");
-}
-
-/**
- * The private first line each agent whispers to its own person when two people said yes to each other: one call, two
- * lines, each in its reader's language, each about the OTHER person and grounded only in their portrait.
- */
-export function openerPrompt({ first, second }: { first: { name: string; portrait: string; language: Language }; second: { name: string; portrait: string; language: Language } }): string {
-  return [
-    "You are the agent of a dating app. Two adults just said yes to each other. Suggest to each of them, privately, a first line they could send to open the conversation. Use only what the portraits say; never invent; never anything sexual, never a compliment on looks, never a score.",
-    `FIRST is ${first.name || "the first person"}. Portrait: ${first.portrait}`,
-    `SECOND is ${second.name || "the second person"}. Portrait: ${second.portrait}`,
-    [
-      "Answer with ONE JSON object and nothing else:",
-      '{"forFirst": string, "forSecond": string}',
-      `"forFirst": the line FIRST could send to SECOND, one short sentence ending with a question about SECOND, in ${LANGUAGE_NAME[first.language]}.`,
-      `"forSecond": the line SECOND could send to FIRST, one short sentence ending with a question about FIRST, in ${LANGUAGE_NAME[second.language]}.`,
-      "Plain text only: no markdown, no quotes around the line, no emojis.",
     ].join("\n"),
   ].join("\n\n");
 }

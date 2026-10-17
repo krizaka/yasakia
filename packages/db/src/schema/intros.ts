@@ -5,9 +5,8 @@ import { accounts } from "./accounts";
 import { introStateEnum } from "./enums";
 
 /**
- * Mutual interest → an intro of 7 days between two people, stored once per pair (`account_a` < `account_b`). Each
- * agent whispers a private first line to its own person (`opener_a` is shown to A only). The agent never reads the
- * messages.
+ * Mutual interest → an intro of 7 days between two people, stored once per pair (`account_a` < `account_b`). Every
+ * message is typed by one of the two people: the AI never writes for anyone, and never reads the messages.
  */
 export const intros = pgTable(
   "intros",
@@ -20,8 +19,6 @@ export const intros = pgTable(
       .references(() => accounts.id, { onDelete: "cascade" })
       .notNull(),
     state: introStateEnum("state").default("OPEN").notNull(),
-    openerA: text("opener_a"),
-    openerB: text("opener_b"),
     openedAt: timestamp("opened_at", { withTimezone: true }).defaultNow().notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     continuedByAAt: timestamp("continued_by_a_at", { withTimezone: true }),

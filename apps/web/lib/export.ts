@@ -115,7 +115,6 @@ export async function buildExport(accountId: string) {
       with: i.accountA === accountId ? i.accountB : i.accountA,
       state: i.state,
       openedAt: i.openedAt,
-      yourOpener: i.accountA === accountId ? i.openerA : i.openerB,
       yourMessages: myMessages.filter((m) => m.introId === i.id).map((m) => ({ body: m.body, createdAt: m.createdAt })),
     })),
     blocks: myBlocks,

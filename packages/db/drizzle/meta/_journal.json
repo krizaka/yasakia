@@ -64,6 +64,13 @@
       "when": 1792459090532,
       "tag": "0008_photo_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792459150532,
+      "tag": "0009_no_ghostwriting",
+      "breakpoints": true
     }
   ]
 }

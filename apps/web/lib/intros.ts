@@ -1,5 +1,4 @@
-import { type AiProvider, AiUnavailableError, openerPrompt, Openers, parseModel } from "@yasakia/ai";
-import { aiCalls, db, introMessages, intros } from "@yasakia/db";
+import { db, introMessages, intros } from "@yasakia/db";
 import { addDays } from "date-fns";
 import { and, asc, eq, lte, or, sql } from "drizzle-orm";
 
@@ -12,8 +11,8 @@ import { matchingRules } from "./rule-sets";
 
 /**
  * Introductions: two people said yes to each other, they get a private room for the MATCHING rule set's `introDays`.
- * Each agent whispers a first line to its own person (the other never sees it); then humans talk — the agent never
- * reads `intro_messages`. Continued when both say so, faded when time runs out.
+ * Humans talk, and every message is typed by the person who sends it: the AI writes nothing for anyone (no suggested line, no
+ * « reply for me ») and never reads `intro_messages`. Continued when both say so, faded when time runs out.
  */
 
 interface PersonCard {
@@ -34,28 +33,8 @@ async function card(accountId: string): Promise<PersonCard> {
   return { id: r.id, name: r.name ?? "", about: r.portrait?.self ?? "", locale: r.locale, fictional: r.email.endsWith(PERSONA_DOMAIN) };
 }
 
-/** One call for both private first lines. The intro opens without them if the engine is out of reach — never invented. */
-async function writeOpeners(ai: AiProvider, accountId: string, a: PersonCard, b: PersonCard): Promise<{ openerA: string; openerB: string; runRef: string } | null> {
-  const prompt = openerPrompt({ first: { name: a.name, portrait: a.about, language: a.locale }, second: { name: b.name, portrait: b.about, language: b.locale } });
-  const conversationId = crypto.randomUUID();
-  const started = performance.now();
-  try {
-    const lines = parseModel((await ai.chat({ conversationId, prompt })).text, Openers);
-    await db.insert(aiCalls).values({ accountId, provider: "orazaka", model: "orazaka-chat", purpose: "OPENER", tokensIn: Math.ceil(prompt.length / 4), tokensOut: Math.ceil((lines.forFirst.length + lines.forSecond.length) / 4), latencyMs: Math.round(performance.now() - started), ok: true, runRef: conversationId });
-    console.log(`[intro] OPENER ok run=${conversationId}`);
-    return { openerA: lines.forFirst, openerB: lines.forSecond, runRef: conversationId };
-  } catch (error) {
-    await db.insert(aiCalls).values({ accountId, provider: "orazaka", model: "orazaka-chat", purpose: "OPENER", latencyMs: Math.round(performance.now() - started), ok: false, runRef: conversationId });
-    if (error instanceof AiUnavailableError) {
-      console.warn(`[intro] OPENER failed run=${conversationId}: ${error.message}`);
-      return null;
-    }
-    throw error;
-  }
-}
-
 /** Opens the intro of two people who said yes to each other (once per pair: a second yes finds it). */
-export async function openIntro(ai: AiProvider, x: string, y: string, now: Date): Promise<{ introId: string; runRef: string | null }> {
+export async function openIntro(x: string, y: string, now: Date): Promise<{ introId: string }> {
   const [accountA, accountB] = orderedPair(x, y);
   const { params } = await matchingRules();
   const [created] = await db
@@ -65,14 +44,11 @@ export async function openIntro(ai: AiProvider, x: string, y: string, now: Date)
     .returning({ id: intros.id });
   if (!created) {
     const [existing] = await db.select({ id: intros.id }).from(intros).where(and(eq(intros.accountA, accountA), eq(intros.accountB, accountB))).limit(1);
-    return { introId: existing.id, runRef: null };
+    return { introId: existing.id };
   }
   await recordAnalytics([accountA, accountB], AnalyticsKind.IntroStart, now);
-  const [a, b] = await Promise.all([card(accountA), card(accountB)]);
-  const lines = await writeOpeners(ai, x, a, b);
-  if (lines) await db.update(intros).set({ openerA: lines.openerA, openerB: lines.openerB }).where(eq(intros.id, created.id));
   await Promise.all([publishToAccount(accountA, { type: "intro.opened", introId: created.id }), publishToAccount(accountB, { type: "intro.opened", introId: created.id })]);
-  return { introId: created.id, runRef: lines?.runRef ?? null };
+  return { introId: created.id };
 }
 
 export interface IntroSummary {
@@ -119,8 +95,6 @@ export interface IntroDetail {
   openedAt: string;
   expiresAt: string;
   frozen: boolean;
-  /** The line my agent whispered to me — private, the other never sees it. */
-  opener: string | null;
   continuedByMe: boolean;
   continuedByThem: boolean;
   them: { name: string; about: string; fictional: boolean };
@@ -137,7 +111,6 @@ export async function introDetail(me: string, introId: string): Promise<IntroDet
     openedAt: intro.openedAt.toISOString(),
     expiresAt: intro.expiresAt.toISOString(),
     frozen: intro.frozenAt !== null,
-    opener: side === "A" ? intro.openerA : intro.openerB,
     continuedByMe: (side === "A" ? intro.continuedByAAt : intro.continuedByBAt) !== null,
     continuedByThem: (side === "A" ? intro.continuedByBAt : intro.continuedByAAt) !== null,
     them: { name: other.name, about: other.about, fictional: other.fictional },
