@@ -13,6 +13,15 @@ function shortSha() {
   }
 }
 
+/** The @krizaka/ui this build runs on, shown beside the version in the footer. */
+function uiVersion() {
+  try {
+    return JSON.parse(readFileSync(new URL("./node_modules/@krizaka/ui/package.json", import.meta.url), "utf8")).version;
+  } catch {
+    return "";
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // A static export, built here and served by the web service (one deployment, host-routed).
@@ -24,7 +33,7 @@ const nextConfig = {
   images: { unoptimized: true },
   reactStrictMode: true,
   poweredByHeader: false,
-  env: { APP_VERSION: `${version}+${shortSha()}` },
+  env: { APP_VERSION: `${version}+${shortSha()}`, APP_UI_VERSION: uiVersion() },
 };
 
 export default nextConfig;

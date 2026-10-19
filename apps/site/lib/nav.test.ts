@@ -54,3 +54,13 @@ describe("the bar's shape (the product-site navigation standard)", () => {
     expect(fr.chrome.signIn.toLowerCase()).toContain("invitation");
   });
 });
+
+describe("the bar's language switch", () => {
+  it("is the family's (a globe and the current code), in the bar and in the phone panel's preferences — never a pill naming the other language", () => {
+    expect(chrome).toContain("NavBar.Language");
+    expect(chrome).toContain("NavBar.MobilePreferences");
+    expect(chrome).toContain("languagesFor(");
+    expect(chrome).not.toContain("hrefLang");
+    expect(chrome).not.toContain("otherLocale");
+  });
+});

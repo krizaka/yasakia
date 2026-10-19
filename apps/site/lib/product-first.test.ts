@@ -12,7 +12,7 @@ const texts = (node: unknown): string[] => (typeof node === "string" ? [node] : 
 describe.each(["en", "fr"])("product first (%s)", (locale) => {
   const m = messages(locale);
   it("does not name Orazaka in the hero, the principles, the steps or the demo journey", () => {
-    const front = [m.home.title, m.home.eyebrow, m.home.lead, m.home.principles, m.how.title, m.how.lead, m.how.steps, m.demo.journey, m.demo.journeyLead];
+    const front = [m.landing.title, m.landing.eyebrow, m.landing.lead, m.landing.features, m.landing.journey, m.landing.comparison, m.how.title, m.how.lead, m.how.steps, m.demo.journey, m.demo.journeyLead];
     for (const t of texts(front)) expect(t, t).not.toMatch(/orazaka/i);
   });
   it("keeps the engine named where it is the proof: the stack", () => {
