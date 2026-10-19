@@ -6,6 +6,7 @@ import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
 import { Badge } from "@krizaka/ui/badge";
 import { Button } from "@krizaka/ui/button";
+import { languageNames,LanguageSwitch } from "@krizaka/ui/language-switch";
 import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -24,7 +25,6 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
   const router = useRouter();
   const path = usePathname() ?? "";
   const home = `/app/${locale}`;
-  const other = locale === "en" ? "fr" : "en";
   const rest = path.slice(home.length);
   const signOut = useMutation({
     mutationFn: () => krizakaFetch("/api/auth/sign-out", { method: "POST" }),
@@ -122,10 +122,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
                   {say("shell.devBadge", { version: VERSION })}
                 </Badge>
               ) : null}
-              <Link href={`/app/${other}${rest}`} hrefLang={other} lang={other} className="rounded-md px-2 py-1 text-sm text-fg-secondary hover:text-fg">
-                <span className="sr-only">{say("shell.language")} · </span>
-                {say("shell.otherLanguage")}
-              </Link>
+              <LanguageSwitch label={say("shell.language")} current={locale} languages={(["en", "fr"] as const).map((code) => ({ code, name: languageNames[code] ?? code, href: `/app/${code}${rest}` }))} linkAs={Link} />
               <ThemeToggle label={say("shell.theme")} variant="ghost" />
               <Button size="sm" variant="secondary" shape="cut" loading={signOut.isPending} onClick={() => signOut.mutate()}>
                 <LogoutIcon size={16} /> {say("shell.signOut")}

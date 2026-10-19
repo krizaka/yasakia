@@ -14,7 +14,6 @@
       "product": "Product"
     },
     "languageLabel": "Language",
-    "otherLanguage": "Français",
     "themeToggle": "Switch between light and dark",
     "product": "A Krizaka product",
     "sourceCode": "Source code",
@@ -36,39 +35,15 @@
         "text": "The real journey, recorded on the development site."
       }
     },
-    "signIn": "Sign in (by invitation)"
+    "signIn": "Sign in (by invitation)",
+    "preferences": "Preferences"
   },
   "status": {
     "label": "Under development",
     "text": "Yasakia is being built in the open. There is no app to download and no account to create yet — this site says what it will be and shows what already runs."
   },
   "home": {
-    "title": "Talk first. Meet both ways.",
-    "eyebrow": "The dating app where you talk first",
-    "lead": "No swipe, no catalogue, no score. An agent gets to know you in your own words, then opens a small batch of people who fit you in both directions.",
-    "ctaHow": "How it works",
     "ctaDemo": "See the demo",
-    "ctaSource": "Follow the build",
-    "principlesTitle": "Four rules, kept by design",
-    "principlesLead": "What Yasakia refuses is as important as what it does.",
-    "principles": {
-      "talk": {
-        "title": "A conversation, not a form",
-        "text": "The agent asks one question at a time, with humour, in your language."
-      },
-      "batch": {
-        "title": "Three to five people, not a feed",
-        "text": "A small batch, each with why you two in words — never a score."
-      },
-      "both": {
-        "title": "Both ways, or not at all",
-        "text": "Someone appears only if you fit them and they fit you."
-      },
-      "debrief": {
-        "title": "The next batch waits for you",
-        "text": "You debrief the last one first, so every batch fits better than the one before."
-      }
-    },
     "closingTitle": "Built in the open",
     "closingLead": "Yasakia is open source, on the same foundations as Orochia and Orazaka. Read the code, or tell us what you expect from a dating app.",
     "closingSource": "Source code",
@@ -218,5 +193,269 @@
     "feedDescription": "What shipped in Yasakia, week by week.",
     "footerVersion": "v{version}",
     "langTag": "en"
+  },
+  "landing": {
+    "eyebrow": "The dating app where you talk first",
+    "title": "Real people. You talk first.",
+    "lead": "No endless swipe, no score. An agent gets to know you in your own words, then opens a small batch of people with verified photos who fit you both ways. You write every message yourself.",
+    "ctaTalk": "Talk to us about Yasakia",
+    "ctaJourney": "See Camille's journey",
+    "status": "Yasakia is built in the open: registration is closed and there is no app to install yet. This site says what it will be and shows what already runs.",
+    "hero": {
+      "visualLabel": "yasakia — your profile",
+      "visualAlt": "A phone: your real-people profile, with verified photos and the mark on what you write.",
+      "profile": "Your profile",
+      "photos": "Photos",
+      "photosOk": "4 to 6 photos, 2 of your face",
+      "checkFace": "Your face is the subject",
+      "checkWords": "Nothing written on a photo",
+      "checkAge": "Nobody who looks under 18",
+      "stamp": "Handwritten",
+      "stampHint": "A signal before every message, never a verdict.",
+      "mine": "This message is yours. The agent writes nothing for you."
+    },
+    "figures": {
+      "batch": "people per batch, never a feed",
+      "photos": "photos at least, 2 of your face",
+      "days": "days to talk"
+    },
+    "features": {
+      "eyebrow": "What Yasakia does",
+      "title": "Four promises, kept by design",
+      "lead": "What Yasakia refuses matters as much as what it does.",
+      "items": {
+        "real": {
+          "title": "Real people",
+          "text": "A profile is 4 to 6 photos, 2 of your face, checked before a batch opens. A refused photo is replaced, never punished."
+        },
+        "intros": {
+          "title": "Introductions, no swiping",
+          "text": "When you both say yes, an introduction opens for seven days. A small batch of three to five people, never a catalogue."
+        },
+        "words": {
+          "title": "Your words, never the AI's",
+          "text": "The agent gets to know you in conversation. It writes no message for you and never reads your conversation with someone."
+        },
+        "signal": {
+          "title": "An authenticity signal",
+          "text": "A small mark before every message says whether it looks handwritten. A signal, never a number, and it blocks nothing."
+        }
+      }
+    },
+    "people": {
+      "eyebrow": "Real people",
+      "title": "Photos checked before the first batch",
+      "lead": "A batch opens only once your set of photos is checked. The check can be wrong, and the text says what it looks at, and what it does not.",
+      "checks": {
+        "count": {
+          "title": "4 to 6 photos",
+          "text": "At least 2 of them show your face."
+        },
+        "face": {
+          "title": "A face is the subject",
+          "text": "Nothing is written on a photo, no screenshot, nobody who looks under 18."
+        },
+        "private": {
+          "title": "Private by default",
+          "text": "Shown only to someone in your batch or introduction, through a link that expires in minutes. Metadata, GPS included, is stripped."
+        },
+        "nobody": {
+          "title": "It identifies nobody",
+          "text": "Comparing your photos with each other is biometric processing: it is off, and even on, only with your separate, explicit consent."
+        }
+      },
+      "powered": "Powered by Orazaka: the photo check and the authenticity signal run on the engine, and every run keeps its run id."
+    },
+    "journey": {
+      "eyebrow": "Camille's journey",
+      "title": "A conversation, a batch, a yes on both sides",
+      "lead": "Camille is a test person, a fictional adult: her journey is a real run on the development site, seen on a phone. Her sentences are the ones she said.",
+      "phoneLabel": "Camille's journey, step by step",
+      "stepOf": "Step {n} of {total}",
+      "says": "Camille says",
+      "note": "The people she meets are a fictional cast: nobody here exists. The agent's words are generated live, so one run differs from the next. The full recording is in the demo.",
+      "demo": "See the recorded demo",
+      "steps": {
+        "talk": {
+          "title": "She talks first",
+          "text": "One question at a time, in her language. No form.",
+          "says": "Hi! I'm Camille, I'm a woman and I live in Montréal."
+        },
+        "portrait": {
+          "title": "Her portrait, in words",
+          "text": "The agent writes who she is and who she looks for, from what she said. She can read it. Never a score.",
+          "says": "I hope to meet someone curious, who reads, who loves cooking and who knows how to listen."
+        },
+        "batch": {
+          "title": "A small batch of five people",
+          "text": "Each comes with why you two, in words, both ways. No swiping."
+        },
+        "yes": {
+          "title": "A yes on both sides",
+          "text": "She says yes, he said yes too: an introduction opens for seven days."
+        },
+        "write": {
+          "title": "She writes her own message",
+          "text": "The agent writes no sentence and never reads what follows. From there, two people talk."
+        }
+      }
+    },
+    "notDoing": {
+      "eyebrow": "What Yasakia does not do",
+      "title": "Three refusals, and what they cost you",
+      "lead": "Each refusal is a decision, said with its price.",
+      "labels": {
+        "chose": "We chose",
+        "refused": "We refused",
+        "because": "Because",
+        "cost": "What it costs you"
+      },
+      "items": {
+        "ghostwriting": {
+          "chose": "Every message is written by a person.",
+          "refused": "A suggested first line, a reply drafted by the agent.",
+          "because": "You want to talk to someone, not to their assistant.",
+          "cost": "You look for your own words, even for the first line."
+        },
+        "swipe": {
+          "chose": "A batch of three to five people, and you answer it.",
+          "refused": "An infinite feed to swipe.",
+          "because": "A feed with no end makes you slide without looking.",
+          "cost": "Fewer profiles to browse: with fewer than three, you wait."
+        },
+        "score": {
+          "chose": "Why you two, in words, both ways.",
+          "refused": "A compatibility score, a ranking.",
+          "because": "A number looks like a truth it is not.",
+          "cost": "You read a few sentences instead of a percentage."
+        }
+      }
+    },
+    "comparison": {
+      "eyebrow": "Side by side",
+      "title": "Yasakia, next to a swiping app",
+      "lead": "An honest comparison: what each asks of you, and what it shows you.",
+      "topic": "Question",
+      "columns": {
+        "yasakia": "Yasakia",
+        "swipe": "A typical swiping app",
+        "ghost": "An app that writes for you"
+      },
+      "rows": {
+        "start": {
+          "topic": "How it starts",
+          "yasakia": {
+            "key": "A conversation.",
+            "detail": "An agent gets to know you in your words."
+          },
+          "swipe": {
+            "key": "A form.",
+            "detail": "Fields and photos, then the feed."
+          },
+          "ghost": {
+            "key": "A drafted profile.",
+            "detail": "A text generated for you."
+          }
+        },
+        "show": {
+          "topic": "What you are shown",
+          "yasakia": {
+            "key": "Three to five people.",
+            "detail": "With why you two, in words."
+          },
+          "swipe": {
+            "key": "A feed.",
+            "detail": "Profiles in a row, with no end."
+          },
+          "ghost": {
+            "key": "Suggestions.",
+            "detail": "Ranked for you."
+          }
+        },
+        "photos": {
+          "topic": "Photos",
+          "yasakia": {
+            "key": "4 to 6, 2 of your face.",
+            "detail": "Checked before a batch opens."
+          },
+          "swipe": {
+            "key": "Up to you.",
+            "detail": "Often unchecked."
+          },
+          "ghost": {
+            "key": "Up to you.",
+            "detail": "Or retouched, or generated."
+          }
+        },
+        "writes": {
+          "topic": "Who writes the messages",
+          "yasakia": {
+            "key": "You, and the other person.",
+            "detail": "The agent writes nothing."
+          },
+          "swipe": {
+            "key": "The people.",
+            "detail": "Most of the time."
+          },
+          "ghost": {
+            "key": "An AI.",
+            "detail": "Suggested or drafted sentences."
+          }
+        },
+        "signal": {
+          "topic": "Knowing it is handwritten",
+          "yasakia": {
+            "key": "A signal before every message.",
+            "detail": "Never a verdict, never a number."
+          },
+          "swipe": {
+            "key": "Nothing.",
+            "detail": "You guess."
+          },
+          "ghost": {
+            "key": "Nothing.",
+            "detail": "That is the point."
+          }
+        }
+      }
+    },
+    "promise": {
+      "label": "The lovebird's promise",
+      "text": "I introduce two people. After that, it is up to them to talk."
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "What people ask us",
+      "items": {
+        "open": {
+          "q": "Can I join?",
+          "a": "Not yet. Yasakia is built in the open: registration is closed and there is no app to install. The code is public, and you can tell us what you expect from a dating app."
+        },
+        "photos": {
+          "q": "Why verified photos?",
+          "a": "For real people: 4 to 6 photos, at least 2 of your face. A batch opens only once the set is checked. The check can be wrong: a refused photo is replaced, never punished."
+        },
+        "faces": {
+          "q": "Does Yasakia compare my faces?",
+          "a": "Comparing your photos with each other is biometric processing. It stays off until it has been reviewed, and even then only with your separate, explicit consent. Nothing is kept."
+        },
+        "writes": {
+          "q": "Does the AI write my messages?",
+          "a": "No. Every message is written by a person: the agent writes nothing for you and never reads your conversation."
+        },
+        "signal": {
+          "q": "What is the mark before a message?",
+          "a": "A signal: handwritten, uncertain, probably generated, or too short to tell. Never a verdict, never a number, and it blocks no message. These detectors are unreliable, especially on short texts: how the message was typed counts as much as its text."
+        },
+        "engine": {
+          "q": "What does the AI run on?",
+          "a": "On Orazaka, Krizaka's engine: the agent, the photo check and the authenticity signal. Yasakia stays the product; the engine is the foundation."
+        }
+      }
+    },
+    "closing": {
+      "title": "Built in the open",
+      "body": "Yasakia is open source. Read the code, or tell us what you expect from a dating app."
+    }
   }
 }

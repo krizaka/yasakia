@@ -26,7 +26,7 @@ export function GET() {
         <div style={{ display: "flex", fontSize: 104, fontWeight: 900, letterSpacing: -2 }}>
           YASAKIA<span style={{ color: "#2dd4bf" }}>.</span>
         </div>
-        <div style={{ marginTop: 24, fontSize: 40, fontWeight: 600, maxWidth: 960, lineHeight: 1.25 }}>{t.home.title}</div>
+        <div style={{ marginTop: 24, fontSize: 40, fontWeight: 600, maxWidth: 960, lineHeight: 1.25 }}>{t.landing.title}</div>
         <div style={{ marginTop: "auto", fontSize: 24, color: "#a1a1aa" }}>{`${new URL(SITE_URL).host} · ${t.chrome.product}`}</div>
       </div>
     ),
