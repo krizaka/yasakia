@@ -8,24 +8,40 @@ import * as schema from "./schema";
 export type Database = NodePgDatabase<typeof schema>;
 
 /**
- * Connections per process when DATABASE_MAX_CONNECTIONS is not set. Small on purpose: a managed PostgreSQL may accept
- * ~22 connections in all, shared by every instance, the rolling deploy's second instance, the LISTEN connection of each
- * instance and the migrate job (docs/DEPLOYMENT.md, "Database connections"). Raise it only with a database (or a
- * pooler) that has room.
+ * Connections per process when DATABASE_MAX_CONNECTIONS is not set, by environment. Small on purpose: a managed
+ * PostgreSQL may accept ~22 connections in all, shared by every instance, the rolling deploy's second instance, the
+ * LISTEN connection of each instance and the migrate job (docs/DEPLOYMENT.md, "Database connections").
+ * - `production`: 5 on a direct database.
+ * - `pooled`: 10 when DATABASE_DIRECT_URL is also set, i.e. DATABASE_URL goes through a transaction pooler (PgBouncer):
+ *   the pooler multiplexes them onto few server connections, so a wider client pool costs the database nothing.
+ * - `development`: 3 (development, tests, CI): several servers share one local database (CI runs two).
  */
-export const DEFAULT_POOL_SIZE = 5;
+export const DEFAULT_POOL_SIZE = { production: 5, pooled: 10, development: 3 } as const;
+
+type Env = Record<string, string | undefined>;
+
+function defaultPoolSize(env: Env): number {
+  if (env.NODE_ENV !== "production") return DEFAULT_POOL_SIZE.development;
+  return env.DATABASE_DIRECT_URL?.trim() ? DEFAULT_POOL_SIZE.pooled : DEFAULT_POOL_SIZE.production;
+}
+
+/** What `instances` processes may hold on one database: their pools (`yasakia-web`) and one LISTEN each. */
+export function connectionBudget({ instances, poolSize: size }: { instances: number; poolSize: number }): { web: number; listen: number } {
+  return { web: instances * size, listen: instances };
+}
 
 /** Above this, a typo (500) would exhaust any database: the value is capped and a warning says so. */
 const MAX_POOL_SIZE = 50;
 
-/** DATABASE_MAX_CONNECTIONS as a positive integer (default 5, at most 50). */
-export function poolSize(value: string | undefined = process.env.DATABASE_MAX_CONNECTIONS): number {
+/** DATABASE_MAX_CONNECTIONS as a positive integer (at most 50); unset or invalid: the environment's default. */
+export function poolSize(value: string | undefined = process.env.DATABASE_MAX_CONNECTIONS, env: Env = process.env): number {
+  const fallback = defaultPoolSize(env);
   const raw = value?.trim();
-  if (!raw) return DEFAULT_POOL_SIZE;
+  if (!raw) return fallback;
   const parsed = Number(raw);
   if (!Number.isInteger(parsed) || parsed < 1) {
-    console.warn(`[db] DATABASE_MAX_CONNECTIONS="${raw}" is not a positive integer: using ${DEFAULT_POOL_SIZE}`);
-    return DEFAULT_POOL_SIZE;
+    console.warn(`[db] DATABASE_MAX_CONNECTIONS="${raw}" is not a positive integer: using ${fallback}`);
+    return fallback;
   }
   if (parsed > MAX_POOL_SIZE) {
     console.warn(`[db] DATABASE_MAX_CONNECTIONS=${parsed} is capped at ${MAX_POOL_SIZE}`);
