@@ -231,10 +231,15 @@ async function announce(messageId: string, verdict: string): Promise<void> {
   for (const account of decisionRecipients(verdict, { senderId: row.senderId, accountA: row.a, accountB: row.b })) await publishToAccount(account, { type: "intro.message", introId: row.introId, messageId });
 }
 
-/** Claims the oldest PENDING media that may be tried now (`FOR UPDATE SKIP LOCKED`, a try at a time per instance). */
+/**
+ * Claims the oldest PENDING media that may be tried now (`FOR UPDATE SKIP LOCKED`, a try at a time per instance). The claim is a **lease**:
+ * `reviewed_at` is set five minutes ahead (a little under the engine's own five-minute limit), so no other loop — another instance, or this
+ * one on its next tick — judges the same media while a review is in flight (two concurrent reviews of one media was a race: the second
+ * run spent a verdict the next media was owed). A decision or a failure sets `reviewed_at` to now: a failed try is retried 15 s later.
+ */
 async function claimNextReview(): Promise<(typeof introMedia.$inferSelect & { introId: string }) | null> {
   const res = await db.execute<{ message_id: string }>(sql`
-    update intro_media set attempts = attempts + 1
+    update intro_media set attempts = attempts + 1, reviewed_at = now() + interval '285 seconds'
     where message_id = (select message_id from intro_media where status = 'PENDING' and attempts < ${MAX_REVIEW_ATTEMPTS} and (reviewed_at is null or reviewed_at < now() - interval '15 seconds') order by created_at for update skip locked limit 1)
     returning message_id`);
   const id = res.rows[0]?.message_id;
