@@ -150,17 +150,17 @@ jobs:
           (cd apps/web && AUTH_SIGNUP_ENABLED= AI_ENGINE_URL= AI_ENGINE_API_KEY= NEXT_DIST_DIR=.next-closed NEXT_PUBLIC_APP_URL=http://localhost:3101 npx next dev --port 3101 > ../../web-closed.log 2>&1 &)
           for i in $(seq 1 90); do curl -sf http://localhost:3000/api/healthz && break; sleep 2; done
           for i in $(seq 1 90); do curl -sf http://localhost:3101/api/healthz && break; sleep 2; done
+      - name: Console crawl (before the scenarios, which use the QA person's sign-in allowance) — every console page at 390/768/1280 px, dark and light, English and French (no overflow, no error)
+        run: |
+          npx playwright-core install --with-deps chromium
+          node scripts/check-console.mjs --base http://localhost:3000
+        env:
+          AUTH_QA_USER_PASSWORD: ${{ env.QA_USER_PASSWORD }}
       - name: Scenarios
         run: npm run test:e2e
         env:
           APP_URL: http://localhost:3000
           CLOSED_URL: http://localhost:3101
           ORAZAKA_STUB_URL: http://127.0.0.1:4599
-      - name: Console crawl — every console page at 390/768/1280 px, dark and light, English and French (no overflow, no error)
-        run: |
-          npx playwright-core install --with-deps chromium
-          node scripts/check-console.mjs --base http://localhost:3000
-        env:
-          AUTH_QA_USER_PASSWORD: ${{ env.QA_USER_PASSWORD }}
       - if: failure()
         run: tail -200 web.log
