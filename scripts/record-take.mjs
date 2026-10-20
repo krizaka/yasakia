@@ -322,7 +322,7 @@ for (let waited = 0; waited < Number(flag("voice-wait", 90)); waited += 3) {
   if (pending === 0) break;
   await tick(3000);
 }
-await tick(4000);
+await tick(10_000); // the thread re-reads every 8 s
 step("media reviewed");
 await tick(3500);
 
