@@ -1,6 +1,6 @@
 "use client";
 
-import { BatchIcon, ChatIcon, ClockIcon, FilterIcon, FlagIcon, GoalIcon, HomeIcon, ImageIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
+import { BatchIcon, ChatIcon, FilterIcon, HomeIcon, ImageIcon, IntroIcon, LogoutIcon, ServerIcon, SettingsIcon, ShieldIcon, UsersIcon } from "@krizaka/icons";
 import { krizakaFetch, useMutation } from "@krizaka/query";
 import { YasakiaLogo } from "@krizaka/ui";
 import { AppShell } from "@krizaka/ui/app-shell";
@@ -11,7 +11,24 @@ import { ThemeToggle } from "@krizaka/ui/theme";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+import { ACCOUNT_HREF, ADMIN_NAV, currentEntry, type NavEntry, USER_NAV } from "@/lib/console-nav";
 import { useSay } from "@/lib/i18n-client";
+
+import { ButtonLink } from "./ButtonLink";
+
+/** The icon of each entry (structure lives in lib/console-nav.ts). */
+const ICONS: Record<string, React.ReactNode> = {
+  dashboard: <HomeIcon />,
+  talk: <ChatIcon />,
+  photos: <ImageIcon />,
+  batch: <BatchIcon />,
+  myIntros: <IntroIcon />,
+  overview: <ShieldIcon />,
+  users: <UsersIcon />,
+  intros: <IntroIcon />,
+  rules: <FilterIcon />,
+  system: <ServerIcon />,
+};
 
 const VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "";
 
@@ -34,35 +51,11 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
     },
   });
   const current = (to: string, exact = false) => (exact ? path === to : path === to || path.startsWith(`${to}/`));
-  const titleKey = path.startsWith(`${home}/admin/audit`)
-    ? "shell.audit"
-    : path.startsWith(`${home}/admin/users`)
-      ? "shell.users"
-      : path.startsWith(`${home}/admin/reports`)
-        ? "shell.reports"
-        : path.startsWith(`${home}/admin/intros`)
-          ? "shell.intros"
-          : path.startsWith(`${home}/admin/analytics`)
-            ? "shell.analytics"
-          : path.startsWith(`${home}/admin/health`)
-            ? "shell.health"
-            : path.startsWith(`${home}/admin/rules`)
-            ? "shell.rules"
-            : path.startsWith(`${home}/admin`)
-              ? "shell.overview"
-              : path.startsWith(`${home}/account`)
-                ? "shell.account"
-                : path.startsWith(`${home}/photos`)
-                  ? "shell.photos"
-                : path.startsWith(`${home}/talk`)
-                  ? "shell.talk"
-                  : path.startsWith(`${home}/batch`)
-                    ? "shell.batch"
-                    : path.startsWith(`${home}/intros`)
-                    ? "shell.myIntros"
-                    : "shell.dashboard";
-  const item = (to: string, label: string, icon: React.ReactNode, exact = false) => (
-    <AppShell.Item asChild label={label} icon={icon} current={current(to, exact)}>
+  const inAdmin = path.startsWith(`${home}/admin`);
+  const where = currentEntry(inAdmin ? ADMIN_NAV : USER_NAV, path, home);
+  const titleKey = where ? where.page.label : path.startsWith(`${home}${ACCOUNT_HREF}`) ? "account" : "dashboard";
+  const item = (to: string, label: string, icon: React.ReactNode, exact = false, entry?: NavEntry) => (
+    <AppShell.Item asChild label={label} icon={icon} current={entry ? where?.entry === entry : current(to, exact)}>
       <Link href={to}>{label}</Link>
     </AppShell.Item>
   );
@@ -79,6 +72,11 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
         collapseLabels={[say("shell.collapse"), say("shell.expand")]}
         footer={
           <div className="flex flex-col gap-1 px-3 pb-2 text-xs text-fg-muted">
+            {adminOnly ? null : (
+              <Link href={`${home}${ACCOUNT_HREF}`} className="inline-flex items-center gap-2 rounded-md py-1 text-fg-secondary hover:text-fg" aria-current={path.startsWith(`${home}${ACCOUNT_HREF}`) ? "page" : undefined}>
+                <SettingsIcon size={14} /> {say("shell.account")}
+              </Link>
+            )}
             <span className="truncate" title={email}>
               {say("shell.signedInAs", { email })}
             </span>
@@ -89,25 +87,13 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
         {adminOnly ? null : (
           <>
             <AppShell.Group>{say("shell.groupYou")}</AppShell.Group>
-            {item(home, say("shell.dashboard"), <HomeIcon />, true)}
-            {item(`${home}/talk`, say("shell.talk"), <ChatIcon />)}
-            {item(`${home}/photos`, say("shell.photos"), <ImageIcon />)}
-            {item(`${home}/batch`, say("shell.batch"), <BatchIcon />)}
-            {item(`${home}/intros`, say("shell.myIntros"), <IntroIcon />)}
-            {item(`${home}/account`, say("shell.account"), <SettingsIcon />)}
+            {USER_NAV.map((entry) => item(`${home}${entry.href}`, say(`shell.${entry.label}`), ICONS[entry.label], entry.href === ""))}
           </>
         )}
         {admin ? (
           <>
             <AppShell.Group>{say("shell.groupAdmin")}</AppShell.Group>
-            {item(`${home}/admin`, say("shell.overview"), <ShieldIcon />, true)}
-            {item(`${home}/admin/users`, say("shell.users"), <UsersIcon />)}
-            {item(`${home}/admin/reports`, say("shell.reports"), <FlagIcon />)}
-            {item(`${home}/admin/intros`, say("shell.intros"), <IntroIcon />)}
-            {item(`${home}/admin/analytics`, say("shell.analytics"), <GoalIcon />)}
-            {item(`${home}/admin/rules`, say("shell.rules"), <FilterIcon />)}
-            {item(`${home}/admin/audit`, say("shell.audit"), <ClockIcon />)}
-            {item(`${home}/admin/health`, say("shell.health"), <ServerIcon />)}
+            {ADMIN_NAV.map((entry) => item(`${home}${entry.href}`, say(`shell.${entry.label}`), ICONS[entry.label], entry.href === "/admin", entry))}
           </>
         ) : null}
       </AppShell.Sidebar>
@@ -118,19 +104,35 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
           actions={
             <>
               {adminOnly ? (
-                <Badge tone="warning" size="sm">
-                  {say("shell.devBadge", { version: VERSION })}
-                </Badge>
+                <>
+                  <Badge tone="warning" size="sm" className="hidden sm:inline-flex">
+                    {say("shell.devBadge", { version: VERSION })}
+                  </Badge>
+                  <Badge tone="warning" size="sm" className="sm:hidden">
+                    {say("shell.devShort")}
+                  </Badge>
+                </>
               ) : null}
               <LanguageSwitch label={say("shell.language")} current={locale} languages={(["en", "fr"] as const).map((code) => ({ code, name: languageNames[code] ?? code, href: `/app/${code}${rest}` }))} linkAs={Link} />
               <ThemeToggle label={say("shell.theme")} variant="ghost" />
               <Button size="sm" variant="secondary" shape="cut" loading={signOut.isPending} onClick={() => signOut.mutate()}>
-                <LogoutIcon size={16} /> {say("shell.signOut")}
+                <LogoutIcon size={16} /> <span className="max-sm:sr-only">{say("shell.signOut")}</span>
               </Button>
             </>
           }
         />
-        <AppShell.Main>{children}</AppShell.Main>
+        <AppShell.Main>
+          {where && where.entry.pages.length > 1 ? (
+            <nav aria-label={say(`shell.${where.entry.label}`)} className="mb-4 flex flex-wrap gap-2">
+              {where.entry.pages.map((page) => (
+                <ButtonLink key={page.href} href={`${home}${page.href}`} size="sm" variant={page === where.page ? "secondary" : "ghost"} aria-current={page === where.page ? "page" : undefined}>
+                  {say(`shell.${page.label}`)}
+                </ButtonLink>
+              ))}
+            </nav>
+          ) : null}
+          {children}
+        </AppShell.Main>
       </AppShell.Body>
     </AppShell.Root>
   );

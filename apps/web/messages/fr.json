@@ -258,7 +258,9 @@
       "rules": "Règles",
       "myIntros": "Présentations",
       "analytics": "Statistiques",
-      "photos": "Photos"
+      "photos": "Photos",
+      "devShort": "DEV",
+      "system": "Système"
     },
     "signIn": {
       "title": "Content de te revoir",

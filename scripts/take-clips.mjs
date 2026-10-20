@@ -14,6 +14,8 @@ import ffmpegPath from "ffmpeg-static";
 
 const dir = path.resolve(process.argv[2] ?? ".");
 const outDir = path.resolve(process.argv[3] ?? path.join(dir, "clips"));
+/** `--prefix take-en` names the English cut `take-en-<id>`; the default is `take` (French). */
+const prefix = process.argv.includes("--prefix") ? process.argv[process.argv.indexOf("--prefix") + 1] : "take";
 const evidence = JSON.parse(fs.readFileSync(path.join(dir, "evidence.json"), "utf8"));
 const at = (name) => {
   const step = evidence.steps.find((s) => s.name === name || s.name.startsWith(name));
@@ -36,14 +38,16 @@ const ff = (...a) => execFileSync(ffmpegPath, ["-y", "-v", "error", ...a], { std
 const source = path.join(dir, "take.mp4");
 const manifest = {};
 for (const [id, [from, to, speed, poster]] of Object.entries(CLIPS)) {
-  const vf = `setpts=PTS/${speed},fps=30,scale=390:844:flags=lanczos`;
+  // A strip above the picture (the phone frame's camera pill sits there, over the app's own bar) and 8 px each side, in the app's
+  // own dark background: the screen is 406x880, the aspect of the frame's screen (9:19.5).
+  const vf = `setpts=PTS/${speed},fps=30,scale=390:844:flags=lanczos,pad=406:880:8:36:color=0x0b0b0d`;
   const input = ["-ss", from.toFixed(2), "-to", to.toFixed(2), "-i", source];
-  const base = path.join(outDir, `take-${id}`);
+  const base = path.join(outDir, `${prefix}-${id}`);
   ff(...input, "-vf", `${vf},format=yuv420p`, "-an", "-c:v", "libx264", "-crf", "27", "-preset", "slow", "-movflags", "+faststart", `${base}.mp4`);
   ff(...input, "-vf", vf, "-an", "-c:v", "libvpx-vp9", "-crf", "36", "-b:v", "0", "-row-mt", "1", `${base}.webm`);
-  ff("-ss", poster.toFixed(2), "-i", source, "-frames:v", "1", "-vf", "scale=390:844:flags=lanczos", "-q:v", "4", `${base}.jpg`);
+  ff("-ss", poster.toFixed(2), "-i", source, "-frames:v", "1", "-vf", "scale=390:844:flags=lanczos,pad=406:880:8:36:color=0x0b0b0d", "-q:v", "4", `${base}.jpg`);
   const seconds = (to - from) / speed;
   manifest[id] = { seconds: Number(seconds.toFixed(1)), speed, from: Number(from.toFixed(1)), to: Number(to.toFixed(1)) };
-  console.log(`✓ take-${id}: ${seconds.toFixed(1)} s (x${speed})`);
+  console.log(`✓ ${prefix}-${id}: ${seconds.toFixed(1)} s (x${speed})`);
 }
 fs.writeFileSync(path.join(outDir, "clips.json"), `${JSON.stringify(manifest, null, 2)}\n`);

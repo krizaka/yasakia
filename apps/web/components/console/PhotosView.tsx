@@ -212,7 +212,7 @@ export function PhotosView({ initial }: { initial: { photos: OwnPhoto[]; check: 
               <li key={p.id} className="flex flex-col gap-1 text-sm">
                 <span className="inline-flex flex-wrap items-center gap-2">
                   <span className="font-medium text-fg">{say("photos.grid.photo", { position: i + 1 })}</span>
-                  <Badge tone={p.check === "FACE" ? "success" : "neutral"} size="sm">
+                  <Badge tone={p.check === "FACE" ? "success" : "neutral"} size="sm" className="h-auto max-w-full whitespace-normal py-0.5 text-start">
                     {say(`photos.status.${p.check === "PENDING" && (state === "CHECKING" || state === "UNCHECKED") ? "CHECKING" : p.check}`)}
                   </Badge>
                 </span>

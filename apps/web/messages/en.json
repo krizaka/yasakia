@@ -258,7 +258,9 @@
       "rules": "Rules",
       "myIntros": "Introductions",
       "analytics": "Analytics",
-      "photos": "Photos"
+      "photos": "Photos",
+      "devShort": "DEV",
+      "system": "System"
     },
     "signIn": {
       "title": "Welcome back",
