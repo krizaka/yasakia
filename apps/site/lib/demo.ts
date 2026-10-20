@@ -1,23 +1,21 @@
-import type { ClipId } from "./media";
+import type { TakeId } from "./media";
 
 /**
- * The cues of the captions, per recording: the id of a message (`demo.<clip>.cues.<id>`) and the second it appears at,
- * in the clip's own seconds (`npm run dev:journey` then `scripts/journey-clips.mjs` write them to `clips.json`). The words
- * are messages in both languages; the recordings are the real journey, never scripted on the agent's side.
+ * The cues of the captions of the full take, in the take's own seconds (the steps of `scripts/record-take.mjs`' evidence.json:
+ * `at` of each step). The words are messages in both languages (`demo.journey.cues.<id>`); the recording is the real run,
+ * never scripted on the agent's side.
  */
 export const CUES = {
-  loop: [
-    { id: "talk", at: 0.3 },
-    { id: "first", at: 2.7 },
-    { id: "understood", at: 13.3 },
-    { id: "portrait", at: 32 },
-    { id: "look", at: 33.8 },
-    { id: "shown", at: 42.1 },
-    { id: "answer", at: 43.1 },
-    { id: "yes", at: 45.8 },
-    { id: "answered", at: 50.3 },
-    { id: "debrief", at: 52.1 },
-    { id: "intro", at: 53.8 },
-    { id: "line", at: 57.8 },
+  full: [
+    { id: "photos", at: 3.7 },
+    { id: "checked", at: 45 },
+    { id: "talk", at: 47.8 },
+    { id: "portrait", at: 99 },
+    { id: "batch", at: 101.5 },
+    { id: "yes", at: 125 },
+    { id: "intro", at: 134.3 },
+    { id: "signal", at: 146 },
+    { id: "photo", at: 156.9 },
+    { id: "voice", at: 165 },
   ],
-} as const satisfies Record<ClipId, readonly { id: string; at: number }[]>;
+} as const satisfies Partial<Record<TakeId, readonly { id: string; at: number }[]>>;

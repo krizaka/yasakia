@@ -134,29 +134,27 @@
   "demo": {
     "title": "Demo",
     "eyebrow": "The real journey",
-    "lead": "Recorded on the development site, against the real engine: a test persona talks to the agent until it writes her portrait, opens her first batch, answers it, sends the debrief, and writes in the introduction that opens. Not an animation, not a mock-up, and not edited: one run, sped up while the agent thinks.",
+    "lead": "Recorded on the development site, against the real engine, as a phone: a test persona adds her photos, which the engine checks, talks to the agent until it writes her portrait, opens her first batch, says yes, and writes her own message in the introduction — with its authenticity mark — then sends a photo and a voice message. Not an animation, not a mock-up: one run, captured at 30 frames a second and not cut.",
     "transcript": "Captions as text",
     "noteTitle": "Read this recording honestly",
-    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists, there is no photo, and Yasakia has no members. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next. No e-mail is shown: the account’s address is replaced by the persona’s name on screen. Honest note: this recording was made before 2026-10-17 and still shows a first line suggested by the agent — Yasakia no longer offers it, every message is typed by the person; a new recording replaces this one.",
+    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists and Yasakia has no members. Her portraits are generated images and her voice is synthesised. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next. No e-mail is shown: the account’s address is replaced by the persona’s name on screen. Honest note: the voice message stays « checking » at the end of this run — Orazaka’s audio-only safety run does not finish yet on the dev engine (krizaka/orazaka#266); the app holds it, it never shows it unchecked.",
     "nextTitle": "When the app ships",
     "nextText": "Its own recording, made on the real application, replaces these. Until then: the code is public.",
-    "journeyTitle": "Talk, a batch, a yes both ways, an introduction",
-    "journeyLead": "The whole loop, as a person lives it — in one recording.",
-    "journeyLabel": "Recording: a person talks to the agent, gets her portrait and a batch of five people with the reasons in words, answers each one, sends the debrief, then writes in the introduction that opened.",
+    "journeyTitle": "Photos, a talk, a batch, a yes both ways, an introduction",
+    "journeyLead": "The whole loop, as a person lives it on her phone — in one recording.",
+    "journeyLabel": "Recording on a phone: a person adds four photos that pass the engine's check, talks to the agent, gets her portrait and a batch of people with the reasons in words, says yes, types a message with its authenticity mark, then sends a photo and a voice message.",
     "journey": {
       "cues": {
-        "talk": "Camille — a test persona, a fictional adult — opens the talk. She speaks first.",
-        "first": "She says who she is and where she lives. The agent answers with a question, not a form.",
-        "understood": "A perfect Saturday, what matters to her. The agent writes down what she said, and nothing more.",
+        "photos": "Camille — a test persona, a fictional adult — adds four photos: two show her face. Nobody sees them yet.",
+        "checked": "The engine's photo check has read them: faces present, nothing written on them, nobody under 18. Her photos are ready.",
+        "talk": "She talks first, one question at a time. The agent answers with a question, not a form.",
         "portrait": "Her portrait is written, in words, from what she said — and embedded, so it can be compared with the others.",
-        "look": "She asks for her first batch: people who fit her, and for whom she fits too.",
-        "shown": "Five people, each with why you two — in words, both ways. No score, no swiping. A fictional cast made for tests.",
-        "answer": "« Tell me more » opens who one of them hopes to meet, in their own words.",
-        "yes": "She says yes. He said yes too: an introduction opens, for seven days.",
-        "answered": "She passes on the others. Everyone is answered.",
-        "debrief": "Three questions before the next batch: did the reasons ring true, what mattered, what next.",
-        "intro": "The introduction opens. Nobody writes for her: the agent writes no line and never reads what follows.",
-        "line": "She types her own message. From here, two people talk."
+        "batch": "Her first batch: people who fit her, and for whom she fits too, each with why you two. No score, no swiping.",
+        "yes": "She says yes. He said yes too: an introduction opens, for seven days. She answers the others and sends the debrief.",
+        "intro": "The introduction. Nobody writes for her: the agent writes no line and never reads what follows.",
+        "signal": "She types her own message. A small mark says how it was written — a signal, never a verdict, and it can be wrong.",
+        "photo": "She sends a photo. It is held for a safety check, then shown as it is: nothing is cut, filtered or edited.",
+        "voice": "A voice message follows. Its words are transcribed by the engine and judged before it is played; until then, only she can see it."
       }
     }
   },
@@ -203,7 +201,7 @@
     "status": "Yasakia is built in the open: registration is closed and there is no app to install yet. This site says what it will be and shows what already runs.",
     "hero": {
       "visualLabel": "yasakia — your profile",
-      "visualAlt": "A phone: your real-people profile, with verified photos and the mark on what you write.",
+      "visualAlt": "A phone playing a real run: Camille's photos being checked on the development site.",
       "profile": "Your profile",
       "photos": "Photos",
       "photosOk": "4 to 6 photos, 2 of your face",
@@ -276,29 +274,35 @@
       "note": "The people she meets are a fictional cast: nobody here exists. The agent's words are generated live, so one run differs from the next. The full recording is in the demo.",
       "demo": "See the recorded demo",
       "steps": {
+        "photos": {
+          "title": "Real people: four photos, two of her face",
+          "text": "Camille adds her photos. The engine checks them: faces present, nothing written on them, nobody under 18. Until then, nobody sees them.",
+          "alt": "The photos screen: four photos, then « Your photos are ready »."
+        },
         "talk": {
           "title": "She talks first",
-          "text": "One question at a time, in her language. No form.",
-          "says": "Hi! I'm Camille, I'm a woman and I live in Montréal."
-        },
-        "portrait": {
-          "title": "Her portrait, in words",
-          "text": "The agent writes who she is and who she looks for, from what she said. She can read it. Never a score.",
-          "says": "I hope to meet someone curious, who reads, who loves cooking and who knows how to listen."
+          "text": "One question at a time, in her language. No form. The agent writes who she is from what she said.",
+          "says": "Hi! I'm Camille, I'm a woman and I live in Montréal.",
+          "alt": "A conversation: Camille writes, the agent answers, then her portrait appears."
         },
         "batch": {
-          "title": "A small batch of five people",
-          "text": "Each comes with why you two, in words, both ways. No swiping."
-        },
-        "yes": {
-          "title": "A yes on both sides",
-          "text": "She says yes, he said yes too: an introduction opens for seven days."
+          "title": "A small batch, with the reasons",
+          "text": "Each person comes with why you two, in words, both ways. No swiping. She says yes, he said yes too: an introduction opens for seven days.",
+          "alt": "The first batch of people with the reasons, then a yes that opens an introduction."
         },
         "write": {
           "title": "She writes her own message",
-          "text": "The agent writes no sentence and never reads what follows. From there, two people talk."
+          "text": "The agent writes no sentence and never reads what follows. A small signal says how the message was written: a signal, never a verdict.",
+          "alt": "A message typed by hand in the introduction, with its authenticity mark."
+        },
+        "media": {
+          "title": "A photo, a voice message",
+          "text": "Sent as they are, nothing edited. The other person sees them once they pass a safety check; a voice message is judged on its words.",
+          "alt": "A photo and a voice message sent in the introduction, held for the safety check."
         }
-      }
+      },
+      "play": "Play the journey",
+      "pause": "Pause the journey"
     },
     "notDoing": {
       "eyebrow": "What Yasakia does not do",

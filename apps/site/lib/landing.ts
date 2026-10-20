@@ -10,8 +10,8 @@ export const FIGURES = { batchMin: 3, batchMax: 5, photosMin: 4, photosMax: 6, f
 /** The home's sections, in reading order (a test holds the page to it). */
 export const HOME_SECTIONS = ["hero", "features", "people", "journey", "not-doing", "comparison", "promise", "faq", "closing"] as const;
 
-/** Camille's journey, one step per beat of the real recorded run (`landing.journey.steps.<id>`). */
-export const JOURNEY_STEPS = ["talk", "portrait", "batch", "yes", "write"] as const;
+/** Camille's journey, one step per beat of the real recorded run (a clip each, lib/media.ts TAKES) (`landing.journey.steps.<id>`). */
+export const JOURNEY_STEPS = ["photos", "talk", "batch", "write", "media"] as const;
 
 /** What Yasakia refuses, each as a decision (`landing.notDoing.items.<id>`). */
 export const NOT_DOING = ["ghostwriting", "swipe", "score"] as const;

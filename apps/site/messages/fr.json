@@ -134,29 +134,27 @@
   "demo": {
     "title": "Démo",
     "eyebrow": "Le vrai parcours",
-    "lead": "Enregistré sur le site de développement, avec le vrai moteur : une personne de test parle à l’agent jusqu’à ce qu’il écrive son portrait, ouvre son premier lot, y répond, envoie le débrief, puis écrit dans la présentation qui s’ouvre. Pas une animation, pas une maquette, pas de montage : un seul passage, accéléré pendant que l’agent réfléchit.",
+    "lead": "Enregistré sur le site de développement, contre le vrai moteur, sur un téléphone : une personne de test ajoute ses photos, que le moteur vérifie, parle à l'agent jusqu'à son portrait, ouvre son premier lot, dit oui, écrit son propre message dans la présentation — avec sa marque d'authenticité — puis envoie une photo et un vocal. Ni animation ni maquette : un seul passage, capturé à 30 images par seconde et non coupé.",
     "transcript": "Les sous-titres en texte",
     "noteTitle": "Lis cet enregistrement honnêtement",
-    "note": "Camille est une personne de test et les personnes qu’elle rencontre sont une distribution fictive : personne ici n’existe, il n’y a aucune photo, et Yasakia n’a pas de membres. La distribution fictive répond oui, c’est ce qui permet de montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scénarisé — donc un passage diffère du suivant. Aucun courriel n’est montré : l’adresse du compte est remplacée à l’écran par le nom de la personne. Note d’honnêteté : cet enregistrement date d’avant le 2026-10-17 et montre encore une première phrase suggérée par l’agent — Yasakia ne l’offre plus, chaque message est écrit par la personne ; un nouvel enregistrement le remplacera.",
+    "note": "Camille est une personne de test et les gens qu'elle rencontre sont une distribution fictive : personne ici n'existe et Yasakia n'a pas de membres. Ses portraits sont des images générées et sa voix est synthétisée. La distribution fictive répond oui, c'est ainsi qu'on peut montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l'agent sont générés en direct par Orazaka — le modèle n'est pas scripté — donc un passage diffère du suivant. Aucun e-mail n'est montré : l'adresse du compte est remplacée à l'écran par le nom de la personne. Note honnête : le vocal reste « en vérification » à la fin de ce passage — la vérification de sécurité audio seule d'Orazaka ne se termine pas encore sur le moteur de dev (krizaka/orazaka#266) ; l'app le retient, elle ne le montre jamais sans contrôle.",
     "nextTitle": "Quand l’appli sortira",
     "nextText": "Son propre enregistrement, fait sur la vraie application, remplacera ceux-ci. D’ici là : le code est public.",
-    "journeyTitle": "Parler, un lot, un oui des deux côtés, une présentation",
-    "journeyLead": "Toute la boucle, comme une personne la vit — en un seul enregistrement.",
-    "journeyLabel": "Enregistrement : une personne parle à l’agent, reçoit son portrait et un lot de cinq personnes avec les raisons en mots, répond à chacune, envoie le débrief, puis écrit dans la présentation qui s’est ouverte.",
+    "journeyTitle": "Des photos, une conversation, un lot, un oui des deux côtés, une présentation",
+    "journeyLead": "La boucle entière, comme une personne la vit sur son téléphone — en un seul enregistrement.",
+    "journeyLabel": "Enregistrement sur un téléphone : une personne ajoute quatre photos qui passent la vérification du moteur, parle à l'agent, reçoit son portrait et un lot de personnes avec les raisons en mots, dit oui, écrit un message avec sa marque d'authenticité, puis envoie une photo et un vocal.",
     "journey": {
       "cues": {
-        "talk": "Camille — une personne de test, une adulte fictive — ouvre la conversation. Elle parle en premier.",
-        "first": "Elle dit qui elle est et où elle vit. L’agent répond par une question, pas par un formulaire.",
-        "understood": "Un samedi parfait, ce qui compte pour elle. L’agent note ce qu’elle a dit, et rien de plus.",
-        "portrait": "Son portrait est écrit, en mots, à partir de ce qu’elle a dit — et vectorisé, pour pouvoir être comparé aux autres.",
-        "look": "Elle demande son premier lot : des personnes qui lui correspondent, et pour qui elle correspond aussi.",
-        "shown": "Cinq personnes, chacune avec pourquoi vous deux — en mots, dans les deux sens. Pas de note, pas de swipe. Une distribution fictive faite pour les tests.",
-        "answer": "« Dis-m’en plus » ouvre qui l’une d’elles espère rencontrer, dans ses propres mots.",
-        "yes": "Elle dit oui. Il a dit oui aussi : une présentation s’ouvre, pour sept jours.",
-        "answered": "Elle passe pour les autres. Tout le monde a sa réponse.",
-        "debrief": "Trois questions avant le prochain lot : les raisons sonnaient-elles juste, ce qui comptait, la suite.",
-        "intro": "La présentation s’ouvre. Personne n’écrit à sa place : l’agent n’écrit aucune phrase et ne lit jamais la suite.",
-        "line": "Elle écrit son propre message. À partir de là, deux personnes se parlent."
+        "photos": "Camille — une personne de test, une adulte fictive — ajoute quatre photos, dont deux de son visage. Personne ne les voit encore.",
+        "checked": "La vérification de photos du moteur les a lues : des visages, rien d'écrit dessus, personne de mineur. Ses photos sont prêtes.",
+        "talk": "Elle parle en premier, une question à la fois. L'agent répond par une question, pas par un formulaire.",
+        "portrait": "Son portrait est écrit, en mots, à partir de ce qu'elle a dit — et vectorisé, pour être comparé aux autres.",
+        "batch": "Son premier lot : des personnes qui lui conviennent, et pour qui elle convient aussi, chacune avec pourquoi vous deux. Pas de note, pas de swipe.",
+        "yes": "Elle dit oui. Il a dit oui aussi : une présentation s'ouvre, pour sept jours. Elle répond aux autres et envoie le débrief.",
+        "intro": "La présentation. Personne n'écrit à sa place : l'agent n'écrit aucune ligne et ne lit jamais la suite.",
+        "signal": "Elle écrit son propre message. Une petite marque dit comment il a été écrit — un signal, jamais un verdict, et il peut se tromper.",
+        "photo": "Elle envoie une photo. Elle est retenue le temps d'une vérification de sécurité, puis montrée telle quelle : rien n'est coupé, filtré ni retouché.",
+        "voice": "Un vocal suit. Ses mots sont transcrits par le moteur et jugés avant qu'il soit lu ; d'ici là, elle seule le voit."
       }
     }
   },
@@ -203,7 +201,7 @@
     "status": "Yasakia se construit à ciel ouvert : les inscriptions sont fermées et il n'y a pas encore d'appli à installer. Ce site dit ce qu'elle sera et montre ce qui tourne déjà.",
     "hero": {
       "visualLabel": "yasakia — ton profil",
-      "visualAlt": "Un téléphone : ton profil de vraies personnes, avec les photos vérifiées et la marque de ce que tu écris.",
+      "visualAlt": "Un téléphone qui joue un vrai passage : les photos de Camille vérifiées sur le site de développement.",
       "profile": "Ton profil",
       "photos": "Photos",
       "photosOk": "4 à 6 photos, dont 2 de ton visage",
@@ -276,29 +274,35 @@
       "note": "Les personnes qu'elle rencontre sont une distribution fictive : personne ici n'existe. Les mots de l'agent sont générés en direct, donc un passage diffère du suivant. L'enregistrement complet est dans la démo.",
       "demo": "Voir la démo enregistrée",
       "steps": {
+        "photos": {
+          "title": "De vraies personnes : quatre photos, deux de son visage",
+          "text": "Camille ajoute ses photos. Le moteur les vérifie : des visages, rien d'écrit dessus, personne de mineur. D'ici là, personne ne les voit.",
+          "alt": "L'écran des photos : quatre photos, puis « Tes photos sont prêtes »."
+        },
         "talk": {
           "title": "Elle parle en premier",
-          "text": "Une question à la fois, dans sa langue. Pas de formulaire.",
-          "says": "Salut ! Moi c'est Camille, je suis une femme et je vis à Montréal."
-        },
-        "portrait": {
-          "title": "Son portrait, en mots",
-          "text": "L'agent écrit qui elle est et qui elle cherche, à partir de ce qu'elle a dit. Elle peut le lire. Jamais une note.",
-          "says": "J'espère rencontrer quelqu'un de curieux, qui lit, qui aime cuisiner et qui sait écouter."
+          "text": "Une question à la fois, dans sa langue. Pas de formulaire. L'agent écrit qui elle est à partir de ce qu'elle a dit.",
+          "says": "Salut ! Moi c'est Camille, je suis une femme et je vis à Montréal.",
+          "alt": "Une conversation : Camille écrit, l'agent répond, puis son portrait apparaît."
         },
         "batch": {
-          "title": "Un petit lot de cinq personnes",
-          "text": "Chacune vient avec pourquoi vous deux, en mots, dans les deux sens. Pas de swipe."
-        },
-        "yes": {
-          "title": "Un oui des deux côtés",
-          "text": "Elle dit oui, il a dit oui aussi : une présentation s'ouvre pour sept jours."
+          "title": "Un petit lot, avec les raisons",
+          "text": "Chaque personne vient avec pourquoi vous deux, en mots, dans les deux sens. Pas de swipe. Elle dit oui, il a dit oui aussi : une présentation s'ouvre pour sept jours.",
+          "alt": "Le premier lot avec les raisons, puis un oui qui ouvre une présentation."
         },
         "write": {
           "title": "Elle écrit son message",
-          "text": "L'agent n'écrit aucune phrase et ne lit jamais la suite. À partir de là, deux personnes se parlent."
+          "text": "L'agent n'écrit aucune phrase et ne lit jamais la suite. Un petit signal dit comment le message a été écrit : un signal, jamais un verdict.",
+          "alt": "Un message écrit à la main dans la présentation, avec sa marque d'authenticité."
+        },
+        "media": {
+          "title": "Une photo, un vocal",
+          "text": "Envoyés tels quels, rien de retouché. L'autre personne les voit une fois qu'ils ont passé une vérification de sécurité ; un vocal est jugé sur ses mots.",
+          "alt": "Une photo et un vocal envoyés dans la présentation, retenus le temps de la vérification de sécurité."
         }
-      }
+      },
+      "play": "Lire le parcours",
+      "pause": "Mettre le parcours en pause"
     },
     "notDoing": {
       "eyebrow": "Ce que Yasakia ne fait pas",
