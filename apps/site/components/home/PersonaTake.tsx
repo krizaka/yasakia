@@ -1,11 +1,12 @@
 import { Section } from "@krizaka/ui/page";
-import { StepShowcase } from "@krizaka/ui/step-showcase";
 
 import { ButtonLink } from "@/components/ButtonLink";
-import { format, getDictionary, type Locale } from "@/lib/i18n";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import { JOURNEY_STEPS } from "@/lib/landing";
 import { take } from "@/lib/media";
 import { pagePath } from "@/lib/site";
+
+import { PersonaShowcase } from "./PersonaShowcase";
 
 /**
  * Camille's real journey, phone first: the StepShowcase of @krizaka/ui — one phone, five steps, each step its own cut of the one
@@ -21,13 +22,7 @@ export function PersonaTake({ locale }: { locale: Locale }) {
   return (
     <Section id="journey" eyebrow={t.eyebrow} title={t.title} lead={t.lead} reveal divider>
       <div className="flex flex-col gap-6">
-        <StepShowcase
-          label={t.phoneLabel}
-          steps={steps}
-          device="phone"
-          labels={{ play: t.play, pause: t.pause, step: (n, total) => format(t.stepOf, { n, total }) }}
-          data-testid="persona-showcase"
-        />
+        <PersonaShowcase label={t.phoneLabel} steps={steps} play={t.play} pause={t.pause} stepOf={t.stepOf} />
         <ol className="sr-only" data-testid="persona-steps">
           {JOURNEY_STEPS.map((id) => (
             <li key={id}>

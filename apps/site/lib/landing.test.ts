@@ -28,8 +28,9 @@ describe("the home is the product landing template of @krizaka/ui, at the Yomiza
   });
 
   it("uses the family's blocks: DeviceFrame (the phone take), ComparisonTable, DecisionList, the lovebird's MascotQuote, NumberTicker", () => {
-    expect(read("components/home/PersonaTake.tsx")).toContain("StepShowcase");
-    expect(read("components/home/PersonaTake.tsx")).toContain('device="phone"');
+    expect(read("components/home/PersonaShowcase.tsx")).toContain("StepShowcase");
+    expect(read("components/home/PersonaShowcase.tsx")).toContain('device="phone"');
+    expect(read("components/home/PersonaShowcase.tsx")).toContain('"use client"'); // its « Step n of m » is a function: it cannot cross from a server component
     expect(read("components/home/HeroPhone.tsx")).toContain('kind="phone"');
     expect(read("components/home/ComparisonSection.tsx")).toContain("@krizaka/ui/comparison-table");
     expect(read("components/home/NotDoing.tsx")).toContain("@krizaka/ui/decision-list");

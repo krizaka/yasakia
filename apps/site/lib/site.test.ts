@@ -7,7 +7,7 @@ import robots from "../app/robots";
 import en from "../messages/en.json";
 import fr from "../messages/fr.json";
 import { llmsText } from "./llms";
-import { TAKES, take } from "./media";
+import { take,TAKES } from "./media";
 import { ORG_ID, pageMetadata, siteJsonLd } from "./seo";
 import { contactHref, pagePath,PAGES, SITE_URL } from "./site";
 
