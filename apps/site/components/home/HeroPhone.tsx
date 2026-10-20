@@ -12,7 +12,7 @@ import { TakeVideo } from "./TakeVideo";
  */
 export function HeroPhone({ locale }: { locale: Locale }) {
   const t = getDictionary(locale).landing.hero;
-  const media = take("hero");
+  const media = take("hero", locale);
   return (
     <div className="flex justify-center py-2">
       <DeviceFrame kind="phone" className="w-[15.5rem] max-w-full">
