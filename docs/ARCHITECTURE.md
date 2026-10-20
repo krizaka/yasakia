@@ -155,7 +155,10 @@ server refuses to start without the session secret, the encryption key, the data
 (`instrumentation.ts`); a request that needs a missing value answers 503. There is no demo mode: the demo (a fictional
 cast) will live in its own database, never in the real one.
 
-## What comes next
+## The brain, on these foundations
 
-PY3 adds the brain on these foundations: the AI port (`packages/ai`, Orazaka as the target), the bilateral matching
-(`packages/matching`), batches, debriefs and intros — and their endpoints, events and scenarios.
+The brain runs on them: the AI port (`packages/ai`, Orazaka the only adapter), the bilateral matching (`packages/matching`),
+batches, debriefs and introductions with their endpoints, events and scenarios. Around an introduction: the authenticity signal
+of each message and the media messages (held until Orazaka's `media-safety` approves them). What is next: the voice message on dev
+(krizaka/orazaka#266), the app's photos, introductions and media screens (`yasakia-mobile`), and the real-person checks that wait for
+the legal review of the face comparison (#114).

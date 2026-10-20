@@ -18,20 +18,22 @@ Orazaka (sovereign AI) and Orochia (video for creators).
 
 ---
 
-## 0. Current phase — **foundations (PY2): production-ready code, local development, DigitalOcean deployable**
+## 0. Current phase — **Dev preview: the whole loop runs on dev.yasakia.com, sign-up closed, QA accounts only**
 
 - Two repositories, cloned side by side (`npm run workspace -- clone`, manifest [`yasakia.workspace.json`](yasakia.workspace.json)):
-  `yasakia` (:3000) and `yasakia-mobile` (:8081).
-- **Done**: the workspace, the data model of the whole product (21 tables), native sessions by e-mail code, the account
-  (profile, rounded position, pause, export, deletion and the media purge), photos (signed upload → normalised →
-  moderated → signed view), blocks, reports, push tokens, the event stream, encryption at rest, the three legal pages,
-  generated docs synced to krizaka.com, Docker, the DigitalOcean spec, CI.
-- **PY3, in increments** ([ADR-001](docs/adr/ADR-001-talk-first-agent-and-bilateral-matching.md)): **done** — the talk-first
-  agent (`packages/ai`: port `AiProvider` and its one adapter, Orazaka; `apps/web/lib/agent*.ts`; `/app/{en|fr}/talk`; the
-  extraction, the sealed facets, the portrait and its two 1024-d vectors), `packages/matching` (hard filters both ways,
-  the weaker direction, the batch), the versioned `rule_sets`. **Done too** — the first batch (`/api/batches`: candidates from pgvector through the hard filters both ways, `packages/matching` ranks
-  by the weaker direction, the agent writes *why you two* both ways; `/app/{en|fr}/batch`; the fictional dev cast, `npm run db:qa-personas`).
-  **Next** — answering a batch, the debrief, the introductions.
+  `yasakia` (:3000) and `yasakia-mobile` (:8081). This one holds the API, the web console (`/app/{en|fr}/…`, the person's space and,
+  on the admin host, the operator's), the public landing (`apps/site`, a static export served by the same service: home,
+  how it works, demo, changelog) and the packages (`db`, `ai`, `matching`, `media`).
+- **Runs on dev, with proof** (`dev-preview.json`, the take of `scripts/record-take.mjs`): sign-in by password or e-mail code (sign-up
+  closed server-side), the talk-first agent (extraction, sealed facets, portrait, two vectors), 4 to 6 photos with 2 of the face
+  checked by Orazaka (`profile-photo-check`; the comparison of faces is **off** — `APP_PHOTO_FACE_COMPARISON` — until the lawyer's
+  review, #114), the first batch with *why you two*, answers, the debrief, introductions (seven days) where **nobody writes for the
+  person** and every message carries an authenticity **signal** (`message-authenticity`: a signal, never a verdict), media
+  messages (photo, video, voice; limits as data, no editing, held until `media-safety` approves; fail-closed), the operator console
+  (users, reports, introductions, rules, audit, health, analytics), the event stream, export, deletion, analytics, e-mail.
+- **Known gap**: a voice message is not approved on dev until Orazaka's audio-only `media-safety` run completes (krizaka/orazaka#266).
+- **Mobile**: `yasakia-mobile` has sign-in, home, talk and batch over the same API; photos, introductions and media messages are next.
+- **Not here**: product documentation (dev.orazaka.com …), a public sign-up, stores, payments.
 - **Allowed on GitHub**: Actions that lint, type-check, test (unit, realtime contract, end-to-end on PostgreSQL +
   pgvector), build, check the generated docs. Production is **fail-closed** (§3.F): never a placeholder secret, never a
   demo mode, never a fake profile.
