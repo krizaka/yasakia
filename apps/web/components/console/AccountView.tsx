@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 
 import { BASE_PATH, errorKey } from "@/lib/client";
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 import { tableLabels } from "./table";
@@ -118,7 +119,7 @@ export function AccountView({ account }: { account: AccountDto }) {
     },
   });
 
-  const when = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
+  const when = useMemo(() => dateFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
   const columns = useMemo<DataTableColumn<AccountDto["sessions"][number]>[]>(
     () => [
       {

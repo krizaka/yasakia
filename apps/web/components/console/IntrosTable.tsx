@@ -5,6 +5,7 @@ import { Badge } from "@krizaka/ui/badge";
 import { DataTable, type DataTableColumn, DataTableFilters, type DataTableQuery } from "@krizaka/ui/data-table";
 import { useMemo, useState } from "react";
 
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 import { tableLabels } from "./table";
@@ -35,7 +36,7 @@ export function IntrosTable() {
     placeholderData: keepPreviousData,
     meta: { list: true },
   });
-  const when = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
+  const when = useMemo(() => dateFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
   const columns = useMemo<DataTableColumn<IntroRow>[]>(
     () => [
       { id: "id", header: say("admin.intros.id"), card: "title", value: (r) => r.id, cell: (r) => <span className="font-mono text-xs">{r.id.slice(0, 8)}</span> },
