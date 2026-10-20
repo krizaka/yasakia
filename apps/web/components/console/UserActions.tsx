@@ -50,7 +50,7 @@ export function UserActions({ id, status, role }: { id: string; status: "ACTIVE"
   if (status === "SUSPENDED") {
     return (
       <div className="flex flex-col items-end gap-2">
-        <ConfirmButton variant="secondary" shape="cut" size="sm" confirmLabel={say("admin.user.restoreConfirm")} loading={restore.isPending} onConfirm={() => restore.mutate()}>
+        <ConfirmButton variant="secondary" size="sm" confirmLabel={say("admin.user.restoreConfirm")} loading={restore.isPending} onConfirm={() => restore.mutate()}>
           {say("admin.user.restore")}
         </ConfirmButton>
         {problem ? <Alert tone="danger">{problem}</Alert> : null}
@@ -61,7 +61,7 @@ export function UserActions({ id, status, role }: { id: string; status: "ACTIVE"
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Button variant="danger" size="sm" shape="cut">
+        <Button variant="danger" size="sm">
           {say("admin.user.suspend")}
         </Button>
       </Dialog.Trigger>
@@ -81,7 +81,7 @@ export function UserActions({ id, status, role }: { id: string; status: "ACTIVE"
                 {say("admin.user.cancel")}
               </Button>
             </Dialog.Close>
-            <form.Submit variant="danger" shape="cut">
+            <form.Submit variant="danger">
               {say("admin.user.suspendSubmit")}
             </form.Submit>
           </Dialog.Footer>

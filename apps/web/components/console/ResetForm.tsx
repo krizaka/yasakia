@@ -60,7 +60,7 @@ export function ResetForm({ locale, signInHref }: { locale: "en" | "fr"; signInH
       <askForCode.Form aria-label={say("reset.title")} className="flex flex-col gap-4">
         <askForCode.TextField name="email" label={say("reset.email")} type="email" autoComplete="username" />
         {problem ? <Alert tone="danger">{problem}</Alert> : null}
-        <askForCode.Submit size="lg" shape="cut" className="w-full">
+        <askForCode.Submit size="lg" className="w-full">
           {say("reset.sendCode")}
         </askForCode.Submit>
         <Link className="text-sm underline" href={signInHref}>
@@ -76,7 +76,7 @@ export function ResetForm({ locale, signInHref }: { locale: "en" | "fr"; signInH
       <setNew.TextField name="password" label={say("reset.password")} type="password" autoComplete="new-password" />
       <p className="text-xs text-fg-muted">{say("reset.passwordHint")}</p>
       {problem ? <Alert tone="danger">{problem}</Alert> : null}
-      <setNew.Submit size="lg" shape="cut" className="w-full">
+      <setNew.Submit size="lg" className="w-full">
         {say("reset.submit")}
       </setNew.Submit>
       <button type="button" className="text-left text-sm underline" onClick={() => setEmail(null)}>

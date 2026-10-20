@@ -115,7 +115,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
               ) : null}
               <LanguageSwitch label={say("shell.language")} current={locale} languages={(["en", "fr"] as const).map((code) => ({ code, name: languageNames[code] ?? code, href: `/app/${code}${rest}` }))} linkAs={Link} />
               <ThemeToggle label={say("shell.theme")} variant="ghost" />
-              <Button size="sm" variant="secondary" shape="cut" loading={signOut.isPending} onClick={() => signOut.mutate()}>
+              <Button size="sm" variant="secondary" loading={signOut.isPending} onClick={() => signOut.mutate()}>
                 <LogoutIcon size={16} /> <span className="max-sm:sr-only">{say("shell.signOut")}</span>
               </Button>
             </>

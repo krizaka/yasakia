@@ -180,7 +180,7 @@ export function PhotosView({ initial }: { initial: { photos: OwnPhoto[]; check: 
             <p>{say("photos.consent.nothingKept")}</p>
             <p>{say("photos.consent.optional")}</p>
             <div className="flex flex-wrap gap-2">
-              <Button size="md" variant="primary" shape="cut" loading={agree.isPending} onClick={() => agree.mutate()}>
+              <Button size="md" variant="primary" loading={agree.isPending} onClick={() => agree.mutate()}>
                 {say("photos.consent.accept")}
               </Button>
             </div>
@@ -231,11 +231,11 @@ export function PhotosView({ initial }: { initial: { photos: OwnPhoto[]; check: 
               </Button>
             ) : null}
             {verified ? (
-              <ButtonLink href={`/app/${locale}/batch`} size="md" variant="primary" shape="cut">
+              <ButtonLink href={`/app/${locale}/batch`} size="md" variant="primary">
                 {say("photos.continue")}
               </ButtonLink>
             ) : (
-              <Button size="md" variant="primary" shape="cut" disabled>
+              <Button size="md" variant="primary" disabled>
                 {say("photos.continue")}
               </Button>
             )}

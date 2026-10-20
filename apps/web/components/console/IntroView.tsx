@@ -107,7 +107,7 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
             <div className="flex flex-col gap-2">
               <p>{intro.continuedByMe ? say("intros.waitingForThem", { name }) : say("intros.continueLead")}</p>
               {!intro.continuedByMe ? (
-                <Button variant="primary" shape="cut" size="sm" className="w-fit" loading={cont.isPending} onClick={() => cont.mutate()}>
+                <Button variant="primary" size="sm" className="w-fit" loading={cont.isPending} onClick={() => cont.mutate()}>
                   {say("intros.continue")}
                 </Button>
               ) : null}

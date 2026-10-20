@@ -134,7 +134,7 @@ export function MediaPicker({ introId, limits, disabled, onSent }: { introId: st
           )}
           <p className="text-xs text-fg-muted">{say("intros.media.asIs", { size: sizeMb(picked.file.size) })}</p>
           <div className="flex gap-2">
-            <Button type="button" size="sm" variant="primary" shape="cut" loading={send.isPending} onClick={() => send.mutate(picked)}>
+            <Button type="button" size="sm" variant="primary" loading={send.isPending} onClick={() => send.mutate(picked)}>
               {say("intros.media.send")}
             </Button>
             <Button type="button" size="sm" variant="ghost" disabled={send.isPending} onClick={() => setPicked(null)}>

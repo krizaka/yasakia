@@ -184,7 +184,7 @@ export function AccountView({ account }: { account: AccountDto }) {
           />
           {note("profile")}
           <div>
-            <profile.Submit size="sm" shape="cut">
+            <profile.Submit size="sm">
               {say("account.profile.save")}
             </profile.Submit>
           </div>
@@ -225,7 +225,7 @@ export function AccountView({ account }: { account: AccountDto }) {
             <password.TextField name="confirm" label={say("account.security.confirm")} type="password" autoComplete="new-password" />
             {note("security")}
             <div>
-              <password.Submit size="sm" shape="cut">
+              <password.Submit size="sm">
                 {say("account.security.submit")}
               </password.Submit>
             </div>
@@ -240,7 +240,7 @@ export function AccountView({ account }: { account: AccountDto }) {
         title={say("account.sessions.title")}
         description={say("account.sessions.description")}
         footer={
-          <ConfirmButton size="sm" variant="secondary" shape="cut" confirmLabel={say("account.sessions.endOthersConfirm")} loading={endOthers.isPending} onConfirm={() => endOthers.mutate()}>
+          <ConfirmButton size="sm" variant="secondary" confirmLabel={say("account.sessions.endOthersConfirm")} loading={endOthers.isPending} onConfirm={() => endOthers.mutate()}>
             {say("account.sessions.endOthers")}
           </ConfirmButton>
         }
@@ -260,7 +260,7 @@ export function AccountView({ account }: { account: AccountDto }) {
       <SettingsSection id="data" title={say("account.data.title")} description={say("account.data.description")}>
         <p className="text-sm text-fg-secondary">{say("account.data.exportHint")}</p>
         <div>
-          <Button asChild size="sm" variant="secondary" shape="cut">
+          <Button asChild size="sm" variant="secondary">
             <a href={`${BASE_PATH}/api/me/export`} download="yasakia-data.json">
               {say("account.data.export")}
             </a>
@@ -276,7 +276,7 @@ export function AccountView({ account }: { account: AccountDto }) {
         </ul>
         {note("delete")}
         <div>
-          <ConfirmButton size="sm" variant="danger" shape="cut" confirmLabel={say("account.delete.confirm")} loading={remove.isPending} onConfirm={() => remove.mutate()}>
+          <ConfirmButton size="sm" variant="danger" confirmLabel={say("account.delete.confirm")} loading={remove.isPending} onConfirm={() => remove.mutate()}>
             {say("account.delete.action")}
           </ConfirmButton>
         </div>

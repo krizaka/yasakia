@@ -120,7 +120,7 @@ export function TalkView({ initial }: { initial: AgentDto }) {
               <p>{agent.portrait.seeking}</p>
             </div>
             <p className="text-fg-muted">{say("talk.portraitNext")}</p>
-            <ButtonLink href={`/app/${locale}/batch`} shape="cut" variant="primary" className="w-fit">
+            <ButtonLink href={`/app/${locale}/batch`} variant="primary" className="w-fit">
               {say("batch.look")}
             </ButtonLink>
           </div>

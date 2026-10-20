@@ -127,19 +127,19 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
               {open.isError && serverCode(open.error) === "PHOTOS_REQUIRED" ? (
                 <div className="flex flex-col gap-2">
                   <p className="text-sm text-fg-secondary">{say("batch.photosNeeded")}</p>
-                  <ButtonLink href={`${home}/photos`} shape="cut" variant="secondary" className="w-fit">
+                  <ButtonLink href={`${home}/photos`} variant="secondary" className="w-fit">
                     {say("batch.photosLink")}
                   </ButtonLink>
                 </div>
               ) : null}
-              <Button shape="cut" variant="primary" loading={open.isPending} onClick={() => open.mutate()} className="w-fit">
+              <Button variant="primary" loading={open.isPending} onClick={() => open.mutate()} className="w-fit">
                 {open.isPending ? say("batch.looking") : say("batch.look")}
               </Button>
             </div>
           ) : initial.state === "ONBOARDING" ? (
             <div className="flex flex-col gap-4">
               <EmptyState icon={<BatchIcon />} title={say("batch.talkFirstTitle")} description={say("batch.talkFirstDescription")} />
-              <ButtonLink href={`${home}/talk`} shape="cut" variant="primary" className="w-fit">
+              <ButtonLink href={`${home}/talk`} variant="primary" className="w-fit">
                 {say("talk.dashboardAction")}
               </ButtonLink>
             </div>

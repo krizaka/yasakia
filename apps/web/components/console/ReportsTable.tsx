@@ -50,7 +50,7 @@ function Details({ row }: { row: ReportRow }) {
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-fg-muted">{say("admin.reports.setStatus")}</span>
         {STATUSES.filter((s) => s !== row.status).map((s) => (
-          <Button key={s} size="sm" variant="secondary" shape="cut" loading={move.isPending && move.variables === s} onClick={() => move.mutate(s)}>
+          <Button key={s} size="sm" variant="secondary" loading={move.isPending && move.variables === s} onClick={() => move.mutate(s)}>
             {say(`admin.reports.statuses.${s}`)}
           </Button>
         ))}
