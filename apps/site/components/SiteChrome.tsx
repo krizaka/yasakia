@@ -36,7 +36,7 @@ export function SiteHeader({ locale, current, path }: { locale: Locale; current:
         </NavBar.Brand>
         <NavBar.Items>
           {NAV_GROUPS.map((group) => (
-            <NavBar.Menu key={group.id} value={group.id} label={t(`chrome.nav.${group.id}`)} active={groupOf(current) === group.id} columns={1}>
+            <NavBar.Menu key={group.id} value={group.id} label={t(`chrome.nav.${group.id}`)} active={groupOf(current) === group.id} columns={1} inlineUpTo={0}>
               {group.pages.map((page) => (
                 <NavBar.MenuLink key={page} asChild icon={ICONS[page]} title={t(`chrome.menu_product.${page}.title`)} description={t(`chrome.menu_product.${page}.text`)} active={page === current}>
                   <Link href={pagePath(locale, page)} />
