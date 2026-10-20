@@ -47,6 +47,12 @@ describe("the bar's shape (the product-site navigation standard)", () => {
     expect(mobile.indexOf("NAV_GROUPS.map")).toBeLessThan(mobile.indexOf("signInHref"));
   });
 
+  it("lets each menu follow the bar's own breakpoint (@krizaka/ui 3.30): inline from lg, a dropdown below — no inlineUpTo / inlineFrom override", () => {
+    expect(chrome).toContain("<NavBar.Menu");
+    expect(chrome).not.toMatch(/inlineUpTo/);
+    expect(chrome).not.toMatch(/inlineFrom/);
+  });
+
   it("offers sign-in by invitation, to the person's space, in each language — and still no sign-up", () => {
     expect(signInHref("en")).toBe("/app/en/sign-in");
     expect(signInHref("fr")).toBe("/app/fr/sign-in");
