@@ -12,7 +12,7 @@
   "dependencies": {
     "@krizaka/app-config": "^0.1.0",
     "@krizaka/charts": "^0.6.0",
-    "@krizaka/i18n": "^0.2.1",
+    "@krizaka/i18n": "^0.2.2",
     "@krizaka/icons": "^0.5.1",
     "@krizaka/push": "^0.2.1",
     "@krizaka/query": "^0.2.1",
@@ -27,24 +27,24 @@
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.3",
     "ioredis": "^5.11.1",
-    "next": "^16.4.0",
+    "next": "^16.4.2",
     "pg": "^8.12.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "sharp": "^0.35.5",
-    "zod": "^4.6.6"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@krizaka/config": "^0.1.0",
+    "@krizaka/config": "^0.4.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.19.2",
     "@types/pg": "^8.11.8",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@yasakia/config": "*",
-    "eslint": "^10.12.0",
-    "eslint-config-next": "^16.4.0",
-    "postcss": "^8.4.41",
+    "eslint": "^10.13.0",
+    "eslint-config-next": "^16.4.2",
+    "postcss": "^8.5.30",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.5.4"
   }
