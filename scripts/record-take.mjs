@@ -290,7 +290,7 @@ await page.getByRole("button", { name: UI.send, exact: true }).filter({ hasText:
 await tick(3000);
 step("photo sent");
 // The photo is held until Orazaka's safety check has looked at it: the page then shows it to both.
-await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/.test(document.body.innerText), null, { timeout: 150_000 }).catch(() => undefined);
+await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/i.test(document.body.innerText), null, { timeout: 150_000 }).catch(() => undefined);
 await tick(2500);
 step("photo approved");
 
@@ -301,7 +301,7 @@ await page.getByRole("button", { name: UI.send, exact: true }).filter({ hasText:
 await tick(5000);
 step("voice message sent");
 evidence.mediaCalls = mediaCalls;
-await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/.test(document.body.innerText), null, { timeout: Number(flag("voice-wait", 90)) * 1000 }).catch(() => undefined);
+await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/i.test(document.body.innerText), null, { timeout: Number(flag("voice-wait", 90)) * 1000 }).catch(() => undefined);
 step("media reviewed");
 await tick(3500);
 

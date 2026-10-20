@@ -30,7 +30,8 @@ const CLIPS = {
   talk: [at("open the conversation"), at("portrait written") + 2, 2.5, at("portrait written") + 1.5],
   batch: [at("open the first batch"), at("open the introduction") - 1, 1.6, at("batch shown") + 1],
   write: [at("open the introduction"), at("send a photo") - 0.5, 1, at("authenticity signal shown") + 1],
-  media: [at("send a photo"), at("send a voice message") + 7, 1, at("photo approved") + 1],
+  // The photo held, then approved, the voice message held, then approved: the waits are sped up so the clip stays about 20 s.
+  media: [at("send a photo"), at("media reviewed") + 2, Math.max(1, (at("media reviewed") + 2 - at("send a photo")) / 20), at("photo approved") + 1],
 };
 
 fs.mkdirSync(outDir, { recursive: true });
