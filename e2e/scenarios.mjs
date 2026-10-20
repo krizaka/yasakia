@@ -393,9 +393,9 @@ let adaPhoto;
   const [listen] = await sql("select count(*)::int as n from pg_stat_activity where application_name = 'yasakia-listen' and datname = current_database()");
   const [web] = await sql("select count(*)::int as n from pg_stat_activity where application_name = 'yasakia-web' and datname = current_database()");
   // Two servers share this database (the open one and the sign-up-closed one): the bound is servers x the pool size
-  // (the development default, 3 — packages/db/src/client.ts), not one pool (yasakia#125).
+  // (the development default, 5 — packages/db/src/client.ts), not one pool (yasakia#125).
   const servers = 2;
-  const bound = servers * (Number(env("DATABASE_MAX_CONNECTIONS", "")) || 3);
+  const bound = servers * (Number(env("DATABASE_MAX_CONNECTIONS", "")) || 5);
   check(`one named LISTEN connection, the pools named and within ${servers} servers x the pool size (${bound})`, listen.n === 1 && web.n >= 1 && web.n <= bound, { listen: listen.n, web: web.n });
 }
 
