@@ -137,7 +137,7 @@
     "lead": "Recorded on the development site, against the real engine, as a phone: a test persona adds her photos, which the engine checks, talks to the agent until it writes her portrait, opens her first batch, says yes, and writes her own message in the introduction — with its authenticity mark — then sends a photo and a voice message. Not an animation, not a mock-up: one run, captured at 30 frames a second and not cut.",
     "transcript": "Captions as text",
     "noteTitle": "Read this recording honestly",
-    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists and Yasakia has no members. Her portraits are generated images and her voice is synthesised. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next. No e-mail is shown: the account’s address is replaced by the persona’s name on screen. Honest note: the voice message stays « checking » at the end of this run — Orazaka’s audio-only safety run does not finish yet on the dev engine (krizaka/orazaka#266); the app holds it, it never shows it unchecked.",
+    "note": "Camille is a test persona and the people she meets are a fictional cast: nobody here exists and Yasakia has no members. Her portraits are generated images and her voice is synthesised. The fictional cast says yes back, which is how a yes both ways can be shown; a real person answers in their own batch. The agent’s words are generated live by Orazaka — the model is not scripted — so a run differs from the next, and sometimes the agent needs one more sentence to understand. No e-mail is shown: the account’s address is replaced by the persona’s name on screen. The waits (a photo being checked, the agent answering) are as long as they were; the clips of the landing speed them up, this page does not.",
     "nextTitle": "When the app ships",
     "nextText": "Its own recording, made on the real application, replaces these. Until then: the code is public.",
     "journeyTitle": "Photos, a talk, a batch, a yes both ways, an introduction",
@@ -154,7 +154,7 @@
         "intro": "The introduction. Nobody writes for her: the agent writes no line and never reads what follows.",
         "signal": "She types her own message. A small mark says how it was written — a signal, never a verdict, and it can be wrong.",
         "photo": "She sends a photo. It is held for a safety check, then shown as it is: nothing is cut, filtered or edited.",
-        "voice": "A voice message follows. Its words are transcribed by the engine and judged before it is played; until then, only she can see it."
+        "voice": "A voice message follows. The engine transcribes it and judges its words before it is played; until then only she can see it, then it is shown as it was sent."
       }
     }
   },

@@ -12,23 +12,23 @@ const CDN = "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour";
  */
 export const TAKES = {
   fr: {
-    hero: { webm: "18eacd86ae", mp4: "50fb2b4010", jpg: "9f078f91d5" },
-    photos: { webm: "2153b3abd3", mp4: "231f593c13", jpg: "9f078f91d5" },
-    talk: { webm: "765dbae8aa", mp4: "f84857aede", jpg: "2c5d196584" },
-    batch: { webm: "83bff00d3e", mp4: "221ea3cd24", jpg: "e5d94cb384" },
-    write: { webm: "3fef90b739", mp4: "76e94b5d74", jpg: "9b35369b4e" },
-    media: { webm: "5b138b21e1", mp4: "19cae52782", jpg: "0459686b99" },
+    hero: { webm: "b9418f789f", mp4: "a798788c96", jpg: "872b2c3706" },
+    photos: { webm: "fb9144cd1d", mp4: "7a94bb8fcd", jpg: "872b2c3706" },
+    talk: { webm: "a88a2129e6", mp4: "f3bc8181f8", jpg: "4c0d1776dc" },
+    batch: { webm: "d501601de5", mp4: "70ee878fae", jpg: "c3b24cc1dc" },
+    write: { webm: "4c38b432f7", mp4: "b74724543a", jpg: "c6f5d63089" },
+    media: { webm: "2daceae2ca", mp4: "f26110acd8", jpg: "f1870a518f" },
     /** The whole run, uncut (the demo page). */
-    full: { webm: "577ef43972", mp4: "50e878895b", jpg: "36cd91221f" },
+    full: { webm: "2c0f95f469", mp4: "7273beac05", jpg: "9ce11180e7" },
   },
   en: {
-    hero: { webm: "49347fa7e1", mp4: "54d9fd48b3", jpg: "6d4e9ab137" },
-    photos: { webm: "d1c32ae3f7", mp4: "cdbdb6b4a9", jpg: "6d4e9ab137" },
-    talk: { webm: "32b8403bce", mp4: "ef4ede3a10", jpg: "21dc365f2d" },
-    batch: { webm: "36d93c47ed", mp4: "d272de72dc", jpg: "86ade6f30f" },
-    write: { webm: "c27d4d30b0", mp4: "605bd57689", jpg: "cc526418a9" },
-    media: { webm: "de1ea231a3", mp4: "ca6088d52c", jpg: "1da5a0c7a5" },
-    full: { webm: "400cce369c", mp4: "5b95752836", jpg: "3f6475dd81" },
+    hero: { webm: "ae936f206f", mp4: "e854bbea38", jpg: "030186018d" },
+    photos: { webm: "73659001ae", mp4: "461fe79386", jpg: "030186018d" },
+    talk: { webm: "e578ac448e", mp4: "5ee66d86c4", jpg: "c31291a5cc" },
+    batch: { webm: "f5f9b50ee3", mp4: "85f421cff0", jpg: "4dd1549023" },
+    write: { webm: "74c4b2c800", mp4: "d647f9014a", jpg: "d87e1212e0" },
+    media: { webm: "425f0d439f", mp4: "30554ad140", jpg: "01e84d9f16" },
+    full: { webm: "eaa55f5139", mp4: "a1ca481d3f", jpg: "deb04c4e8a" },
   },
 } as const;
 
