@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { CUES } from "@/lib/demo";
 import { type Locale, translator } from "@/lib/i18n";
-import { clip } from "@/lib/media";
+import { take } from "@/lib/media";
 import { pagePath, REPO_URL } from "@/lib/site";
 
 import { ButtonLink } from "./ButtonLink";
@@ -85,7 +85,7 @@ export function HowView({ locale }: { locale: Locale }) {
 /** The demo: the real journey, recorded on the development site — one run, captioned in the page. Media come from the CDN only. */
 export function DemoView({ locale }: { locale: Locale }) {
   const t = translator(locale);
-  const media = clip("loop");
+  const media = take("full");
   return (
     <>
       <SiteHeader locale={locale} current="demo" />
@@ -101,7 +101,7 @@ export function DemoView({ locale }: { locale: Locale }) {
               poster={media.poster}
               label={t("demo.journeyLabel")}
               transcriptLabel={t("demo.transcript")}
-              cues={CUES.loop.map((c) => ({ at: c.at, text: t(`demo.journey.cues.${c.id}`) }))}
+              cues={CUES.full.map((c) => ({ at: c.at, text: t(`demo.journey.cues.${c.id}`) }))}
             />
           </Page>
         </Section>

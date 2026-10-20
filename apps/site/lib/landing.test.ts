@@ -28,8 +28,8 @@ describe("the home is the product landing template of @krizaka/ui, at the Yomiza
   });
 
   it("uses the family's blocks: DeviceFrame (the phone take), ComparisonTable, DecisionList, the lovebird's MascotQuote, NumberTicker", () => {
-    expect(read("components/home/PersonaTake.tsx")).toContain("DeviceFrame");
-    expect(read("components/home/PersonaTake.tsx")).toContain('kind="phone"');
+    expect(read("components/home/PersonaTake.tsx")).toContain("StepShowcase");
+    expect(read("components/home/PersonaTake.tsx")).toContain('device="phone"');
     expect(read("components/home/HeroPhone.tsx")).toContain('kind="phone"');
     expect(read("components/home/ComparisonSection.tsx")).toContain("@krizaka/ui/comparison-table");
     expect(read("components/home/NotDoing.tsx")).toContain("@krizaka/ui/decision-list");
@@ -43,9 +43,17 @@ describe("the home is the product landing template of @krizaka/ui, at the Yomiza
     expect(home).not.toMatch(/sign-?up|waiting list|store/i);
   });
 
-  it("the first screen is the phone and the words, painted at once: no recording in the hero", () => {
+  it("the hero's phone plays the real take (no drawn mock: no empty grey tile, no static tick), its poster painted at once", () => {
+    const hero = read("components/home/HeroPhone.tsx");
     expect(home).toContain("visual={<HeroPhone");
-    expect(home).not.toMatch(/<video|rel="preload"/);
+    expect(hero).toContain("TakeVideo");
+    expect(hero).toContain('take("hero")');
+    expect(hero).not.toMatch(/bg-accent\/25|border-dashed|CheckIcon|aspect-\[3\/4\]/);
+    const video = read("components/home/TakeVideo.tsx");
+    expect(video).toContain("poster={poster}"); // the first frame is the LCP, never the video
+    expect(video).toContain("prefers-reduced-motion"); // still under reduced motion
+    expect(video).toContain("saveData");
+    expect(video).not.toContain("autoPlay");
   });
 });
 
@@ -66,9 +74,11 @@ describe.each(["en", "fr"])("the words (%s)", (locale) => {
   const l = m.landing;
 
   it("has every section's words", () => {
-    for (const id of JOURNEY_STEPS) expect(l.journey.steps[id].title && l.journey.steps[id].text, id).toBeTruthy();
+    expect(JOURNEY_STEPS).toEqual(["photos", "talk", "batch", "write", "media"]);
+    for (const id of JOURNEY_STEPS) expect(l.journey.steps[id].title && l.journey.steps[id].text && l.journey.steps[id].alt, id).toBeTruthy();
+    expect(l.journey.play && l.journey.pause).toBeTruthy();
     // Only the words Camille really said are quoted (the run's own script); the other steps describe what the screen did.
-    for (const id of ["talk", "portrait"] as const) expect(l.journey.steps[id].says, id).toBeTruthy();
+    for (const id of ["talk"] as const) expect(l.journey.steps[id].says, id).toBeTruthy();
     for (const id of NOT_DOING) expect(l.notDoing.items[id].chose && l.notDoing.items[id].refused && l.notDoing.items[id].because && l.notDoing.items[id].cost, id).toBeTruthy();
     for (const id of FAQ_IDS) expect(l.faq.items[id].q && l.faq.items[id].a, id).toBeTruthy();
     expect(Object.keys(l.comparison.rows).length).toBeGreaterThanOrEqual(4);
