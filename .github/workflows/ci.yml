@@ -156,6 +156,8 @@ jobs:
           node scripts/check-console.mjs --base http://localhost:3000
         env:
           AUTH_QA_USER_PASSWORD: ${{ env.QA_USER_PASSWORD }}
+      - name: Give the scenarios back their sign-in allowance (the crawl used one)
+        run: psql "$DATABASE_URL" -c "delete from rate_limit_buckets"
       - name: Scenarios
         run: npm run test:e2e
         env:
