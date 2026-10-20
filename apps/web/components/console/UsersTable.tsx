@@ -6,6 +6,7 @@ import { DataTable, type DataTableColumn, DataTableFilters, type DataTableQuery 
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 import { listParams, tableLabels } from "./table";
@@ -48,7 +49,7 @@ export function UsersTable() {
     placeholderData: keepPreviousData,
     meta: { list: true },
   });
-  const date = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "medium" }), [locale]);
+  const date = useMemo(() => dateFormat(locale, { dateStyle: "medium" }), [locale]);
   const columns = useMemo<DataTableColumn<UserRow>[]>(
     () => [
       {

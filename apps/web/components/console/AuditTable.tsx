@@ -5,6 +5,7 @@ import { DataTable, type DataTableColumn, DataTableFilters, type DataTableQuery 
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 import { tableLabels } from "./table";
@@ -37,7 +38,7 @@ export function AuditTable() {
     placeholderData: keepPreviousData,
     meta: { list: true },
   });
-  const when = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "medium" }), [locale]);
+  const when = useMemo(() => dateFormat(locale, { dateStyle: "medium", timeStyle: "medium" }), [locale]);
   const columns = useMemo<DataTableColumn<AuditRow>[]>(
     () => [
       { id: "createdAt", header: say("admin.audit.when"), sortable: true, value: (r) => r.createdAt, cell: (r) => <time dateTime={r.createdAt} suppressHydrationWarning>{when.format(new Date(r.createdAt))}</time> },

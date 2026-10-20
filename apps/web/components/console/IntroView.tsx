@@ -13,6 +13,7 @@ import { MediaMessage } from "@/components/console/MediaMessage";
 import { MediaPicker } from "@/components/console/MediaPicker";
 import { errorKey } from "@/lib/client";
 import { ComposerTracker } from "@/lib/composer-signals";
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 import type { IntroDetail } from "@/lib/intros";
 
@@ -56,7 +57,7 @@ export function IntroView({ initial }: { initial: IntroDetail }) {
 
   const open = intro.state === "OPEN" && new Date(intro.expiresAt) > new Date();
   const writable = (open || intro.state === "CONTINUED") && !intro.frozen;
-  const time = new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" });
+  const time = dateFormat(locale, { dateStyle: "short", timeStyle: "short" });
   const name = intro.them.name || say("intros.someone");
   const submit = () => {
     const body = draft.trim();

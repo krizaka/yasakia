@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { errorKey } from "@/lib/client";
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 import { tableLabels } from "./table";
@@ -70,7 +71,7 @@ export function ReportsTable() {
     placeholderData: keepPreviousData,
     meta: { list: true },
   });
-  const when = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
+  const when = useMemo(() => dateFormat(locale, { dateStyle: "medium", timeStyle: "short" }), [locale]);
   const who = (id: string | null) =>
     id ? (
       <Link className="font-mono text-xs text-fg-accent underline-offset-4 hover:underline" href={`/app/${locale}/admin/users/${id}`}>
