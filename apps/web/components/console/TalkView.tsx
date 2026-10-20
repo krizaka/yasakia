@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { ButtonLink } from "@/components/console/ButtonLink";
 import type { AgentDto } from "@/lib/agent-dto";
 import { errorKey } from "@/lib/client";
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 const keys = defineKeys("agent", { view: () => ["view"] });
@@ -62,7 +63,7 @@ export function TalkView({ initial }: { initial: AgentDto }) {
   }, [agent.messages.length, pending]);
 
   const closed = agent.state !== "ONBOARDING";
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" });
+  const time = dateFormat(locale, { hour: "2-digit", minute: "2-digit" });
   const thinking = send.isPending || (agent.state === "ONBOARDING" && agent.waiting);
   const submit = () => {
     const content = draft.trim();

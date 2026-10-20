@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import { ButtonLink } from "@/components/console/ButtonLink";
 import { BASE_PATH } from "@/lib/client";
 import type { DashboardDto } from "@/lib/dashboard";
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 const keys = defineKeys("dashboard", { me: () => ["me"] });
@@ -20,7 +21,7 @@ const EVENTS = ["batch.ready", "intro.opened", "intro.message"] as const;
 
 function useDate(locale: string) {
   return useMemo(() => {
-    const f = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
+    const f = dateFormat(locale, { dateStyle: "medium", timeStyle: "short" });
     return (iso: string) => f.format(new Date(iso));
   }, [locale]);
 }

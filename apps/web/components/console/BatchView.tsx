@@ -17,6 +17,7 @@ import { DebriefForm } from "@/components/console/DebriefForm";
 import type { AgentDto } from "@/lib/agent-dto";
 import type { BatchView as BatchDto } from "@/lib/batches";
 import { errorKey, serverCode } from "@/lib/client";
+import { dateFormat } from "@/lib/format-date";
 import { useSay } from "@/lib/i18n-client";
 
 const keys = defineKeys("batch", { current: () => ["current"] });
@@ -54,7 +55,7 @@ export function BatchView({ initial }: { initial: BatchPageData }) {
     router.refresh();
   };
   const date = useMemo(() => {
-    const f = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
+    const f = dateFormat(locale, { dateStyle: "long", timeStyle: "short" });
     return (iso: string) => f.format(new Date(iso));
   }, [locale]);
   const home = `/app/${locale}`;
