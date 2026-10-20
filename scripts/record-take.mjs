@@ -322,7 +322,10 @@ for (let waited = 0; waited < Number(flag("voice-wait", 90)); waited += 3) {
   if (pending === 0) break;
   await tick(3000);
 }
-await tick(10_000); // the thread re-reads every 8 s
+await tick(2000);
+// She comes back to the conversation: opened again, the thread shows what the engine decided (a headless tab pauses the thread's own polling).
+await page.reload({ waitUntil: "load" });
+await tick(4500);
 step("media reviewed");
 await tick(3500);
 
