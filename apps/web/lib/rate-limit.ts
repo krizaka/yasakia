@@ -22,7 +22,9 @@ export interface RateLimitStore {
   hit(key: string, windowSeconds: number, now?: number): Promise<RateLimitHit>;
 }
 
-const MAX_KEYS = 10_000;
+// @fixed: the memory bound of the in-process store, not a business parameter
+export const MAX_KEYS = 10_000;
+const OVERFLOW = "overflow";
 
 export function memoryStore(): RateLimitStore {
   const windows = new Map<string, RateLimitHit>();
@@ -31,12 +33,16 @@ export function memoryStore(): RateLimitStore {
     async hit(key, windowSeconds, now = Date.now()) {
       let entry = windows.get(key);
       if (!entry || entry.resetAt <= now) {
-        if (windows.size >= MAX_KEYS) {
-          for (const [k, v] of windows) if (v.resetAt <= now) windows.delete(k);
-          if (windows.size >= MAX_KEYS) windows.clear();
+        // Only ended windows may go: a live one is a refusal someone has earned.
+        if (windows.size >= MAX_KEYS) for (const [k, v] of windows) if (v.resetAt <= now) windows.delete(k);
+        // Still full of live windows (a flood of distinct keys): never clear them — that would give every blocked caller a
+        // fresh count. A new key shares one overflow window instead, so the flood limits itself.
+        const slot = windows.size >= MAX_KEYS ? OVERFLOW : key;
+        entry = windows.get(slot);
+        if (!entry || entry.resetAt <= now) {
+          entry = { count: 0, resetAt: now + windowSeconds * 1000 };
+          windows.set(slot, entry);
         }
-        entry = { count: 0, resetAt: now + windowSeconds * 1000 };
-        windows.set(key, entry);
       }
       entry.count += 1;
       return { ...entry };
