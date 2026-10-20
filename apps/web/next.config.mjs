@@ -54,15 +54,18 @@ const securityHeaders = [
 ];
 
 /**
- * The public landing — English at `/`, French under `/fr`, plus `/how-it-works` and `/demo` — is a static export copied into
+ * The public landing — English at `/`, French under `/fr`, plus `/how-it-works`, `/demo` and `/changelog` (with its feed) — is a static export copied into
  * public/ (scripts/sync-site.mjs). A page address is mapped to its file; with and without a trailing slash, the export's canonical
  * URLs keep theirs (skipTrailingSlashRedirect).
  */
-const LANDING_PAGES = ["", "how-it-works", "demo", "fr", "fr/how-it-works", "fr/demo"];
+const LANDING_PAGES = ["", "how-it-works", "demo", "changelog", "fr", "fr/how-it-works", "fr/demo", "fr/changelog"];
 const landingRewrites = LANDING_PAGES.flatMap((page) => {
   const file = `/${page ? `${page}/` : ""}index.html`;
   return page ? [{ source: `/${page}`, destination: file }, { source: `/${page}/`, destination: file }] : [{ source: "/", destination: file }];
 });
+// The changelog's RSS feeds are exported files too (changelog/feed.xml, fr/changelog/feed.xml): mapped to themselves so the
+// web app's locale redirect (proxy.ts) never takes them.
+const FEEDS = ["/changelog/feed.xml", "/fr/changelog/feed.xml"].map((path) => ({ source: path, destination: path }));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -83,7 +86,7 @@ const nextConfig = {
   // The mail templates are read from disk at run time; the image copies them next to the server (deploy/docker/Dockerfile).
   skipTrailingSlashRedirect: true,
   async rewrites() {
-    return { beforeFiles: landingRewrites, afterFiles: [], fallback: [] };
+    return { beforeFiles: [...landingRewrites, ...FEEDS], afterFiles: [], fallback: [] };
   },
   async headers() {
     return [
