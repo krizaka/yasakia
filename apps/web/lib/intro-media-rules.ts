@@ -38,3 +38,11 @@ export function visibleMedia(viewerId: string, row: { senderId: string; status: 
   if (row.senderId === viewerId) return true; // including a refused one: the sender is told why
   return row.status === MediaStatus.Approved;
 }
+
+/** Who is told when the safety check decides (ids only, over the event stream): both people of an approval, the other first; the sender alone of a refusal (they learn why); nobody of a held one. */
+export function decisionRecipients(verdict: string, row: { senderId: string; accountA: string; accountB: string }): string[] {
+  const other = row.senderId === row.accountA ? row.accountB : row.accountA;
+  if (verdict === "APPROVED") return [other, row.senderId];
+  if (verdict === "REJECTED") return [row.senderId];
+  return [];
+}

@@ -5,7 +5,7 @@ import { addSeconds } from "date-fns";
 import { and, eq, inArray, lt, or, sql } from "drizzle-orm";
 
 import { HttpError, refuse } from "./http";
-import { mediaAccess, MediaStatus, MessageKind } from "./intro-media-rules";
+import { decisionRecipients, mediaAccess, MediaStatus, MessageKind } from "./intro-media-rules";
 import { sideOf, writeRefusal } from "./intro-rules";
 import { mediaStorage, prepareMediaProcessing, signMessageMediaUrl, signMessageUpload, verifyMessageUpload } from "./media";
 import { publishToAccount } from "./realtime";
@@ -219,15 +219,16 @@ export async function viewMedia(viewerId: string, introId: string, messageId: st
   return { url: signed.url, posterUrl: row.media.posterKey ? signMessageMediaUrl(row.media.posterKey).url : null, expiresAt: signed.expiresAt, mimeType: row.media.mimeType, kind: row.media.kind as MessageMediaKind };
 }
 
-/** A media message was approved: the other person is told at once (ids only). */
-async function announce(messageId: string): Promise<void> {
+/** The safety check decided: the people concerned are told at once (ids only) and refetch their thread — the sender's « only you can see it » must not linger. */
+async function announce(messageId: string, verdict: string): Promise<void> {
   const [row] = await db
     .select({ senderId: introMessages.senderId, introId: introMessages.introId, a: intros.accountA, b: intros.accountB })
     .from(introMessages)
     .innerJoin(intros, eq(intros.id, introMessages.introId))
     .where(eq(introMessages.id, messageId))
     .limit(1);
-  if (row) await publishToAccount(row.senderId === row.a ? row.b : row.a, { type: "intro.message", introId: row.introId, messageId });
+  if (!row) return;
+  for (const account of decisionRecipients(verdict, { senderId: row.senderId, accountA: row.a, accountB: row.b })) await publishToAccount(account, { type: "intro.message", introId: row.introId, messageId });
 }
 
 /** Claims the oldest PENDING media that may be tried now (`FOR UPDATE SKIP LOCKED`, a try at a time per instance). */
@@ -268,11 +269,12 @@ export async function reviewNextMedia(ai: AiProvider): Promise<boolean> {
     console.log(`[media] review ${claimed.messageId} run=${result.runId} verdict=${result.report.verdict} ms=${result.ms}`);
     if (result.report.verdict === Verdict.Approved) {
       await db.update(introMedia).set({ status: MediaStatus.Approved, engineRunId: result.runId, reviewedAt: sql`now()` }).where(eq(introMedia.messageId, claimed.messageId));
-      await announce(claimed.messageId);
+      await announce(claimed.messageId, Verdict.Approved);
     } else if (result.report.verdict === Verdict.Rejected) {
       await storage.delete(claimed.storageKey).catch(() => undefined);
       if (claimed.posterKey) await storage.delete(claimed.posterKey).catch(() => undefined);
       await db.update(introMedia).set({ status: MediaStatus.Rejected, moderationCodes: result.report.blockers, engineRunId: result.runId, reviewedAt: sql`now()`, waveform: null }).where(eq(introMedia.messageId, claimed.messageId));
+      await announce(claimed.messageId, Verdict.Rejected);
     } else {
       // Unreadable: held. Never approved; tried again a few seconds later, up to a few times.
       await db.update(introMedia).set({ engineRunId: result.runId, reviewedAt: sql`now()` }).where(eq(introMedia.messageId, claimed.messageId));
