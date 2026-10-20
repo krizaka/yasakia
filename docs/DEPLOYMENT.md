@@ -58,7 +58,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | `DATABASE_URL` | ✓ |  |  | PostgreSQL 16 with pgvector. |
 | `DATABASE_DIRECT_URL` | — |  |  | A direct (session) connection for LISTEN and the migrations when DATABASE_URL goes through a transaction pooler. |
 | `DATABASE_CA_CERT` | recommended |  |  | CA of a managed PostgreSQL (PEM; App Platform: `${<db>.CA_CERT}`), verified with TLS. |
-| `DATABASE_MAX_CONNECTIONS` | — |  | `5` | Connections one process's pool may hold — see *Database connections*. |
+| `DATABASE_MAX_CONNECTIONS` | — |  | `5 (3 in development, 10 behind a pooler)` | Connections one process's pool may hold — see *Database connections*. |
 | `DATABASE_ENCRYPTION_KEY` | ✓ | ✓ |  | Encrypts the sensitive fields at rest (AES-256-GCM): 32 random bytes in base64. Keep it. |
 | `DATABASE_ENCRYPTION_KEYS_PREVIOUS` | — | ✓ |  | Rotation: previous keys, comma separated — what they sealed still opens. |
 | `DATABASE_ALLOW_RESET` | — |  |  | Development deployments only: the release job may rebuild a database whose migration history was squashed. |
@@ -144,7 +144,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 
 Every process opens **one** pool (`packages/db/src/client.ts`, kept on `globalThis`: Next.js loads a module once per
 module graph — route handlers, pages, instrumentation — and a module-level pool would be created three times; that is
-what exhausted Orochia's dev database on 2026-10-12). Its size is `DATABASE_MAX_CONNECTIONS` (default **5**, capped at
+what exhausted Orochia's dev database on 2026-10-12). Its size is `DATABASE_MAX_CONNECTIONS` (default **5**; **3** in development and CI; **10** when `DATABASE_DIRECT_URL` shows a transaction pooler (PgBouncer) fronts `DATABASE_URL`, which multiplexes them; capped at
 50), idle connections close after 10 s. The realtime bus holds exactly **one** LISTEN connection per process. Every
 connection is named (`application_name`), so `pg_stat_activity` says who holds what:
 
