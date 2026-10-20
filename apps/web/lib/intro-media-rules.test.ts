@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { mediaAccess, type MediaAccessInput, visibleMedia } from "./intro-media-rules";
+import { decisionRecipients, mediaAccess, type MediaAccessInput, visibleMedia } from "./intro-media-rules";
 
 const base: MediaAccessInput = { viewerIsSender: false, status: "APPROVED", introState: "OPEN", frozen: false, expired: false };
 
@@ -32,5 +32,19 @@ describe("visibleMedia — what a thread shows each person", () => {
     expect(visibleMedia("a", row("a", "GONE"))).toBe(false);
     expect(visibleMedia("a", row("a", "REJECTED"))).toBe(true); // the sender learns why
     expect(visibleMedia("b", row("a", "REJECTED"))).toBe(false); // the other person never knew
+  });
+});
+
+// Found recording the take: once the safety check approved a photo, the sender's own thread kept saying « only you can see it »
+// until a reload — only the other person was told. Both are told of an approval; the sender alone of a refusal.
+describe("who is told of a safety decision", () => {
+  const row = { senderId: "a", accountA: "a", accountB: "b" };
+  it("tells both people of an approval, the other first", () => {
+    expect(decisionRecipients("APPROVED", row)).toEqual(["b", "a"]);
+    expect(decisionRecipients("APPROVED", { senderId: "b", accountA: "a", accountB: "b" })).toEqual(["a", "b"]);
+  });
+  it("tells only the sender of a refusal, and nobody of a held one", () => {
+    expect(decisionRecipients("REJECTED", row)).toEqual(["a"]);
+    expect(decisionRecipients("UNREADABLE", row)).toEqual([]);
   });
 });
