@@ -61,12 +61,10 @@ export async function crawl({ base, email, password, admin, forwardedFor, shots 
   const problems = [];
   const extraHTTPHeaders = forwardedFor ? { "X-Forwarded-For": forwardedFor } : undefined;
   const signIn = await browser.newContext({ extraHTTPHeaders });
-  const first = await signIn.newPage();
-  first.setDefaultTimeout(180_000); // a development server compiles each page the first time it is asked for
-  await first.goto(`${base}/app/en/sign-in`);
-  await first.locator('input[name="email"]').fill(email);
-  await first.locator('input[name="password"]').fill(password);
-  await Promise.all([first.waitForURL((u) => !u.pathname.endsWith("/sign-in"), { timeout: 60_000 }), first.locator('form button[type="submit"]').click()]);
+  // The password sign-in is an API call (the form of a cold development server may not be hydrated when it is clicked): the session cookie
+  // lands in this context, whose state every stop reuses.
+  const reply = await signIn.request.post(`${base}/api/auth/password`, { data: { email, password }, headers: { origin: base }, timeout: 180_000 });
+  if (!reply.ok()) throw new Error(`sign-in answered ${reply.status()}`);
   const state = await signIn.storageState();
   await signIn.close();
   const pages = admin ? ADMIN_PAGES : USER_PAGES;
