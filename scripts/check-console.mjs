@@ -41,13 +41,44 @@ export function overflowInPage() {
   };
   const out = [];
   if (document.documentElement.scrollWidth > vw + 1) out.push(`page scrolls sideways (${document.documentElement.scrollWidth} > ${vw})`);
+  /** The nearest ancestor that clips (hidden / clip, not a scroller): what pokes out of it is cut, not scrolled to. */
+  const clipper = (el) => {
+    for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+      const o = getComputedStyle(p).overflowX;
+      if (/(auto|scroll)/.test(o)) return null; // a scroller: what pokes out is scrolled to
+      if (/(hidden|clip)/.test(o)) return p;
+    }
+    return null;
+  };
   for (const el of document.querySelectorAll("body *")) {
     if (el.closest("[aria-hidden='true']")) continue;
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) continue;
     const style = getComputedStyle(el);
     if (style.position === "fixed" || style.visibility === "hidden") continue;
-    if ((r.right > vw + 1 || r.left < -1) && !clipped(el) && out.length < 4) out.push(`<${el.tagName.toLowerCase()}> "${(el.textContent ?? "").trim().slice(0, 40)}" ${Math.round(r.left)}..${Math.round(r.right)} of ${vw}`);
+    if (out.length >= 4) break;
+    const label = () => `<${el.tagName.toLowerCase()}> "${(el.textContent ?? "").trim().slice(0, 40)}"`;
+    if ((r.right > vw + 1 || r.left < -1) && !clipped(el)) {
+      out.push(`${label()} ${Math.round(r.left)}..${Math.round(r.right)} of ${vw}`);
+      continue;
+    }
+    // Text cut by a clipping ancestor (not an ellipsis on purpose: that element clips itself).
+    const c = clipper(el);
+    if (c && style.textOverflow !== "ellipsis") {
+      // The text itself, not the box (a block is as wide as its container): the rectangles of its words.
+      const range = document.createRange();
+      for (const n of el.childNodes) {
+        if (n.nodeType !== 3 || !n.textContent.trim()) continue;
+        range.selectNodeContents(n);
+        const cr = c.getBoundingClientRect();
+        for (const t of range.getClientRects()) {
+          if (t.width > 0 && ((t.right > cr.right + 1 && t.left < cr.right - 2) || (t.left < cr.left - 1 && t.right > cr.left + 2))) {
+            out.push(`${label()} is cut by its container (${Math.round(t.right)} > ${Math.round(cr.right)})`);
+            break;
+          }
+        }
+      }
+    }
   }
   const text = document.body.innerText;
   if (/Something went wrong|Une erreur est survenue|Quelque chose s’est mal passé/i.test(text)) out.push("an error page");
