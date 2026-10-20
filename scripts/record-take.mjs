@@ -313,7 +313,16 @@ await page.getByRole("button", { name: UI.send, exact: true }).filter({ hasText:
 await tick(5000);
 step("voice message sent");
 evidence.mediaCalls = mediaCalls;
-await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/i.test(document.body.innerText), null, { timeout: Number(flag("voice-wait", 90)) * 1000 }).catch(() => undefined);
+// Until the engine has decided on both media (the API says so), then a moment for the page to show it (the sender is told by the event stream).
+for (let waited = 0; waited < Number(flag("voice-wait", 90)); waited += 3) {
+  const pending = await page.evaluate(async (id) => {
+    const r = await fetch(`/api/intros/${id}`, { credentials: "same-origin" }).then((x) => x.json()).catch(() => null);
+    return (r?.intro?.messages ?? []).filter((m) => m.media && m.media.status === "PENDING").length;
+  }, evidence.introId);
+  if (pending === 0) break;
+  await tick(3000);
+}
+await tick(4000);
 step("media reviewed");
 await tick(3500);
 
