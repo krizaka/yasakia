@@ -178,6 +178,12 @@ await tick(600);
 await Promise.all([page.waitForURL(new RegExp(`/app/${locale}/?$`)), page.locator('form button[type="submit"]').click()]);
 await tick(1500);
 
+// A blank page for the photos (she signs in once: the same session removes what an earlier take left).
+await page.evaluate(async () => {
+  const list = await fetch("/api/me/photos", { credentials: "same-origin" }).then((r) => r.json()).catch(() => ({ photos: [] }));
+  for (const photo of list.photos ?? []) await fetch(`/api/me/photos/${photo.id}`, { method: "DELETE", credentials: "same-origin" });
+});
+
 // ── 1. the photos: four, two with her face — checked by Orazaka ────────────────────────────────
 step("open the photos");
 await page.goto(`${base}/app/${locale}/photos`);
