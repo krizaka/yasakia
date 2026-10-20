@@ -28,7 +28,7 @@ paperwork.
 | Media in conversations | Bunny Storage (`messages/<intro>/…`) + `intro_media` | a photo, video or voice message you chose to send, **as you sent it** minus every metadata block (GPS included); private, viewed only through 300-second signed URLs by the two people of the conversation, and by the other only after a safety check by Orazaka (frames of a video, the words of a voice message — nothing is kept by the checker) | while the conversation lives; deleted when it fades or closes, and when either account is deleted (purge ≤ 30 days) |
 | Authenticity signals | `intro_message_signals` | one of four words per message (HAND · UNSURE · LIKELY_GENERATED · TOO_SHORT), the classifier's coarse level, and five counters of how the message was typed (time, characters typed and pasted, paste events, deletions) — no keystroke, no timing series, no text | gone with the message |
 | Consent to compare photos | `biometric_consents` | the wording's version, when it was given, when withdrawn; the comparison is off until given (and while the deployment's flag is off) | while the account exists |
-| Conversation with the agent | `agent_messages` (PY3) | never used to train a model | while the account exists |
+| Conversation with the agent | `agent_messages` | never used to train a model | while the account exists |
 | Facets (the portrait) | `facets` | sensitive facets **sealed** (AES-256-GCM, bound to account + key) | while the account exists; editable |
 | Embeddings | `facet_embeddings` | derived from facets; never shown | while the account exists |
 | Batches, decisions, debriefs | `batches`, `batch_items`, `debriefs`, `pairs_seen` | reasons in words, never a score | while the account exists |
@@ -41,7 +41,7 @@ paperwork.
 | Deletion record | `account_deletions` | an id, a date, the media keys until purged | the record of the deletion |
 
 Servers and database: DigitalOcean, Toronto region (Canada). Photos: Bunny.net. E-mail: Mailgun (address + message).
-Push: Expo → Apple / Google (token + notification text). AI (PY3): Orazaka, or a hosted model under a contract that
+Push: Expo → Apple / Google (token + notification text). AI: Orazaka, or a hosted model under a contract that
 forbids retention and training.
 
 ## Rights, in the API
@@ -49,7 +49,7 @@ forbids retention and training.
 - **Access and portability** — `GET /api/me/export`: everything of the account as JSON (the facets opened, the report
   details the person wrote, their own messages; never another person's words). Built at once under a second, else in
   the background (`202` + id, kept 24 hours, sealed).
-- **Rectification** — `PATCH /api/me`, `PUT /api/me/location`, the photos endpoints; the portrait's corrections (PY3)
+- **Rectification** — `PATCH /api/me`, `PUT /api/me/location`, the photos endpoints; the portrait's corrections
   win over what the agent inferred (confidence 1).
 - **Erasure** — `DELETE /api/me`: one transaction deletes the account and, by cascade, every row that is theirs; the
   media keys go to `account_deletions` and the purge (`lib/jobs.ts`, `FOR UPDATE SKIP LOCKED`) removes them from

@@ -10,8 +10,10 @@ before. No swipe, no catalogue, no fake match.
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![krizaka.com](https://img.shields.io/badge/dev.yasakia.com-Yasakia-14b8a6)](https://dev.yasakia.com)
 
-This repository is Yasakia's **API** (Next.js route handlers), its **packages** (data, photos), its **docs** and its
-three **web pages** (privacy, terms, account deletion). The app for iOS and Android is
+This repository is Yasakia's **API** (Next.js route handlers), its **packages** (data, agent, matching, media), its **docs**, the
+**web console** (`/app/{en|fr}`: the person's space, the operator's on the admin host), the three **legal pages** (privacy, terms,
+account deletion) and the public **landing** of [dev.yasakia.com](https://dev.yasakia.com) (`apps/site`: home, how it works, a demo
+that plays a real run, the changelog). Registration is closed: Yasakia is in Dev preview, QA accounts only. The app for iOS and Android is
 [`krizaka/yasakia-mobile`](https://github.com/krizaka/yasakia-mobile). Yasakia is the third open-source product of
 [Krizaka](https://krizaka.com), built on the same foundations as Orochia and on the shared `@krizaka/*` bricks; its AI
 runs on Orazaka, and nowhere else.
@@ -38,6 +40,9 @@ Then [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md): sign up the way the app
   (AES-256-GCM), export and deletion in the API from day one, blocks and reports that work at once.
 - **PostgreSQL does the heavy lifting**: pgvector (HNSW) for who you are and who you seek, `earthdistance` for the
   radius, LISTEN/NOTIFY for live events — one database, no broker.
+- **Introductions where nobody writes for you** — seven days, every message typed by the two people; a small **signal** says how a
+  message was written (a signal, never a verdict), and photos, videos and voice messages are sent as they are (limits as data, no
+  editing) and shown once Orazaka's safety check approves them.
 - **Fail-closed**: a production server refuses to start without its secrets; no demo mode, no fake profile.
 
 | Doc | |
