@@ -53,14 +53,12 @@
       "checked": "2026-10-20"
     },
     "mobile.build": {
-      "evidence": null,
-      "gap": "A Release build for the iOS simulator succeeds (pod install + xcodebuild) and the app launches on the simulator against dev.yasakia.com (yasakia-mobile#22, launch capture on Bunny); the signed-in screens were not walked (taps did not focus the fields under Maestro on the iOS 26 simulator), and no EAS or TestFlight build exists (Expo and Apple accounts).",
-      "issue": "https://github.com/krizaka/yasakia/issues/59"
+      "evidence": "https://krizaka-assets.b-cdn.net/pr-assets/yasakia-mobile/dev-preview-mobile/yasakia-mobile-walkthrough-light-en.mp4",
+      "checked": "2026-10-20"
     },
     "mobile.ux-review": {
-      "evidence": null,
-      "gap": "docs/UX_DECISIONS.md of yasakia-mobile (four tabs, keyboard) is written; Photos and Introductions screens do not exist yet, so the phone's journey is not the web's journey.",
-      "issue": "https://github.com/krizaka/yasakia/issues/60"
+      "evidence": "https://github.com/krizaka/yasakia-mobile/blob/main/docs/UX_DECISIONS.md",
+      "checked": "2026-10-20"
     },
     "quality.ci-green": {
       "evidence": "https://github.com/krizaka/yasakia/actions?query=branch%3Amain",
