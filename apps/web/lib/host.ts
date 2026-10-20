@@ -28,4 +28,4 @@ export function allowedOnAdminHost(pathname: string): boolean {
 }
 
 /** The pages of the public landing (English at the root, French under /fr), with or without a trailing slash. */
-export const isLandingPath = (pathname: string) => /^\/(?:fr\/)?(?:(?:how-it-works|demo)\/?)?$/.test(pathname) || pathname === "/fr";
+export const isLandingPath = (pathname: string) => /^\/(?:fr\/)?(?:(?:how-it-works|demo|changelog)\/?)?$/.test(pathname) || pathname === "/fr";

@@ -32,8 +32,8 @@ describe("admin paths", () => {
 
 describe("landing paths", () => {
   it("knows the pages of the public landing, with or without a slash", () => {
-    for (const p of ["/", "/fr", "/fr/", "/how-it-works", "/how-it-works/", "/demo", "/fr/demo/", "/fr/how-it-works"]) expect(isLandingPath(p), p).toBe(true);
-    for (const p of ["/en", "/en/privacy", "/fr/privacy", "/app/en", "/how-it-works/x", "/api/healthz"]) expect(isLandingPath(p), p).toBe(false);
+    for (const p of ["/", "/fr", "/fr/", "/how-it-works", "/how-it-works/", "/demo", "/fr/demo/", "/fr/how-it-works", "/changelog", "/changelog/", "/fr/changelog", "/fr/changelog/"]) expect(isLandingPath(p), p).toBe(true);
+    for (const p of ["/en", "/en/privacy", "/fr/privacy", "/app/en", "/how-it-works/x", "/changelog/x", "/en/changelog", "/api/healthz"]) expect(isLandingPath(p), p).toBe(false);
   });
 });
 
