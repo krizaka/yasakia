@@ -234,14 +234,23 @@ await tick(2500);
 step("open the first batch");
 await page.goto(`${base}/app/${locale}/batch`);
 await tick(1500);
-const asked = page.waitForResponse((r) => r.url().endsWith("/api/batches") && r.request().method() === "POST", { timeout: 180_000 });
-await page.getByRole("button", { name: UI.start }).click();
-const response = await asked;
-const batch = { status: response.status(), ...(await response.json()) };
+// « The agent is out of reach, try again in a moment » is a real answer (the engine's model sometimes answers off its contract): she tries again.
+let batch;
+for (let attempt = 0; attempt < 3; attempt++) {
+  const asked = page.waitForResponse((r) => r.url().endsWith("/api/batches") && r.request().method() === "POST", { timeout: 180_000 });
+  await page.getByRole("button", { name: UI.start }).click();
+  const response = await asked;
+  batch = { status: response.status(), ...(await response.json().catch(() => ({}))) };
+  if (response.ok() || attempt === 2) break;
+  step(`batch: HTTP ${batch.status}, she tries again`);
+  await tick(12_000);
+  await page.goto(`${base}/app/${locale}/batch`);
+  await tick(1500);
+}
 evidence.batchRuns = batch.batch?.runs ?? [];
 evidence.batchStatus = batch.status;
 step(`batch: HTTP ${batch.status}`);
-if (!response.ok()) throw new Error(`the batch answered ${batch.status}`);
+if (batch.status !== 201) throw new Error(`the batch answered ${batch.status}`);
 await page.getByText(UI.why, { exact: true }).first().waitFor({ timeout: 60_000 });
 await tick(2500);
 step("batch shown");
