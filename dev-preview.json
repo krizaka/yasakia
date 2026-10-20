@@ -9,40 +9,36 @@
       "checked": "2026-10-16"
     },
     "site.signup-closed": {
-      "evidence": null,
-      "gap": "Sign-in is passwordless (/api/auth/request-code, /verify); nothing proves that an unknown address cannot create an account on dev.",
-      "issue": "https://github.com/krizaka/yasakia/issues/49"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/e2e/scenarios.mjs",
+      "checked": "2026-10-20"
     },
     "site.qa-signin": {
       "evidence": "https://github.com/krizaka/yasakia/actions/runs/38991461722",
       "checked": "2026-10-16"
     },
     "journey.core": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/loop.31a8872f96.mp4",
-      "checked": "2026-10-17"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "checked": "2026-10-20"
     },
     "journey.ai-via-orazaka": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/loop.31a8872f96.mp4",
-      "checked": "2026-10-17"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "checked": "2026-10-20"
     },
     "journey.real-people": {
-      "evidence": null,
-      "gap": "Photo rules (4 to 6, two with the face) and Orazaka's photo check are built and tested in CI; the live run on dev with the persona Camille is not recorded yet.",
-      "issue": "https://github.com/krizaka/yasakia/issues/110"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "checked": "2026-10-20"
     },
     "journey.no-ghostwriting": {
-      "evidence": null,
-      "gap": "Removed in code and guarded by tests (no suggested line, no column, no endpoint, the agent's persona forbids it); not yet seen running on dev, and the recorded journey on the site still shows the old suggested line (said on the demo page until it is re-recorded).",
-      "issue": "https://github.com/krizaka/yasakia/issues/111"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "checked": "2026-10-20"
     },
     "journey.authenticity-signal": {
-      "evidence": null,
-      "gap": "Built and tested in CI (signal on every message, counters, rules, calibration documented: 0/80 false « HIGH » per language, 3/80 EN and 10/80 FR generated texts recognised); not yet seen running on dev (needs the pack installed and its worker connected).",
-      "issue": "https://github.com/krizaka/yasakia/issues/112"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "checked": "2026-10-20"
     },
     "journey.media-messages": {
       "evidence": null,
-      "gap": "Built and tested in CI (limits as data, no editing, private signed URLs, moderation that fails closed, waveform, expiry with the conversation); not yet seen running on dev (needs the media-safety pack installed and the Mac's audio transcription for voice messages).",
+      "gap": "Live on dev: a photo message is judged by Orazaka (run 778774d5-7dab-4a1b-8696-7d128fa89d29, APPROVED) and shown as it is. The voice message stays held: Orazaka's audio-only media-safety run never completes (krizaka/orazaka#266).",
       "issue": "https://github.com/krizaka/yasakia/issues/113"
     },
     "ui.krizaka-ui": {
@@ -88,9 +84,8 @@
       "issue": "https://github.com/krizaka/yasakia/issues/62"
     },
     "seo.family": {
-      "evidence": null,
-      "gap": "node scripts/check-seo-family.mjs --base https://dev.yasakia.com --host https://dev.yasakia.com --index off fails (empty sitemap / no Sitemap: line wh…",
-      "issue": "https://github.com/krizaka/yasakia/issues/64"
+      "evidence": "https://github.com/krizaka/.github/actions/runs/39368823780",
+      "checked": "2026-10-20"
     },
     "ops.cost": {
       "evidence": null,
