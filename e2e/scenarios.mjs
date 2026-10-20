@@ -1157,6 +1157,9 @@ let adaPhoto;
         check("media: a photo is cleaned and stored, then waits for its safety check (PENDING) — the sender sees it, the other person does not", done1.status === 200 && ["PENDING", "APPROVED"].includes(done1.json.media.status) && (await seenBy(mia)).some((m) => m.id === holdId));
         check("media: …nothing of it exists for the other person while it waits (not in the thread, 404 on its URL)", done1.json.media.status !== "PENDING" || (!(await seenBy(noa)).some((m) => m.id === holdId) && (await asNoa(`${room}/media/${holdId}`)).status === 404));
         check("media: the safety check approved it through Orazaka (media-safety, a run id kept)", (await approved(holdId)) !== null && (await sql("select engine_run_id from intro_media where message_id = $1", [holdId]))[0].engine_run_id !== null && (await runsOfStub()).mediaSafety.length >= 1);
+        // One review at a time per media (a lease): two loops judging the same photo spent a verdict the next media was owed.
+        await sleep(6000);
+        check("media: one safety run for that photo — a second loop does not judge it again while the first review is in flight", (await runsOfStub()).mediaSafety.length === 1, (await runsOfStub()).mediaSafety.length);
         const seenNoa = (await seenBy(noa)).find((m) => m.id === holdId);
         check("media: once approved the other person sees it, with no URL in the thread (the file comes through a signed URL)", seenNoa?.kind === "PHOTO" && seenNoa.media.status === "APPROVED" && !JSON.stringify(seenNoa).includes("messages/") && !/https?:/.test(JSON.stringify(seenNoa)));
         const url1 = await asNoa(`${room}/media/${holdId}`);
