@@ -19,7 +19,7 @@ export function TakeVideo({ webm, mp4, poster, alt }: { webm: string; mp4: strin
   }, []);
 
   return (
-    <video ref={ref} className="block aspect-[390/844] w-full bg-surface-0 object-cover" poster={poster} muted loop playsInline preload="metadata" aria-label={alt} data-testid="take-video">
+    <video ref={ref} className="block aspect-[406/880] w-full bg-surface-0 object-cover" poster={poster} muted loop playsInline preload="metadata" aria-label={alt} data-testid="take-video">
       <source src={webm} type="video/webm" />
       <source src={mp4} type="video/mp4" />
     </video>

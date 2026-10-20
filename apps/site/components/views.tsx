@@ -85,7 +85,7 @@ export function HowView({ locale }: { locale: Locale }) {
 /** The demo: the real journey, recorded on the development site — one run, captioned in the page. Media come from the CDN only. */
 export function DemoView({ locale }: { locale: Locale }) {
   const t = translator(locale);
-  const media = take("full");
+  const media = take("full", locale);
   return (
     <>
       <SiteHeader locale={locale} current="demo" />
@@ -101,7 +101,7 @@ export function DemoView({ locale }: { locale: Locale }) {
               poster={media.poster}
               label={t("demo.journeyLabel")}
               transcriptLabel={t("demo.transcript")}
-              cues={CUES.full.map((c) => ({ at: c.at, text: t(`demo.journey.cues.${c.id}`) }))}
+              cues={CUES[locale].map((c) => ({ at: c.at, text: t(`demo.journey.cues.${c.id}`) }))}
             />
           </Page>
         </Section>

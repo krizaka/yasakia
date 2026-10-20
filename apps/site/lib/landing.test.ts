@@ -48,7 +48,7 @@ describe("the home is the product landing template of @krizaka/ui, at the Yomiza
     const hero = read("components/home/HeroPhone.tsx");
     expect(home).toContain("visual={<HeroPhone");
     expect(hero).toContain("TakeVideo");
-    expect(hero).toContain('take("hero")');
+    expect(hero).toContain('take("hero", locale)');
     expect(hero).not.toMatch(/bg-accent\/25|border-dashed|CheckIcon|aspect-\[3\/4\]/);
     const video = read("components/home/TakeVideo.tsx");
     expect(video).toContain("poster={poster}"); // the first frame is the LCP, never the video

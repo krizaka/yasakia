@@ -32,16 +32,19 @@ describe("the public dev site", () => {
     for (const banned of ["sign up", "sign-up", "download now", "app store", "google play", "waiting list", "inscrivez", "télécharger maintenant"]) expect(words).not.toContain(banned);
   });
 
-  it("reads the real take from the CDN only: the hero's loop and one clip per step, hashed, under the product's own folder", () => {
-    expect(Object.keys(TAKES)).toEqual(["hero", "photos", "talk", "batch", "write", "media", "full"]);
-    for (const id of Object.keys(TAKES) as (keyof typeof TAKES)[]) {
-      for (const url of Object.values(take(id))) expect(url).toMatch(new RegExp(`^https://krizaka-assets\\.b-cdn\\.net/site/products/yasakia/tour/take-${id}\\.[0-9a-f]{10}\\.(webm|mp4|jpg)$`));
+  it("reads the real take from the CDN only, in the reader's language: the hero's loop and one clip per step, hashed, under the product's own folder", () => {
+    for (const locale of ["fr", "en"] as const) {
+      expect(Object.keys(TAKES[locale])).toEqual(["hero", "photos", "talk", "batch", "write", "media", "full"]);
+      for (const id of Object.keys(TAKES[locale]) as (keyof (typeof TAKES)["fr"])[]) {
+        const name = locale === "en" ? `take-en-${id}` : `take-${id}`;
+        for (const url of Object.values(take(id, locale))) expect(url).toMatch(new RegExp(`^https://krizaka-assets\\.b-cdn\\.net/site/products/yasakia/tour/${name}\\.[0-9a-f]{10}\\.(webm|mp4|jpg)$`));
+      }
     }
   });
 
   it("reads its demo from the CDN only, hashed, under the product's own folder — and lazily, with a poster, never autoplaying", () => {
     // One recording of the whole run, uncut; the old loop recording (it showed a suggested first line) is gone from the page.
-    for (const url of Object.values(take("full"))) expect(url).toMatch(/^https:\/\/krizaka-assets\.b-cdn\.net\/site\/products\/yasakia\/tour\/take-full\.[0-9a-f]{10}\.(webm|mp4|jpg)$/);
+    for (const url of Object.values(take("full", "fr"))) expect(url).toMatch(/^https:\/\/krizaka-assets\.b-cdn\.net\/site\/products\/yasakia\/tour\/take-full\.[0-9a-f]{10}\.(webm|mp4|jpg)$/);
     const player = readFileSync(new URL("../components/CaptionedVideo.tsx", import.meta.url), "utf8");
     expect(player).toContain('preload="none"');
     expect(player).toContain("poster={poster}");

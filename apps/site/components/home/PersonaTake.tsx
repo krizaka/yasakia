@@ -16,7 +16,7 @@ import { PersonaShowcase } from "./PersonaShowcase";
 export function PersonaTake({ locale }: { locale: Locale }) {
   const t = getDictionary(locale).landing.journey;
   const steps = JOURNEY_STEPS.map((id) => {
-    const media = take(id);
+    const media = take(id, locale);
     return { id, title: t.steps[id].title, description: t.steps[id].text, poster: media.poster, alt: t.steps[id].alt, video: { webm: media.webm, mp4: media.mp4 } };
   });
   return (
