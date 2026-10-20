@@ -160,5 +160,7 @@ jobs:
         run: |
           npx playwright-core install --with-deps chromium
           node scripts/check-console.mjs --base http://localhost:3000
+        env:
+          AUTH_QA_USER_PASSWORD: ${{ env.QA_USER_PASSWORD }}
       - if: failure()
         run: tail -200 web.log

@@ -7,8 +7,8 @@
  *   - an error page («Something went wrong»), an empty main area.
  * With --shots <dir> it writes a screenshot of each stop (they go to Bunny `pr-assets/yasakia/dev-preview/`, never the repository).
  *
- *   QA_USER_PASSWORD=… node scripts/check-console.mjs --base https://dev.yasakia.com [--email qa+user@yasakia.com] [--shots <dir>]
- *   QA_ADMIN_PASSWORD=… node scripts/check-console.mjs --admin --base https://admin.yasakia.com [--forwarded-for 203.0.113.7]
+ *   AUTH_QA_USER_PASSWORD=… node scripts/check-console.mjs --base https://dev.yasakia.com [--email qa+user@yasakia.com] [--shots <dir>]
+ *   AUTH_QA_ADMIN_PASSWORD=… node scripts/check-console.mjs --admin --base https://admin.yasakia.com [--forwarded-for 203.0.113.7]
  *
  * Passwords come from the environment, never a flag, and are never printed. Credentials are read by whoever runs it.
  */
@@ -62,6 +62,7 @@ export async function crawl({ base, email, password, admin, forwardedFor, shots 
   const extraHTTPHeaders = forwardedFor ? { "X-Forwarded-For": forwardedFor } : undefined;
   const signIn = await browser.newContext({ extraHTTPHeaders });
   const first = await signIn.newPage();
+  first.setDefaultTimeout(180_000); // a development server compiles each page the first time it is asked for
   await first.goto(`${base}/app/en/sign-in`);
   await first.locator('input[name="email"]').fill(email);
   await first.locator('input[name="password"]').fill(password);
@@ -82,6 +83,7 @@ export async function crawl({ base, email, password, admin, forwardedFor, shots 
         }
       }, theme);
       const page = await context.newPage();
+      page.setDefaultTimeout(180_000);
       const errors = [];
       page.on("pageerror", (e) => errors.push(`script error: ${e.message.slice(0, 120)}`));
       page.on("response", (r) => {
@@ -108,12 +110,12 @@ export async function crawl({ base, email, password, admin, forwardedFor, shots 
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
   const admin = has("admin");
-  const password = admin ? process.env.QA_ADMIN_PASSWORD : process.env.QA_USER_PASSWORD;
+  const password = admin ? process.env.AUTH_QA_ADMIN_PASSWORD : process.env.AUTH_QA_USER_PASSWORD;
   if (!password) {
-    console.error(`${admin ? "QA_ADMIN_PASSWORD" : "QA_USER_PASSWORD"} is not set (read it with the secret tool; never type it on a command line).`);
+    console.error(`${admin ? "AUTH_QA_ADMIN_PASSWORD" : "AUTH_QA_USER_PASSWORD"} is not set (read it with the secret tool; never type it on a command line).`);
     process.exit(2);
   }
-  const email = arg("email", admin ? "qa+admin@yasakia.com" : "qa+user@yasakia.com");
+  const email = arg("email", process.env.AUTH_QA_USER_EMAIL ?? (admin ? "qa+admin@yasakia.com" : "qa+user@yasakia.com"));
   const { problems, stops } = await crawl({ base: String(arg("base", "http://localhost:3000")).replace(/\/$/, ""), email, password, admin, forwardedFor: arg("forwarded-for", undefined), shots: arg("shots", undefined) });
   if (problems.length) {
     console.error(`✗ ${problems.length} problem(s) over ${stops} stops:\n${problems.map((p) => `  ${p}`).join("\n")}`);
