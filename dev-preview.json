@@ -17,53 +17,49 @@
       "checked": "2026-10-16"
     },
     "journey.core": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.7273beac05.mp4",
       "checked": "2026-10-20"
     },
     "journey.ai-via-orazaka": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.7273beac05.mp4",
       "checked": "2026-10-20"
     },
     "journey.real-people": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.7273beac05.mp4",
       "checked": "2026-10-20"
     },
     "journey.no-ghostwriting": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.7273beac05.mp4",
       "checked": "2026-10-20"
     },
     "journey.authenticity-signal": {
-      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.32157449b9.mp4",
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.7273beac05.mp4",
       "checked": "2026-10-20"
     },
     "journey.media-messages": {
-      "evidence": null,
-      "gap": "Live on dev: a photo message is judged by Orazaka (run 778774d5-7dab-4a1b-8696-7d128fa89d29, APPROVED) and shown as it is. The voice message stays held: Orazaka's audio-only media-safety run never completes (krizaka/orazaka#266).",
-      "issue": "https://github.com/krizaka/yasakia/issues/113"
+      "evidence": "https://krizaka-assets.b-cdn.net/site/products/yasakia/tour/take-full.7273beac05.mp4",
+      "checked": "2026-10-20"
     },
     "ui.krizaka-ui": {
-      "evidence": null,
-      "gap": "No CI crawl; the dev home shows no <footer> at / (it redirects to a locale/app path): check the real entry.",
-      "issue": "https://github.com/krizaka/yasakia/issues/55"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/.github/workflows/ci.yml",
+      "checked": "2026-10-20"
     },
     "ui.themes-devices": {
-      "evidence": null,
-      "gap": "No CI crawl; the dev home shows no <footer> at / (it redirects to a locale/app path): check the real entry.",
-      "issue": "https://github.com/krizaka/yasakia/issues/55"
+      "evidence": "https://krizaka-assets.b-cdn.net/pr-assets/yasakia/dev-preview/app-en-photos-dark-390.png",
+      "checked": "2026-10-20"
     },
     "ux.ia-review": {
-      "evidence": null,
-      "gap": "No UX/IA review.",
-      "issue": "https://github.com/krizaka/yasakia/issues/57"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/docs/UX_DECISIONS.md",
+      "checked": "2026-10-20"
     },
     "mobile.build": {
       "evidence": null,
-      "gap": "The mobile app is a separate paused repo (last push 2026-10-12); nothing is built or recorded.",
+      "gap": "A Release build for the iOS simulator succeeds (pod install + xcodebuild) and the app launches on the simulator against dev.yasakia.com (yasakia-mobile#22, launch capture on Bunny); the signed-in screens were not walked (taps did not focus the fields under Maestro on the iOS 26 simulator), and no EAS or TestFlight build exists (Expo and Apple accounts).",
       "issue": "https://github.com/krizaka/yasakia/issues/59"
     },
     "mobile.ux-review": {
       "evidence": null,
-      "gap": "No UX/IA review of the mobile app.",
+      "gap": "docs/UX_DECISIONS.md of yasakia-mobile (four tabs, keyboard) is written; Photos and Introductions screens do not exist yet, so the phone's journey is not the web's journey.",
       "issue": "https://github.com/krizaka/yasakia/issues/60"
     },
     "quality.ci-green": {
@@ -79,9 +75,8 @@
       "checked": "2026-10-16"
     },
     "docs.current": {
-      "evidence": null,
-      "gap": "README/AGENTS/docs not checked.",
-      "issue": "https://github.com/krizaka/yasakia/issues/62"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/AGENTS.md",
+      "checked": "2026-10-20"
     },
     "seo.family": {
       "evidence": "https://github.com/krizaka/.github/actions/runs/39368823780",
@@ -101,24 +96,20 @@
       "checked": "2026-10-16"
     },
     "admin.operator-tasks": {
-      "evidence": null,
-      "gap": "Admin API exists (reports, intros, health, audit); tasks not proven end to end (reports triage, intros).",
-      "issue": "https://github.com/krizaka/yasakia/issues/68"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/e2e/scenarios.mjs",
+      "checked": "2026-10-20"
     },
     "admin.audit-log": {
-      "evidence": null,
-      "gap": "Audit route exists; not proven for every action.",
-      "issue": "https://github.com/krizaka/yasakia/issues/70"
+      "evidence": "https://krizaka-assets.b-cdn.net/pr-assets/yasakia/dev-preview/admin-en-admin-audit-dark-1280.png",
+      "checked": "2026-10-20"
     },
     "admin.shell": {
-      "evidence": null,
-      "gap": "Admin shell/themes unverified.",
-      "issue": "https://github.com/krizaka/yasakia/issues/71"
+      "evidence": "https://krizaka-assets.b-cdn.net/pr-assets/yasakia/dev-preview/admin-en-admin-users-dark-390.png",
+      "checked": "2026-10-20"
     },
     "admin.ux-review": {
-      "evidence": null,
-      "gap": "No UX/IA review of the console.",
-      "issue": "https://github.com/krizaka/yasakia/issues/73"
+      "evidence": "https://github.com/krizaka/yasakia/blob/main/docs/UX_DECISIONS.md",
+      "checked": "2026-10-20"
     },
     "admin.ci": {
       "evidence": "https://github.com/krizaka/yasakia/actions?query=branch%3Amain",
