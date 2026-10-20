@@ -624,18 +624,26 @@
         "empty": "Rien d’enregistré.",
         "emptyDescription": "Change la recherche ou les filtres.",
         "actions": {
-          "auth.sign_in": "Connexion",
-          "auth.sign_in_refused": "Connexion refusée",
-          "auth.sign_out": "Déconnexion",
-          "auth.password_changed": "Mot de passe changé",
-          "account.deleted": "Compte supprimé",
-          "admin.suspend": "Compte suspendu",
-          "admin.restore": "Compte rétabli",
-          "admin.sessions_revoked": "Sessions terminées",
-          "admin.role": "Rôle modifié",
-          "admin.delete": "Compte effacé par un opérateur",
-          "admin.rules_published": "Jeu de règles publié",
-          "admin.qa_reset": "Compte QA réinitialisé"
+          "auth": {
+            "sign_in": "Connexion",
+            "sign_in_refused": "Connexion refusée",
+            "sign_out": "Déconnexion",
+            "password_changed": "Mot de passe changé",
+            "password_reset": "Mot de passe réinitialisé"
+          },
+          "account": {
+            "deleted": "Compte supprimé"
+          },
+          "admin": {
+            "suspend": "Compte suspendu",
+            "restore": "Compte rétabli",
+            "sessions_revoked": "Sessions terminées",
+            "role": "Rôle modifié",
+            "delete": "Compte effacé par un opérateur",
+            "rules_published": "Jeu de règles publié",
+            "qa_reset": "Compte QA réinitialisé",
+            "report": "Signalement traité"
+          }
         }
       },
       "table": {

@@ -624,18 +624,26 @@
         "empty": "Nothing recorded.",
         "emptyDescription": "Change the search or the filters.",
         "actions": {
-          "auth.sign_in": "Signed in",
-          "auth.sign_in_refused": "Sign-in refused",
-          "auth.sign_out": "Signed out",
-          "auth.password_changed": "Password changed",
-          "account.deleted": "Account deleted",
-          "admin.suspend": "Account suspended",
-          "admin.restore": "Account restored",
-          "admin.sessions_revoked": "Sessions ended",
-          "admin.role": "Role changed",
-          "admin.delete": "Account erased by an operator",
-          "admin.rules_published": "Rule set published",
-          "admin.qa_reset": "QA account reset"
+          "auth": {
+            "sign_in": "Signed in",
+            "sign_in_refused": "Sign-in refused",
+            "sign_out": "Signed out",
+            "password_changed": "Password changed",
+            "password_reset": "Password reset"
+          },
+          "account": {
+            "deleted": "Account deleted"
+          },
+          "admin": {
+            "suspend": "Account suspended",
+            "restore": "Account restored",
+            "sessions_revoked": "Sessions ended",
+            "role": "Role changed",
+            "delete": "Account erased by an operator",
+            "rules_published": "Rule set published",
+            "qa_reset": "QA account reset",
+            "report": "Report handled"
+          }
         }
       },
       "table": {
