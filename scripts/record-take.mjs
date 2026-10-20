@@ -72,6 +72,7 @@ const UI = {
     chips: ["En partie", "Les valeurs", "Plus près de chez moi"],
     note: "Elle aime cuisiner et les jeux de mots, c’est un bon début.",
     first: "Salut ! J’ai vu que tu aimes cuisiner. C’est quoi ton plat de réconfort ?",
+    clarify: "Pour être claire : je veux une relation sérieuse et durable, avec quelqu’un qui veut la même chose.",
     signals: ["Écrit à la main", "Incertain", "Probablement généré", "Trop court pour juger"],
     send: "Envoyer",
     photoButton: "Photo",
@@ -90,6 +91,7 @@ const UI = {
     chips: ["Partly", "Values", "Closer to me"],
     note: "She likes cooking and puns, a good start.",
     first: "Hi! I saw you like to cook. What is your comfort dish?",
+    clarify: "To be clear: I want a serious, long-term relationship, with someone who wants the same.",
     signals: ["Written by hand", "Uncertain", "Probably generated", "Too short to judge"],
     send: "Send",
     photoButton: "Photo",
@@ -214,7 +216,17 @@ for (const line of SAYS) {
   await tick(2200);
 }
 step("wait for the portrait");
-await page.getByText(UI.portrait, { exact: true }).waitFor({ timeout: 120_000 });
+// The agent's understanding is a model's: if it could not shape what she said, she is asked once more, in her own words (up to twice).
+for (let again = 0; again < 3; again++) {
+  const shown = await page.getByText(UI.portrait, { exact: true }).waitFor({ timeout: again === 2 ? 120_000 : 45_000 }).then(() => true, () => false);
+  if (shown) break;
+  if (again === 2) throw new Error("the portrait did not appear");
+  await type(composer, UI.clarify, 18);
+  const more = page.waitForResponse((r) => r.url().endsWith("/api/agent/messages") && r.request().method() === "POST", { timeout: 120_000 });
+  await composer.press("Enter");
+  step("one more message, to be understood");
+  await more;
+}
 step("portrait written");
 await tick(2500);
 
