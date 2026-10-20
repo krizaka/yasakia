@@ -14,9 +14,9 @@ export type Database = NodePgDatabase<typeof schema>;
  * - `production`: 5 on a direct database.
  * - `pooled`: 10 when DATABASE_DIRECT_URL is also set, i.e. DATABASE_URL goes through a transaction pooler (PgBouncer):
  *   the pooler multiplexes them onto few server connections, so a wider client pool costs the database nothing.
- * - `development`: 3 (development, tests, CI): several servers share one local database (CI runs two).
+ * - `development`: 5 (development, tests, CI): several servers share one local database (CI runs two); 3 starved the media review loop in CI (a connection wait counted as a failed check, and a retried check consumed the next scenario's verdict).
  */
-export const DEFAULT_POOL_SIZE = { production: 5, pooled: 10, development: 3 } as const;
+export const DEFAULT_POOL_SIZE = { production: 5, pooled: 10, development: 5 } as const;
 
 type Env = Record<string, string | undefined>;
 
