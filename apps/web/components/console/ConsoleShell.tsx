@@ -99,7 +99,7 @@ export function ConsoleShell({ locale, email, admin, adminOnly = false, children
       </AppShell.Sidebar>
       <AppShell.Body>
         <AppShell.Header
-          title={say(titleKey)}
+          title={say(`shell.${titleKey}`)}
           menuLabel={say("shell.openMenu")}
           actions={
             <>

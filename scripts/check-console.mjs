@@ -53,7 +53,7 @@ export function overflowInPage() {
   for (const el of document.querySelectorAll("body *")) {
     if (el.closest("[aria-hidden='true']")) continue;
     const r = el.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) continue;
+    if (r.width <= 2 || r.height <= 2) continue; // nothing, or visually hidden text (sr-only)
     const style = getComputedStyle(el);
     if (style.position === "fixed" || style.visibility === "hidden") continue;
     if (out.length >= 4) break;
@@ -82,6 +82,7 @@ export function overflowInPage() {
   }
   const text = document.body.innerText;
   if (/Something went wrong|Une erreur est survenue|Quelque chose s’est mal passé/i.test(text)) out.push("an error page");
+  if (/\bconsole\.[a-z][A-Za-z]*(\.[A-Za-z]+)+/.test(text) || /\bconsole\.(shell|photos|talk|batch|users|audit|health|rules|analytics|overview)\b/.test(text)) out.push("a message key shown as text (a missing translation)");
   const main = document.querySelector("main") ?? document.body;
   if (main.innerText.trim().length < 20) out.push("an empty main area");
   return out;

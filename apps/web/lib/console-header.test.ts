@@ -16,4 +16,8 @@ describe("the console header fits a phone", () => {
   it("keeps the sign-out button's name for assistive technology when only its icon shows", () => {
     expect(shell).toContain('className="max-sm:sr-only"');
   });
+
+  it("words the page title through the shell messages (a bare label rendered « console.photos »)", () => {
+    expect(shell).toContain("title={say(`shell.${titleKey}`)}");
+  });
 });
