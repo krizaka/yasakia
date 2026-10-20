@@ -61,7 +61,7 @@ export const ENV_VARS: readonly EnvVar[] = [
   v("DATABASE_URL", "DATABASE", "required", text, "PostgreSQL 16 with pgvector."),
   v("DATABASE_DIRECT_URL", "DATABASE", "optional", text, "A direct (session) connection for LISTEN and the migrations when DATABASE_URL goes through a transaction pooler."),
   v("DATABASE_CA_CERT", "DATABASE", "recommended", text, "CA of a managed PostgreSQL (PEM; App Platform: `${<db>.CA_CERT}`), verified with TLS."),
-  v("DATABASE_MAX_CONNECTIONS", "DATABASE", "optional", int(1, 50), "Connections one process's pool may hold — see *Database connections*.", { default: "5" }),
+  v("DATABASE_MAX_CONNECTIONS", "DATABASE", "optional", int(1, 50), "Connections one process's pool may hold — see *Database connections*.", { default: "5 (3 in development, 10 behind a pooler)" }),
   v("DATABASE_ENCRYPTION_KEY", "DATABASE", "required", z.string().min(32, "must be 32 random bytes in base64 (or 32+ characters)"), "Encrypts the sensitive fields at rest (AES-256-GCM): 32 random bytes in base64. Keep it.", { secret: true }),
   v("DATABASE_ENCRYPTION_KEYS_PREVIOUS", "DATABASE", "optional", text, "Rotation: previous keys, comma separated — what they sealed still opens.", { secret: true }),
   v("DATABASE_ALLOW_RESET", "DATABASE", "optional", z.enum(["true", "false"]), "Development deployments only: the release job may rebuild a database whose migration history was squashed."),
