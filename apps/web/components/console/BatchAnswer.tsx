@@ -36,7 +36,7 @@ export function BatchAnswer({ batchId, person, open, onAnswered }: { batchId: st
           <Badge tone="success" dot>
             {say("batch.answer.saidYes")}
           </Badge>
-          <ButtonLink href={introId ? `/app/${locale}/intros/${introId}` : `/app/${locale}/intros`} size="sm" variant="secondary" shape="cut">
+          <ButtonLink href={introId ? `/app/${locale}/intros/${introId}` : `/app/${locale}/intros`} size="sm" variant="secondary">
             {say("batch.answer.toIntros")}
           </ButtonLink>
         </div>
@@ -45,7 +45,7 @@ export function BatchAnswer({ batchId, person, open, onAnswered }: { batchId: st
       ) : null}
       {!final && open ? (
         <div className="flex flex-wrap gap-2" role="group" aria-label={say("batch.answer.label", { name: person.name || say("batch.someone") })}>
-          <Button size="sm" variant="primary" shape="cut" loading={answer.isPending && answer.variables === "INTERESTED"} disabled={answer.isPending} onClick={() => answer.mutate("INTERESTED")}>
+          <Button size="sm" variant="primary" loading={answer.isPending && answer.variables === "INTERESTED"} disabled={answer.isPending} onClick={() => answer.mutate("INTERESTED")}>
             {say("batch.answer.interested")}
           </Button>
           {person.decision !== "TELL_ME_MORE" ? (

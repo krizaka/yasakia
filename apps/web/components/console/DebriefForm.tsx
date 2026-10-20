@@ -54,7 +54,7 @@ export function DebriefForm({ batchId, onDone }: { batchId: string; onDone: () =
       ))}
       <form.TextArea name="text" label={say("batch.debrief.text")} hint={say("batch.debrief.textHint")} maxLength={500} />
       {problem ? <Alert tone="danger">{problem}</Alert> : null}
-      <form.Submit variant="primary" shape="cut" className="w-fit">
+      <form.Submit variant="primary" className="w-fit">
         {say("batch.debrief.submit")}
       </form.Submit>
     </form.Form>

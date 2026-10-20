@@ -43,7 +43,7 @@ export function SignInForm({ next }: { next: string }) {
       <form.TextField name="email" label={say("signIn.email")} type="email" autoComplete="username" />
       <form.TextField name="password" label={say("signIn.password")} type="password" autoComplete="current-password" />
       {problem ? <Alert tone="danger">{problem}</Alert> : null}
-      <form.Submit size="lg" shape="cut" shimmer className="w-full">
+      <form.Submit size="lg" shimmer className="w-full">
         {say("signIn.submit")}
       </form.Submit>
     </form.Form>

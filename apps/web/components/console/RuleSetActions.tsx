@@ -94,7 +94,7 @@ export function RuleSetActions({ domain, params, fields, versions }: { domain: s
       <div className="flex flex-wrap gap-2">
         <Dialog.Root open={open === "publish"} onOpenChange={(o) => change(o ? "publish" : null)}>
           <Dialog.Trigger asChild>
-            <Button variant="primary" size="sm" shape="cut">
+            <Button variant="primary" size="sm">
               {say("admin.rules.publish")}
             </Button>
           </Dialog.Trigger>
@@ -117,7 +117,7 @@ export function RuleSetActions({ domain, params, fields, versions }: { domain: s
                     {say("admin.user.cancel")}
                   </Button>
                 </Dialog.Close>
-                <pub.Submit variant="primary" shape="cut">
+                <pub.Submit variant="primary">
                   {say("admin.rules.publishSubmit")}
                 </pub.Submit>
               </Dialog.Footer>
@@ -127,7 +127,7 @@ export function RuleSetActions({ domain, params, fields, versions }: { domain: s
         {versions.length > 0 ? (
           <Dialog.Root open={open === "restore"} onOpenChange={(o) => change(o ? "restore" : null)}>
             <Dialog.Trigger asChild>
-              <Button variant="secondary" size="sm" shape="cut">
+              <Button variant="secondary" size="sm">
                 {say("admin.rules.restore")}
               </Button>
             </Dialog.Trigger>
@@ -148,7 +148,7 @@ export function RuleSetActions({ domain, params, fields, versions }: { domain: s
                       {say("admin.user.cancel")}
                     </Button>
                   </Dialog.Close>
-                  <res.Submit variant="primary" shape="cut">
+                  <res.Submit variant="primary">
                     {say("admin.rules.restoreSubmit")}
                   </res.Submit>
                 </Dialog.Footer>

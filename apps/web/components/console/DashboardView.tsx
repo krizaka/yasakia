@@ -58,7 +58,7 @@ export function DashboardView({ initial }: { initial: DashboardDto }) {
         <div className="flex flex-col gap-3">
           <p className="font-display text-xl font-extrabold text-fg">{say(`dashboard.agentState.${d.agentState}`)}</p>
           {d.agentState === "ONBOARDING" ? (
-            <ButtonLink href={`${home}/talk`} size="sm" variant="primary" shape="cut" className="w-fit">
+            <ButtonLink href={`${home}/talk`} size="sm" variant="primary" className="w-fit">
               {say("talk.dashboardAction")}
             </ButtonLink>
           ) : null}
@@ -135,7 +135,7 @@ export function DashboardView({ initial }: { initial: DashboardDto }) {
                 <li key={m}>{say(`dashboard.missing.${m}`)}</li>
               ))}
             </ul>
-            <ButtonLink href={`${home}/account`} size="sm" variant="secondary" shape="cut" className="w-fit">
+            <ButtonLink href={`${home}/account`} size="sm" variant="secondary" className="w-fit">
               {say("dashboard.profileAction")}
             </ButtonLink>
           </div>
