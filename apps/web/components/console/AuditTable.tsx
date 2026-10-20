@@ -20,7 +20,8 @@ interface AuditRow {
   createdAt: string;
 }
 
-const ACTIONS = ["auth.sign_in", "auth.sign_in_refused", "auth.sign_out", "auth.password_changed", "account.deleted", "admin.suspend", "admin.restore"] as const;
+// Every action the audit log can hold (lib/audit.ts AUDIT_ACTIONS — a server module, so the list is repeated here and a test holds them equal).
+const ACTIONS = ["auth.sign_in", "auth.sign_in_refused", "auth.sign_out", "auth.password_changed", "auth.password_reset", "account.deleted", "admin.suspend", "admin.restore", "admin.report", "admin.sessions_revoked", "admin.role", "admin.delete", "admin.rules_published", "admin.qa_reset"] as const;
 const keys = defineKeys("admin-audit", { list: (query: DataTableQuery) => [query] });
 const NONE: AuditRow[] = [];
 

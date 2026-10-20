@@ -35,7 +35,8 @@ export default async function UserPage({ params }: { params: Promise<{ locale: s
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const lines = await auditFor(id, 12);
   const agentStates = getDictionary(locale).console.dashboard.agentState;
-  const actions = d.audit.actions as Record<string, string>;
+  // The labels are nested by the action's own dots (« auth.sign_in » → auth → sign_in).
+  const actionLabel = (action: string) => action.split(".").reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], d.audit.actions) as string | undefined;
   return (
     <DetailLayout
       back={<Link href={`/app/${locale}/admin/users`}>{d.user.back}</Link>}
@@ -89,7 +90,7 @@ export default async function UserPage({ params }: { params: Promise<{ locale: s
               events={lines.map((l) => ({
                 id: l.id,
                 at: l.createdAt,
-                title: actions[l.action] ?? l.action,
+                title: actionLabel(l.action) ?? l.action,
                 description: [l.actor, l.detail ? Object.values(l.detail).join(" · ") : null].filter(Boolean).join(" — ") || undefined,
                 tone: l.action === "auth.sign_in_refused" || l.action === "admin.suspend" ? ("danger" as const) : undefined,
               }))}
