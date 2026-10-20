@@ -106,7 +106,7 @@ yasakia/                           npm workspaces — Apache-2.0
 - Route handlers stay thin: authenticate (`requireUser` / `requireAdmin`) → validate (zod) → call `lib/` → respond.
   **Every rule that decides access lives in `lib/access.ts` or the domain module** — never inline in a route.
 - **The database pool is `@yasakia/db`'s, and only it**: one pool per process on `globalThis`, `DATABASE_MAX_CONNECTIONS`
-  (default 5 in production, 3 in development, 10 behind a pooler), named connections (`yasakia-web`, `yasakia-listen`, `yasakia-migrate`), `DATABASE_DIRECT_URL` (optional)
+  (default 5, 10 behind a pooler), named connections (`yasakia-web`, `yasakia-listen`, `yasakia-migrate`), `DATABASE_DIRECT_URL` (optional)
   for LISTEN and migrations. Never `new Pool()` in the app. The budget is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 - **Shared UI and platform bricks come from npm, never from a copy** (`@krizaka/*`). A missing generic piece is built
   in krizaka-ui first, released, then adopted. No product word (`yasakia`) goes into a platform brick.

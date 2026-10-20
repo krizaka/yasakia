@@ -72,6 +72,7 @@ const UI = {
     chips: ["En partie", "Les valeurs", "Plus près de chez moi"],
     note: "Elle aime cuisiner et les jeux de mots, c’est un bon début.",
     first: "Salut ! J’ai vu que tu aimes cuisiner. C’est quoi ton plat de réconfort ?",
+    clarify: "Pour être claire : je veux une relation sérieuse et durable, avec quelqu’un qui veut la même chose.",
     signals: ["Écrit à la main", "Incertain", "Probablement généré", "Trop court pour juger"],
     send: "Envoyer",
     photoButton: "Photo",
@@ -90,6 +91,7 @@ const UI = {
     chips: ["Partly", "Values", "Closer to me"],
     note: "She likes cooking and puns, a good start.",
     first: "Hi! I saw you like to cook. What is your comfort dish?",
+    clarify: "To be clear: I want a serious, long-term relationship, with someone who wants the same.",
     signals: ["Written by hand", "Uncertain", "Probably generated", "Too short to judge"],
     send: "Send",
     photoButton: "Photo",
@@ -176,6 +178,12 @@ await tick(600);
 await Promise.all([page.waitForURL(new RegExp(`/app/${locale}/?$`)), page.locator('form button[type="submit"]').click()]);
 await tick(1500);
 
+// A blank page for the photos (she signs in once: the same session removes what an earlier take left).
+await page.evaluate(async () => {
+  const list = await fetch("/api/me/photos", { credentials: "same-origin" }).then((r) => r.json()).catch(() => ({ photos: [] }));
+  for (const photo of list.photos ?? []) await fetch(`/api/me/photos/${photo.id}`, { method: "DELETE", credentials: "same-origin" });
+});
+
 // ── 1. the photos: four, two with her face — checked by Orazaka ────────────────────────────────
 step("open the photos");
 await page.goto(`${base}/app/${locale}/photos`);
@@ -214,7 +222,17 @@ for (const line of SAYS) {
   await tick(2200);
 }
 step("wait for the portrait");
-await page.getByText(UI.portrait, { exact: true }).waitFor({ timeout: 120_000 });
+// The agent's understanding is a model's: if it could not shape what she said, she is asked once more, in her own words (up to twice).
+for (let again = 0; again < 3; again++) {
+  const shown = await page.getByText(UI.portrait, { exact: true }).waitFor({ timeout: again === 2 ? 120_000 : 45_000 }).then(() => true, () => false);
+  if (shown) break;
+  if (again === 2) throw new Error("the portrait did not appear");
+  await type(composer, UI.clarify, 18);
+  const more = page.waitForResponse((r) => r.url().endsWith("/api/agent/messages") && r.request().method() === "POST", { timeout: 120_000 });
+  await composer.press("Enter");
+  step("one more message, to be understood");
+  await more;
+}
 step("portrait written");
 await tick(2500);
 
@@ -222,14 +240,23 @@ await tick(2500);
 step("open the first batch");
 await page.goto(`${base}/app/${locale}/batch`);
 await tick(1500);
-const asked = page.waitForResponse((r) => r.url().endsWith("/api/batches") && r.request().method() === "POST", { timeout: 180_000 });
-await page.getByRole("button", { name: UI.start }).click();
-const response = await asked;
-const batch = { status: response.status(), ...(await response.json()) };
+// « The agent is out of reach, try again in a moment » is a real answer (the engine's model sometimes answers off its contract): she tries again.
+let batch;
+for (let attempt = 0; attempt < 3; attempt++) {
+  const asked = page.waitForResponse((r) => r.url().endsWith("/api/batches") && r.request().method() === "POST", { timeout: 180_000 });
+  await page.getByRole("button", { name: UI.start }).click();
+  const response = await asked;
+  batch = { status: response.status(), ...(await response.json().catch(() => ({}))) };
+  if (response.ok() || attempt === 2) break;
+  step(`batch: HTTP ${batch.status}, she tries again`);
+  await tick(12_000);
+  await page.goto(`${base}/app/${locale}/batch`);
+  await tick(1500);
+}
 evidence.batchRuns = batch.batch?.runs ?? [];
 evidence.batchStatus = batch.status;
 step(`batch: HTTP ${batch.status}`);
-if (!response.ok()) throw new Error(`the batch answered ${batch.status}`);
+if (batch.status !== 201) throw new Error(`the batch answered ${batch.status}`);
 await page.getByText(UI.why, { exact: true }).first().waitFor({ timeout: 60_000 });
 await tick(2500);
 step("batch shown");
@@ -290,7 +317,7 @@ await page.getByRole("button", { name: UI.send, exact: true }).filter({ hasText:
 await tick(3000);
 step("photo sent");
 // The photo is held until Orazaka's safety check has looked at it: the page then shows it to both.
-await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/.test(document.body.innerText), null, { timeout: 150_000 }).catch(() => undefined);
+await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/i.test(document.body.innerText), null, { timeout: 150_000 }).catch(() => undefined);
 await tick(2500);
 step("photo approved");
 
@@ -301,7 +328,19 @@ await page.getByRole("button", { name: UI.send, exact: true }).filter({ hasText:
 await tick(5000);
 step("voice message sent");
 evidence.mediaCalls = mediaCalls;
-await page.waitForFunction(() => !/Safety check…|Vérification de sécurité…/.test(document.body.innerText), null, { timeout: Number(flag("voice-wait", 90)) * 1000 }).catch(() => undefined);
+// Until the engine has decided on both media (the API says so), then a moment for the page to show it (the sender is told by the event stream).
+for (let waited = 0; waited < Number(flag("voice-wait", 90)); waited += 3) {
+  const pending = await page.evaluate(async (id) => {
+    const r = await fetch(`/api/intros/${id}`, { credentials: "same-origin" }).then((x) => x.json()).catch(() => null);
+    return (r?.intro?.messages ?? []).filter((m) => m.media && m.media.status === "PENDING").length;
+  }, evidence.introId);
+  if (pending === 0) break;
+  await tick(3000);
+}
+await tick(2000);
+// She comes back to the conversation: opened again, the thread shows what the engine decided (a headless tab pauses the thread's own polling).
+await page.reload({ waitUntil: "load" });
+await tick(4500);
 step("media reviewed");
 await tick(3500);
 

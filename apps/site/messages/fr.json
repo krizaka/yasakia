@@ -137,7 +137,7 @@
     "lead": "Enregistré sur le site de développement, contre le vrai moteur, sur un téléphone : une personne de test ajoute ses photos, que le moteur vérifie, parle à l'agent jusqu'à son portrait, ouvre son premier lot, dit oui, écrit son propre message dans la présentation — avec sa marque d'authenticité — puis envoie une photo et un vocal. Ni animation ni maquette : un seul passage, capturé à 30 images par seconde et non coupé.",
     "transcript": "Les sous-titres en texte",
     "noteTitle": "Lis cet enregistrement honnêtement",
-    "note": "Camille est une personne de test et les gens qu'elle rencontre sont une distribution fictive : personne ici n'existe et Yasakia n'a pas de membres. Ses portraits sont des images générées et sa voix est synthétisée. La distribution fictive répond oui, c'est ainsi qu'on peut montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l'agent sont générés en direct par Orazaka — le modèle n'est pas scripté — donc un passage diffère du suivant. Aucun e-mail n'est montré : l'adresse du compte est remplacée à l'écran par le nom de la personne. Note honnête : le vocal reste « en vérification » à la fin de ce passage — la vérification de sécurité audio seule d'Orazaka ne se termine pas encore sur le moteur de dev (krizaka/orazaka#266) ; l'app le retient, elle ne le montre jamais sans contrôle.",
+    "note": "Camille est une personne de test et les gens qu’elle rencontre sont une distribution fictive : personne ici n’existe et Yasakia n’a pas de membres. Ses portraits sont des images générées et sa voix est synthétisée. La distribution fictive répond oui, c’est ainsi qu’on peut montrer un oui des deux côtés ; une vraie personne répond dans son propre lot. Les mots de l’agent sont générés en direct par Orazaka — le modèle n’est pas scripté — donc un passage diffère du suivant, et l’agent a parfois besoin d’une phrase de plus pour comprendre. Aucun e-mail n’est montré : l’adresse du compte est remplacée à l’écran par le nom de la personne. Les attentes (une photo vérifiée, l’agent qui répond) durent ce qu’elles ont duré ; les clips de la landing les accélèrent, cette page non.",
     "nextTitle": "Quand l’appli sortira",
     "nextText": "Son propre enregistrement, fait sur la vraie application, remplacera ceux-ci. D’ici là : le code est public.",
     "journeyTitle": "Des photos, une conversation, un lot, un oui des deux côtés, une présentation",
@@ -154,7 +154,7 @@
         "intro": "La présentation. Personne n'écrit à sa place : l'agent n'écrit aucune ligne et ne lit jamais la suite.",
         "signal": "Elle écrit son propre message. Une petite marque dit comment il a été écrit — un signal, jamais un verdict, et il peut se tromper.",
         "photo": "Elle envoie une photo. Elle est retenue le temps d'une vérification de sécurité, puis montrée telle quelle : rien n'est coupé, filtré ni retouché.",
-        "voice": "Un vocal suit. Ses mots sont transcrits par le moteur et jugés avant qu'il soit lu ; d'ici là, elle seule le voit."
+        "voice": "Un vocal suit. Le moteur le transcrit et juge ses mots avant qu’il soit lu ; d’ici là, elle seule le voit, puis il est montré tel qu’il a été envoyé."
       }
     }
   },

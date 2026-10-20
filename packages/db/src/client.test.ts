@@ -47,17 +47,17 @@ describe("the database pool", () => {
 
   // yasakia#125: CI runs two development servers on one database (the open one and the sign-up-closed one) and counted
   // 6 web connections against a cap of 5. The default is now per environment, and a bound is instances x pool size.
-  it("has a default per environment: production 5, a pooler in front 10, development and tests 3", async () => {
+  it("has a default per environment: production 5, a pooler in front 10, development and tests 5", async () => {
     const { poolSize, DEFAULT_POOL_SIZE } = await freshModule();
-    expect(DEFAULT_POOL_SIZE).toEqual({ production: 5, pooled: 10, development: 3 });
+    expect(DEFAULT_POOL_SIZE).toEqual({ production: 5, pooled: 10, development: 5 });
     expect(poolSize(undefined, { NODE_ENV: "production" })).toBe(5);
     expect(poolSize(undefined, { NODE_ENV: "production", DATABASE_DIRECT_URL: "postgresql://direct" })).toBe(10);
-    expect(poolSize(undefined, { NODE_ENV: "development" })).toBe(3);
-    expect(poolSize(undefined, { NODE_ENV: "test" })).toBe(3);
-    expect(poolSize(undefined, {})).toBe(3);
+    expect(poolSize(undefined, { NODE_ENV: "development" })).toBe(5);
+    expect(poolSize(undefined, { NODE_ENV: "test" })).toBe(5);
+    expect(poolSize(undefined, {})).toBe(5);
     // A pooler never overrides an explicit value, and development never uses the pooled default.
     expect(poolSize("4", { NODE_ENV: "production", DATABASE_DIRECT_URL: "postgresql://direct" })).toBe(4);
-    expect(poolSize(undefined, { NODE_ENV: "development", DATABASE_DIRECT_URL: "postgresql://direct" })).toBe(3);
+    expect(poolSize(undefined, { NODE_ENV: "development", DATABASE_DIRECT_URL: "postgresql://direct" })).toBe(5);
   });
 
   it("budgets connections: instances x pool size, plus one LISTEN per instance", async () => {
