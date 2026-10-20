@@ -156,5 +156,9 @@ jobs:
           APP_URL: http://localhost:3000
           CLOSED_URL: http://localhost:3101
           ORAZAKA_STUB_URL: http://127.0.0.1:4599
+      - name: Console crawl — every console page at 390/768/1280 px, dark and light, English and French (no overflow, no error)
+        run: |
+          npx playwright-core install --with-deps chromium
+          node scripts/check-console.mjs --base http://localhost:3000
       - if: failure()
         run: tail -200 web.log
