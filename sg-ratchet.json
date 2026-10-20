@@ -14,6 +14,6 @@
     "no-hand-ms-one-hour": 0,
     "no-ts-enum": 0,
     "no-types-at-package-root": 0,
-    "no-unjustified-numeric-export": 18
+    "no-unjustified-numeric-export": 17
   }
 }
