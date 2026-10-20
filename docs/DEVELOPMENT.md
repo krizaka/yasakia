@@ -63,6 +63,13 @@ Never edit an applied migration: fix forward. Migration `0000_extensions` (hand-
   `AI_ENGINE_*`); it records a video and writes `evidence.json` with the engine's run ids. Before a recording: `npm run db:qa-reset`
   (the QA person's agent starts from a blank page — QA addresses only, never production) and `npm run db:qa-personas` (the
   fictional Montréal cast, `packages/db/personas/montreal.json`, embedded by the real engine — local and dev databases only).
+- **The real take** (`node scripts/record-take.mjs`, then `node scripts/take-clips.mjs <dir>`): Camille's whole run on dev as a
+  **phone** recording — photos checked by the engine, conversation, batch, a message typed by hand (the authenticity mark), a photo
+  and a voice message — captured with the DevTools screencast (frames with their own timestamps, resampled to a constant 30 fps)
+  and cut into the landing's hero loop and one clip per step. It needs fictitious assets (generated portraits, a synthesised voice)
+  in `--assets`, the QA person reset and without photos, and the pack workers connected to the dev broker (`orazaka-packs`:
+  `message-authenticity`, `profile-photo-check`, `media-safety`). The clips go to Bunny (`scripts/cdn-assets.mjs` of krizaka-com),
+  their hashes into `apps/site/lib/media.ts`.
 
 ## Rules a change keeps
 
