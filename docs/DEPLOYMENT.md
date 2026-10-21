@@ -36,6 +36,7 @@ refuses to start without it (`assertProductionConfig`, which also checks every v
 | Variable | Production | Secret | Default | What it does |
 | :--- | :---: | :---: | :--- | :--- |
 | `NEXT_PUBLIC_APP_URL` *(build)* | ✓ |  | `http://localhost:3000` | Public origin of the API: signed upload URLs and local media URLs are built on it. |
+| `APP_DEV_HOST` | — |  |  | The development address (dev.yasakia.com): pages go to www.yasakia.com with a 308, the API and /.well-known keep serving there, noindex (lib/indexing.ts, epic krizaka/.github#119). |
 | `APP_ADMIN_HOST` | — |  |  | The host of the administration console (admin.yasakia.com): the same deployment answers it through host-based ingress; there only the administration exists, elsewhere it does not (404). Unset: both at one address (local development). |
 | `APP_IOS_TEAM_ID` | — |  |  | The Apple Team ID of yasakia-mobile: `/.well-known/apple-app-site-association` is served only when it is set (universal links, krizaka/.github#81). |
 | `APP_ANDROID_CERT_SHA256` | — |  |  | The SHA-256 signing fingerprints of the Android app (EAS and Play): `/.well-known/assetlinks.json` is served only when they are set (App Links). |
