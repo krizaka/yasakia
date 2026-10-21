@@ -1,7 +1,7 @@
 /** Addresses of the site — structure, not words (the words are in messages/). */
 export const KRIZAKA_URL = "https://www.krizaka.com";
 export const REPO_URL = "https://github.com/krizaka/yasakia";
-export const SITE_URL = "https://dev.yasakia.com";
+export const SITE_URL = "https://www.yasakia.com";
 /** The version of this build: package.json + the short commit, injected by next.config.mjs. */
 export const APP_VERSION = process.env.APP_VERSION ?? "dev";
 /** The @krizaka/ui version this build runs on (next.config.mjs). */

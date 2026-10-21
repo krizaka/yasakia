@@ -44,6 +44,7 @@ const v = (name: string, context: EnvContext, need: EnvNeed, schema: z.ZodTypeAn
 
 export const ENV_VARS: readonly EnvVar[] = [
   v("NEXT_PUBLIC_APP_URL", "APP", "required", url, "Public origin of the API: signed upload URLs and local media URLs are built on it.", { build: true, default: "http://localhost:3000" }),
+  v("APP_DEV_HOST", "APP", "optional", text, "The development address (dev.yasakia.com): pages go to www.yasakia.com with a 308, the API and /.well-known keep serving there, noindex (lib/indexing.ts, epic krizaka/.github#119)."),
   v("APP_ADMIN_HOST", "APP", "optional", text, "The host of the administration console (admin.yasakia.com): the same deployment answers it through host-based ingress; there only the administration exists, elsewhere it does not (404). Unset: both at one address (local development)."),
   v("APP_IOS_TEAM_ID", "APP", "optional", z.string().regex(/^[A-Z0-9]{10}$/, "an Apple Team ID: 10 capitals or digits"), "The Apple Team ID of yasakia-mobile: `/.well-known/apple-app-site-association` is served only when it is set (universal links, krizaka/.github#81)."),
   v("APP_ANDROID_CERT_SHA256", "APP", "optional", z.string().regex(/^([0-9A-F]{2}(:[0-9A-F]{2}){31})(\s*,\s*[0-9A-F]{2}(:[0-9A-F]{2}){31})*$/, "SHA-256 fingerprints AB:CD:…, comma-separated"), "The SHA-256 signing fingerprints of the Android app (EAS and Play): `/.well-known/assetlinks.json` is served only when they are set (App Links)."),

@@ -10,7 +10,7 @@ if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 const packageVersion = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")).version;
 // package.json's version + the short commit DigitalOcean passes at build (APP_COMMIT_SHA), as the static site shows it.
 const appVersion = process.env.APP_COMMIT_SHA ? `${packageVersion}+${process.env.APP_COMMIT_SHA.slice(0, 7)}` : packageVersion;
-// dev.yasakia.com serves the static site at / and this app under /app (NEXT_PUBLIC_APP_BASE_PATH=/app); empty elsewhere.
+// www.yasakia.com serves the static site at / and this app under /app (NEXT_PUBLIC_APP_BASE_PATH=/app); empty elsewhere.
 const basePath = process.env.NEXT_PUBLIC_APP_BASE_PATH?.trim() || "";
 const production = process.env.NODE_ENV === "production";
 
@@ -93,6 +93,8 @@ const nextConfig = {
       { source: "/:path*", headers: securityHeaders },
       // The administration host is never indexed (the landing, on the other host, is).
       { source: "/:path*", has: [{ type: "host", value: "admin\\..*" }], headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+      // The development host keeps only the API and /.well-known (the proxy sends its pages to www): never indexed (epic krizaka/.github#119).
+      { source: "/:path*", has: [{ type: "host", value: "dev\\..*" }], headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
     ];
   },
 };

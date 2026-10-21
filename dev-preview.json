@@ -5,7 +5,7 @@
   "index": "on",
   "criteria": {
     "site.healthy": {
-      "evidence": "https://dev.yasakia.com/api/healthz",
+      "evidence": "https://www.yasakia.com/api/healthz",
       "checked": "2026-10-16"
     },
     "site.signup-closed": {

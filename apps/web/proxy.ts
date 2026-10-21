@@ -1,7 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { allowedOnAdminHost, hostKind, isAdminPath, isLandingPath } from "@/lib/host";
-import { indexable } from "@/lib/indexing";
+import { devRedirect, indexableOn, isDevHost } from "@/lib/indexing";
+import { PRODUCT_URL } from "@/lib/site";
 
 /**
  * Four address spaces in one app. The public landing owns `/`, `/fr`, `/how-it-works`, `/demo` (static pages copied into
@@ -33,11 +34,26 @@ function remember(request: NextRequest, locale: string) {
 export const NOINDEX_HEADER = "noindex, nofollow, noarchive";
 export const CLOSED_ROBOTS = "User-agent: *\nDisallow: /\n";
 
+const hostOf = (request: NextRequest) => (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(",")[0]!.trim();
+
 export function proxy(request: NextRequest) {
+  const host = hostOf(request);
+  // dev.yasakia.com (APP_DEV_HOST): robots.txt closes everything; a page goes to www (308); the API, /.well-known keep
+  // serving - all noindex (epic krizaka/.github#119). Nothing below runs for it.
+  if (isDevHost(host)) {
+    const { pathname, search } = request.nextUrl;
+    const closed = (r: NextResponse) => {
+      r.headers.set("x-robots-tag", NOINDEX_HEADER);
+      return r;
+    };
+    if (pathname === "/robots.txt") return closed(new NextResponse(CLOSED_ROBOTS, { headers: { "Content-Type": "text/plain" } }));
+    const to = devRedirect(request.method, pathname, search, process.env.NEXT_PUBLIC_APP_URL ?? PRODUCT_URL);
+    return closed(to ? NextResponse.redirect(to, 308) : NextResponse.next());
+  }
   const response = route(request);
   // A route that answers nothing (`undefined`: let it through) still carries the header.
   const out = response ?? NextResponse.next();
-  if (hostKind(request.headers) === "admin" || !indexable()) out.headers.set("x-robots-tag", NOINDEX_HEADER);
+  if (hostKind(request.headers) === "admin" || !indexableOn(host)) out.headers.set("x-robots-tag", NOINDEX_HEADER);
   return out;
 }
 
@@ -45,8 +61,8 @@ function route(request: NextRequest): NextResponse | undefined {
   const { pathname } = request.nextUrl;
   const kind = hostKind(request.headers);
   // Closed deployment: robots.txt disallows everything and advertises no sitemap; the sitemap does not exist.
-  if (pathname === "/robots.txt" && (kind === "admin" || !indexable())) return new NextResponse(CLOSED_ROBOTS, { headers: { "Content-Type": "text/plain" } });
-  if (pathname === "/sitemap.xml" && (kind === "admin" || !indexable())) return notFound();
+  if (pathname === "/robots.txt" && (kind === "admin" || !indexableOn(hostOf(request)))) return new NextResponse(CLOSED_ROBOTS, { headers: { "Content-Type": "text/plain" } });
+  if (pathname === "/sitemap.xml" && (kind === "admin" || !indexableOn(hostOf(request)))) return notFound();
   if (pathname === "/robots.txt" || pathname === "/sitemap.xml") return;
   if (kind === "app" && isAdminPath(pathname)) return notFound();
   if (kind === "admin") {
@@ -70,5 +86,5 @@ function route(request: NextRequest): NextResponse | undefined {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/robots.txt", "/sitemap.xml", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  matcher: ["/api/:path*", "/.well-known/:path*", "/robots.txt", "/sitemap.xml", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };
