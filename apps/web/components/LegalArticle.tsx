@@ -42,7 +42,7 @@ export function LegalArticle({ locale, page }: { locale: Locale; page: "privacy"
       </PageHero>
       <Page size="narrow" className="pb-8">
         <nav aria-labelledby="toc-title" className="mb-10 rounded-2xl border border-border-default bg-surface-1 p-5">
-          <p id="toc-title" className="mb-2 text-xs font-semibold uppercase tracking-widest text-fg-accent">
+          <p id="toc-title" className="mb-2 text-xs font-semibold text-fg-accent">
             {t("chrome.onThisPage")}
           </p>
           <ol className="grid gap-1 text-sm sm:grid-cols-2">

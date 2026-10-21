@@ -19,7 +19,7 @@ export function AuthenticityMark({ signal }: { signal: AuthenticitySignal | null
   const label = say(`intros.authenticity.${key}.label`);
   return (
     <Tooltip content={<span className="block max-w-64 text-sm">{say(`intros.authenticity.${key}.hint`)} {say("intros.authenticity.canBeWrong")}</span>}>
-      <button type="button" className="inline-flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2" aria-label={`${label}. ${say(`intros.authenticity.${key}.hint`)} ${say("intros.authenticity.canBeWrong")}`}>
+      <button type="button" className="inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2" aria-label={`${label}. ${say(`intros.authenticity.${key}.hint`)} ${say("intros.authenticity.canBeWrong")}`}>
         <Badge tone={signal ? TONE[signal] : "neutral"} size="sm" dot={signal === "HAND" || signal === "LIKELY_GENERATED"}>
           {label}
         </Badge>

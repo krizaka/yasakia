@@ -31,7 +31,7 @@ export function PageState({
         <span className="flex h-36 w-36 items-center justify-center rounded-full border border-accent/20 bg-accent/10 shadow-lg sm:h-40 sm:w-40" aria-hidden>
           <Mascot bird={bird} mood={mood} size={112} />
         </span>
-        <p className="mt-6 text-[10px] font-bold uppercase tracking-widest text-fg-accent">{eyebrow}</p>
+        <p className="mt-6 text-[10px] font-bold text-fg-accent">{eyebrow}</p>
         <h1 className="mt-2 font-display text-3xl font-black tracking-tight text-fg text-balance sm:text-5xl">{title}</h1>
         <p className="mt-3 max-w-md text-sm text-fg-secondary text-pretty sm:text-base">{body}</p>
         <div className="mt-7 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">{actions}</div>

@@ -35,7 +35,7 @@ export function ServerError({ locale, digest, retry, as }: { locale?: string; di
       }
       reference={
         digest ? (
-          <p className="inline-flex items-center gap-2 rounded-full border border-border-default bg-surface-1/80 px-4 py-1 text-xs">
+          <p className="inline-flex items-center gap-2 rounded-sm border border-border-default bg-surface-1/80 px-4 py-1 text-xs">
             <span className="text-fg-muted">{t("reference")}</span>
             <code className="select-all font-mono text-fg">{digest}</code>
           </p>

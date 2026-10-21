@@ -7,6 +7,7 @@
       gradient — in both themes. No product token is needed yet: the roles express everything these pages draw. */
 @import "tailwindcss";
 @import "@krizaka/tailwind";
+@import "@krizaka/fonts/css";     /* the Cahier faces (Young Serif, Atkinson Hyperlegible Next, Courier Prime) — krizaka-ui ADR-004 */
 @import "@krizaka/ui/tailwind.css";
 @import "@krizaka/tokens/brands/yasakia.css";
 
