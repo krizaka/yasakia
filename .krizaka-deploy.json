@@ -1,0 +1,8 @@
+{
+  "app": "yasakia-dev",
+  "url": "https://www.yasakia.com",
+  "health": "/api/healthz",
+  "indexing": "on",
+  "spec": "deploy/digitalocean/web.app.yaml",
+  "product": "yasakia"
+}

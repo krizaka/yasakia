@@ -310,7 +310,7 @@ yasakia/                           npm workspaces — Apache-2.0
   URLs: the landing at `/`, `/fr`, `/how-it-works`, `/demo`; the legal pages at `/{en|fr}/{privacy|terms|delete-account}`; the
   console under **`/app/{en|fr}/…`** (`app/app/[locale]/(app)`): 
   `sign-in`, the home (`/`), `account`, and the administration — `admin` (overview), `admin/users` (+ detail), `admin/reports`
-  (moderation), `admin/intros`, `admin/audit`, `admin/health` (health + version) — under AppShell, a DEV badge, never indexed.
+  (moderation), `admin/intros`, `admin/audit`, `admin/health` (health + version) — under AppShell, a DEV badge, dev and admin never indexed.
   Built **only** from our bricks:
   `@krizaka/ui` (`AuthLayout`, `AppShell` — the console template —, `DashboardLayout`, `SettingsLayout`, `DetailLayout`,
   `DataTable` in server mode, `form`, `Dialog`, `ConfirmButton`, `Timeline`), `@krizaka/query` (server state, the live
