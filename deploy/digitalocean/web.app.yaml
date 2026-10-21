@@ -59,8 +59,11 @@ services:
       - { key: DATABASE_MAX_CONNECTIONS, scope: RUN_TIME, value: "2" }
       - { key: AUTH_SESSION_SECRET, scope: RUN_TIME, type: SECRET }
       - { key: DATABASE_ENCRYPTION_KEY, scope: RUN_TIME, type: SECRET }
+      # The live app has these (krizaka-deploy refused an apply that would delete them); the pseudonym key is a SECRET (live value kept).
+      - { key: AI_PSEUDONYM_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: APP_IOS_TEAM_ID, scope: RUN_TIME, value: "27HS8H7A52" }
       - { key: AUTH_SIGNUP_ENABLED, scope: RUN_TIME, value: "false" }
-      - { key: AUTH_ALLOWED_IPS, scope: RUN_TIME, value: "142.122.41.109" }
+      - { key: AUTH_ALLOWED_IPS, scope: RUN_TIME, value: __AUTH_ALLOWED_IPS__ }
       # Photos: Yasakia's own private Bunny storage zone + pull zone (token authentication, signed URLs of 300 s), both `yasakia-dev`.
       - { key: MEDIA_STORAGE_PROVIDER, scope: RUN_TIME, value: bunny }
       - { key: MEDIA_STORAGE_ZONE, scope: RUN_TIME, value: yasakia-dev }
