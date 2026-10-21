@@ -21,7 +21,7 @@ export function SiteHeader({ locale, current }: { locale: Locale; current?: Lega
   const t = translator(locale);
   const here = `/${locale}${current ? `/${LEGAL_PATHS[current]}` : ""}`;
   return (
-    <header className="border-b border-border-default bg-surface-0/80 backdrop-blur-md">
+    <header className="border-b border-border-default bg-surface-0/80 ">
       <Page className="flex min-h-16 flex-wrap items-center gap-x-4 gap-y-2 py-3">
         <a href={PRODUCT_URL} aria-label={t("chrome.brandHome")} className="inline-flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <YasakiaLogo size={30} />
