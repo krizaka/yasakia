@@ -11,15 +11,15 @@
   "dependencies": {
     "@krizaka/i18n": "^0.2.2",
     "@krizaka/icons": "^0.5.1",
-    "@krizaka/tailwind": "^3.44.0",
-    "@krizaka/tokens": "^3.44.0",
-    "@krizaka/ui": "^3.44.0",
+    "@krizaka/tailwind": "^3.45.0",
+    "@krizaka/tokens": "^3.45.0",
+    "@krizaka/ui": "^3.45.0",
     "next": "^16.4.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@krizaka/config": "^0.4.1",
+    "@krizaka/config": "^0.7.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.19.2",
     "@types/react": "^19.2.0",
