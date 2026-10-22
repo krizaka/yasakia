@@ -14,39 +14,32 @@ permissions:
   contents: read
 
 jobs:
+  # Lint, typecheck, unit tests and build + checks run side by side (the org's node-ci, krizaka/.github#151).
+  ci:
+    permissions:
+      contents: read
+    uses: krizaka/.github/.github/workflows/node-ci.yml@d95527618e5b070cff81d248964290b732e31886 # v1.4.0
+    with:
+      parallel: true
+      typecheck-script: typecheck
+      timeout-minutes: 45
+      playwright: chromium
+      after-build: scripts/ci-after-build.sh
+      env: |
+        NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+  # The required check keeps its name; it reads the gate's verdict. Goes when protection requires « ci / CI gate ».
   verify:
     name: Lint · Typecheck · Unit tests · Docs · Build
+    needs: ci
+    if: ${{ always() }}
     runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    env:
+      RESULT: ${{ needs.ci.outputs.result }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Lint (ESLint, package types, i18n check + scan, UI ratchet — lint-ratchet.json)
-        run: npm run lint
-      - name: Typecheck the web app
-        run: npm run typecheck
-      - name: Unit tests
-        run: npm test
-      - name: Docs are generated from this code
-        run: node scripts/generate-docs.mjs --check
-      - name: Universal links / App Links (krizaka/.github#81) — web routes ↔ claimed paths ↔ routes.json
-        run: node scripts/check-app-links.mjs
-      - name: Production build
-        run: npm run build
-        env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
-      # `npm run build` above built the landing (apps/site, a static export) and copied it into apps/web/public (served by the web service).
-      - name: SEO family contract (robots, AI crawlers, sitemap, llms.txt, canonical, JSON-LD back to Krizaka)
-        run: |
-          python3 -m http.server 3000 --directory apps/web/public >/dev/null 2>&1 &
-          sleep 2
-          node scripts/check-seo-family.mjs --base http://localhost:3000 --host https://www.yasakia.com --types WebSite,SoftwareApplication
-          # Responsive guard: no horizontal overflow at 360–1440 px in both themes, on the landing and the pages it links.
-          npx playwright-core install --with-deps chromium
-          npm run check:overflow -- --base http://localhost:3000
+      - run: test "$RESULT" = success
 
   database:
     name: Migrations & seed on PostgreSQL 16 + pgvector
@@ -79,9 +72,15 @@ jobs:
       - name: Development seed loads (twice — idempotent)
         run: npm run db:seed && npm run db:seed
 
+  # Two suites side by side (each on its own PostgreSQL / Valkey / servers): the console crawl, and the scenarios. The required check
+  # « Feature scenarios (API, real sessions, PostgreSQL + pgvector) » is the shim `scenarios-gate` at the end.
   e2e:
-    name: Feature scenarios (API, real sessions, PostgreSQL + pgvector)
+    name: ${{ format('Feature scenarios - {0}', matrix.suite) }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [console-crawl, scenarios]
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -128,9 +127,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --prefer-offline --no-audit --no-fund
       - run: npm run db:migrate
       - name: Realtime bus contract — PostgreSQL and Valkey, two instances each
+        if: ${{ matrix.suite == 'scenarios' }}
         run: npx vitest run apps/web/lib/realtime.integration.test.ts
         env:
           REALTIME_IT: "1"
@@ -148,17 +148,20 @@ jobs:
           node e2e/orazaka-stub.mjs 4599 > orazaka-stub.log 2>&1 &
           npm run dev > web.log 2>&1 &
           (cd apps/web && AUTH_SIGNUP_ENABLED= AI_ENGINE_URL= AI_ENGINE_API_KEY= NEXT_DIST_DIR=.next-closed NEXT_PUBLIC_APP_URL=http://localhost:3101 npx next dev --port 3101 > ../../web-closed.log 2>&1 &)
-          for i in $(seq 1 90); do curl -sf http://localhost:3000/api/healthz && break; sleep 2; done
-          for i in $(seq 1 90); do curl -sf http://localhost:3101/api/healthz && break; sleep 2; done
+          for _ in $(seq 1 90); do curl -sf http://localhost:3000/api/healthz && break; sleep 2; done
+          for _ in $(seq 1 90); do curl -sf http://localhost:3101/api/healthz && break; sleep 2; done
       - name: Console crawl (before the scenarios, which use the QA person's sign-in allowance) — every console page at 390/768/1280 px, dark and light, English and French (no overflow, no error)
+        if: ${{ matrix.suite == 'console-crawl' }}
         run: |
           npx playwright-core install --with-deps chromium
           node scripts/check-console.mjs --base http://localhost:3000
         env:
           AUTH_QA_USER_PASSWORD: ${{ env.QA_USER_PASSWORD }}
       - name: Give the scenarios back their sign-in allowance (the crawl used one)
+        if: ${{ matrix.suite == 'scenarios' }}
         run: psql "$DATABASE_URL" -c "delete from rate_limit_buckets"
       - name: Scenarios
+        if: ${{ matrix.suite == 'scenarios' }}
         run: npm run test:e2e
         env:
           APP_URL: http://localhost:3000
@@ -166,3 +169,16 @@ jobs:
           ORAZAKA_STUB_URL: http://127.0.0.1:4599
       - if: failure()
         run: tail -200 web.log
+
+  # The required check keeps its name; it reads every suite's result.
+  scenarios-gate:
+    name: Feature scenarios (API, real sessions, PostgreSQL + pgvector)
+    needs: e2e
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    env:
+      RESULT: ${{ needs.e2e.result }}
+    steps:
+      - run: test "$RESULT" = success
