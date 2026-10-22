@@ -10,7 +10,7 @@ import { siteJsonLd } from "@/lib/seo";
 /** The `<html>` of every page, in its language and the reader's theme (`kz-theme`: dark · light · system), no flash. */
 export function RootShell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-surface="product" suppressHydrationWarning>
       {/* eslint-disable-next-line @next/next/no-head-element -- the root layout of an App Router page: the theme script runs before the first paint */}
       <head>
         <ThemeScript defaultMode="system" />

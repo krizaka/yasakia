@@ -16,7 +16,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
   const params = useParams<{ locale?: string }>();
   const locale = errorLocale(params?.locale);
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-surface="product" suppressHydrationWarning>
       <head>
         <title>{errorStrings(locale)("serverMetaTitle")}</title>
         <meta name="robots" content="noindex" />
