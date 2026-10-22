@@ -36,7 +36,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const { locale } = await params;
   if (!LOCALES.includes(locale as Locale)) notFound();
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-surface="product" suppressHydrationWarning>
       <head>
         {/* Applies the persisted theme (`kz-theme`: dark · light · system) before the first paint: no flash. */}
         <ThemeScript defaultMode="system" />
