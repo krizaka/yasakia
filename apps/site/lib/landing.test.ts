@@ -122,6 +122,6 @@ describe("the responsive guard", () => {
     expect(script).toContain("export const WIDTHS = [360, 390, 430, 768, 1024, 1440]");
     expect(script).toContain('["dark", "light"]');
     expect(JSON.parse(readFileSync(path.join(ROOT, "../../package.json"), "utf8")).scripts["check:overflow"]).toBe("node scripts/check-overflow.mjs");
-    expect(readFileSync(path.join(ROOT, "../../.github/workflows/ci.yml"), "utf8")).toContain("check:overflow");
+    expect(readFileSync(path.join(ROOT, "../../scripts/ci-after-build.sh"), "utf8")).toContain("check:overflow");
   });
 });
