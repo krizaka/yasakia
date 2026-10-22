@@ -9,6 +9,19 @@
     "palette": 0,
     "light": 0,
     "arbitraryVar": 0,
-    "classNameTemplate": 0
-  }
+    "classNameTemplate": 0,
+    "fetchInClientEffect": 0,
+    "directTanstackImport": 0,
+    "localTableOrForm": 0,
+    "retiredImport": 0,
+    "routeStateSelection": 0
+  },
+  "stackGlobs": [
+    "app/**/*.{js,jsx,mjs,ts,tsx,mts}",
+    "components/**/*.{js,jsx,mjs,ts,tsx,mts}",
+    "src/**/*.{js,jsx,mjs,ts,tsx,mts}",
+    "lib/**/*.{js,jsx,mjs,ts,tsx,mts}",
+    "hooks/**/*.{js,jsx,mjs,ts,tsx,mts}",
+    "features/**/*.{js,jsx,mjs,ts,tsx,mts}"
+  ]
 }
