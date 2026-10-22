@@ -59,6 +59,7 @@
   "author": "Krizaka Core Team",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@krizaka/config": "^0.7.0",
     "@ast-grep/cli": "0.51.0",
     "@krizaka/i18n": "^0.2.2",
     "pg": "^8.12.0",
