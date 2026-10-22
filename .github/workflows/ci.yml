@@ -28,19 +28,6 @@ jobs:
       env: |
         NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-  # The required check keeps its name; it reads the gate's verdict. Goes when protection requires « ci / CI gate ».
-  verify:
-    name: Lint · Typecheck · Unit tests · Docs · Build
-    needs: ci
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    permissions: {}
-    env:
-      RESULT: ${{ needs.ci.outputs.result }}
-    steps:
-      - run: test "$RESULT" = success
-
   database:
     name: Migrations & seed on PostgreSQL 16 + pgvector
     runs-on: ubuntu-latest
